@@ -1,12 +1,12 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Model } from "mongoose";
 
-interface StudentProps {
+export interface StudentProps {
   firstName: string;
   lastName: string;
   email: string;
 }
 
-const studentSchema = new Schema<StudentProps>({
+const studentSchema = new Schema<StudentProps, Model<StudentProps>>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },
