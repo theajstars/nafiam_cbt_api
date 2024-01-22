@@ -28,13 +28,11 @@ export default function (app: Express) {
     const { token } = req.body;
     const v = verifyToken(token);
     if (!v) {
-      console.log("JWT Verification error!");
       res.json({
         status: false,
         statusCode: 401,
       });
     } else {
-      console.log("Verified!", v);
       res.json(<DefaultResponse>{
         status: true,
         statusCode: 200,
@@ -44,14 +42,3 @@ export default function (app: Express) {
     }
   });
 }
-bcrypt.genSalt(10).then(async (salt) => {
-  const hash = await bcrypt.hash("somePass2024", salt);
-  console.log(hash);
-  //   const admin = new Admin({
-  //     email: "atajiboyeo@gmail.com",
-  //     password: hash,
-  //     firstName: "Lord",
-  //     lastName: "Braavo",
-  //   });
-  //   await admin.save();
-});

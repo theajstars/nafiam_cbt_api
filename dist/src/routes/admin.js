@@ -40,14 +40,12 @@ function default_1(app) {
         const { token } = req.body;
         const v = (0, JWT_1.verifyToken)(token);
         if (!v) {
-            console.log("JWT Verification error!");
             res.json({
                 status: false,
                 statusCode: 401,
             });
         }
         else {
-            console.log("Verified!", v);
             res.json({
                 status: true,
                 statusCode: 200,
@@ -58,15 +56,4 @@ function default_1(app) {
     }));
 }
 exports.default = default_1;
-bcryptjs_1.default.genSalt(10).then((salt) => __awaiter(void 0, void 0, void 0, function* () {
-    const hash = yield bcryptjs_1.default.hash("somePass2024", salt);
-    console.log(hash);
-    //   const admin = new Admin({
-    //     email: "atajiboyeo@gmail.com",
-    //     password: hash,
-    //     firstName: "Lord",
-    //     lastName: "Braavo",
-    //   });
-    //   await admin.save();
-}));
 //# sourceMappingURL=admin.js.map
