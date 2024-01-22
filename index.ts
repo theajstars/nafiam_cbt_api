@@ -1,7 +1,7 @@
 import express from "express";
 import { connect } from "mongoose";
 
-import login from "./src/routes/login";
+import login from "./src/routes/student/login";
 
 import { Student, StudentProps } from "./src/models/Student";
 

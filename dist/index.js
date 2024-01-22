@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = require("mongoose");
-const login_1 = __importDefault(require("./src/routes/login"));
+const login_1 = __importDefault(require("./src/routes/student/login"));
 const app = (0, express_1.default)();
 exports.app = app;
 const PORT = 8080;
