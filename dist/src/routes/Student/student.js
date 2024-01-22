@@ -21,4 +21,4 @@ function default_1(app) {
     }));
 }
 exports.default = default_1;
-//# sourceMappingURL=login.js.map
+//# sourceMappingURL=student.js.map

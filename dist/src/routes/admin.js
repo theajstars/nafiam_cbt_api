@@ -8,8 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const basePath = "/student";
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const basePath = "/admin";
 function default_1(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         var _a;
@@ -21,4 +25,8 @@ function default_1(app) {
     }));
 }
 exports.default = default_1;
-//# sourceMappingURL=login.js.map
+bcryptjs_1.default.genSalt(10).then((salt) => __awaiter(void 0, void 0, void 0, function* () {
+    const hash = yield bcryptjs_1.default.hash("somePass2024", salt);
+    console.log(hash);
+}));
+//# sourceMappingURL=admin.js.map
