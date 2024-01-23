@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const Admin_1 = require("../models/Admin");
 const JWT_1 = require("../Lib/JWT");
+const Misc_1 = require("../Lib/Misc");
 const basePath = "/admin";
 function default_1(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -40,10 +41,7 @@ function default_1(app) {
         const { token } = req.body;
         const v = (0, JWT_1.verifyToken)(token);
         if (!v) {
-            res.json({
-                status: false,
-                statusCode: 401,
-            });
+            res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
             res.json({
@@ -52,6 +50,12 @@ function default_1(app) {
                 data: v,
                 message: "Verified successfully!",
             });
+        }
+    }));
+    app.post("/admin/onboard_student", (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const body = req.body;
+        if (!body || !body.token) {
+            res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
 }

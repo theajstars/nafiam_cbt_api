@@ -1,8 +1,10 @@
-import { Express } from "express";
+import { Express, Request } from "express";
 import bcrypt from "bcryptjs";
 import { Admin } from "../models/Admin";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Types";
+import { OnboardStudentRequest } from "../Lib/Request";
+import { UnauthorizedResponseObject } from "../Lib/Misc";
 const basePath = "/admin";
 
 export default function (app: Express) {
@@ -28,10 +30,7 @@ export default function (app: Express) {
     const { token } = req.body;
     const v = verifyToken(token);
     if (!v) {
-      res.json({
-        status: false,
-        statusCode: 401,
-      });
+      res.json(UnauthorizedResponseObject);
     } else {
       res.json(<DefaultResponse>{
         status: true,
@@ -39,6 +38,13 @@ export default function (app: Express) {
         data: v,
         message: "Verified successfully!",
       });
+    }
+  });
+
+  app.post("/admin/onboard_student", async (req, res) => {
+    const body: OnboardStudentRequest = req.body;
+    if (!body || !body.token) {
+      res.json(UnauthorizedResponseObject);
     }
   });
 }
