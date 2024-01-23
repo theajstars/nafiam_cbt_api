@@ -1,6 +1,7 @@
 import { Schema, model, Model } from "mongoose";
 
 export interface StudentProps {
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -13,7 +14,8 @@ export interface StudentProps {
     | "master_warrant_officer";
 }
 
-const studentSchema = new Schema<StudentProps, Model<StudentProps>>({
+const studentSchema = new Schema<StudentProps>({
+  id: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },

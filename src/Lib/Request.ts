@@ -2,7 +2,7 @@ export interface AdminAuthRequiredRequest {
   token: string;
 }
 export interface OnboardStudentRequest extends AdminAuthRequiredRequest {
-  studentID: string;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;

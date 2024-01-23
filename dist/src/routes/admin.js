@@ -16,6 +16,7 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const Admin_1 = require("../models/Admin");
 const JWT_1 = require("../Lib/JWT");
 const Misc_1 = require("../Lib/Misc");
+const Student_1 = require("../models/Student");
 const basePath = "/admin";
 function default_1(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -56,6 +57,19 @@ function default_1(app) {
         const body = req.body;
         if (!body || !body.token) {
             res.json(Misc_1.UnauthorizedResponseObject);
+        }
+        else {
+            const { firstName, lastName, email, rank, id } = body;
+            const student = yield new Student_1.Student({
+                firstName,
+                lastName,
+                email,
+                rank,
+                id,
+            }).save();
+            if (student._id) {
+                res.json((0, Misc_1.returnSuccessResponseObject)("Student created successfully!"));
+            }
         }
     }));
 }

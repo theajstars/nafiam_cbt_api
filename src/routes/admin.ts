@@ -4,7 +4,11 @@ import { Admin } from "../models/Admin";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Types";
 import { OnboardStudentRequest } from "../Lib/Request";
-import { UnauthorizedResponseObject } from "../Lib/Misc";
+import {
+  returnSuccessResponseObject,
+  UnauthorizedResponseObject,
+} from "../Lib/Misc";
+import { Student } from "../models/Student";
 const basePath = "/admin";
 
 export default function (app: Express) {
@@ -45,6 +49,18 @@ export default function (app: Express) {
     const body: OnboardStudentRequest = req.body;
     if (!body || !body.token) {
       res.json(UnauthorizedResponseObject);
+    } else {
+      const { firstName, lastName, email, rank, id } = body;
+      const student = await new Student({
+        firstName,
+        lastName,
+        email,
+        rank,
+        id,
+      }).save();
+      if (student._id) {
+        res.json(returnSuccessResponseObject("Student created successfully!"));
+      }
     }
   });
 }
