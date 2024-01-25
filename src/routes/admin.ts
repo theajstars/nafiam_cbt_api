@@ -3,7 +3,10 @@ import bcrypt from "bcryptjs";
 import { Admin } from "../models/Admin";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Types";
-import { OnboardStudentRequest } from "../Lib/Request";
+import {
+  AdminAuthRequiredRequest,
+  OnboardStudentRequest,
+} from "../Lib/Request";
 import {
   returnSuccessResponseObject,
   UnauthorizedResponseObject,
@@ -33,7 +36,7 @@ export default function (app: Express) {
   app.post(`${basePath}/verify_token`, async (req, res) => {
     const { token } = req.body;
     const v = verifyToken(token);
-    if (!v) {
+    if (!v || v.user !== "admin") {
       res.json(UnauthorizedResponseObject);
     } else {
       res.json(<DefaultResponse>{
@@ -47,7 +50,8 @@ export default function (app: Express) {
 
   app.post("/admin/onboard_student", async (req, res) => {
     const body: OnboardStudentRequest = req.body;
-    if (!body || !body.token) {
+    const v = verifyToken(body.token);
+    if (!body || !body.token || v.user !== "admin") {
       res.json(UnauthorizedResponseObject);
     } else {
       const { firstName, lastName, email, rank, id } = body;
@@ -59,8 +63,27 @@ export default function (app: Express) {
         id,
       }).save();
       if (student._id) {
-        res.json(returnSuccessResponseObject("Student created successfully!"));
+        res.json(
+          returnSuccessResponseObject("Student created successfully!", 201)
+        );
       }
+    }
+  });
+
+  app.post("/admin/getStudent/:studentID", async (req, res) => {
+    const body: AdminAuthRequiredRequest = req.body;
+
+    const studentID = req.params.studentID;
+    const v = verifyToken(body.token);
+    if (!body || !body.token || v.user !== "admin") {
+      res.json(UnauthorizedResponseObject);
+    } else {
+      const student = await Student.findOne({ id: studentID });
+      res.json(<DefaultResponse>{
+        data: student,
+        status: true,
+        statusCode: student ? 200 : 404,
+      });
     }
   });
 }

@@ -41,7 +41,7 @@ function default_1(app) {
     app.post(`${basePath}/verify_token`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const v = (0, JWT_1.verifyToken)(token);
-        if (!v) {
+        if (!v || v.user !== "admin") {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
@@ -55,7 +55,8 @@ function default_1(app) {
     }));
     app.post("/admin/onboard_student", (req, res) => __awaiter(this, void 0, void 0, function* () {
         const body = req.body;
-        if (!body || !body.token) {
+        const v = (0, JWT_1.verifyToken)(body.token);
+        if (!body || !body.token || v.user !== "admin") {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
@@ -68,8 +69,24 @@ function default_1(app) {
                 id,
             }).save();
             if (student._id) {
-                res.json((0, Misc_1.returnSuccessResponseObject)("Student created successfully!"));
+                res.json((0, Misc_1.returnSuccessResponseObject)("Student created successfully!", 201));
             }
+        }
+    }));
+    app.post("/admin/getStudent/:studentID", (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const body = req.body;
+        const studentID = req.params.studentID;
+        const v = (0, JWT_1.verifyToken)(body.token);
+        if (!body || !body.token || v.user !== "admin") {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+        else {
+            const student = yield Student_1.Student.findOne({ id: studentID });
+            res.json({
+                data: student,
+                status: true,
+                statusCode: student ? 200 : 404,
+            });
         }
     }));
 }

@@ -6,10 +6,13 @@ export const UnauthorizedResponseObject = {
   message: "Unauthorized Request",
 };
 
-export const returnSuccessResponseObject = (message?: string) => {
+export const returnSuccessResponseObject = (
+  message?: string,
+  statusCode?: number
+) => {
   return <DefaultResponse>{
     status: true,
-    statusCode: 200,
+    statusCode: statusCode ?? 200,
     message,
   };
 };

@@ -6,10 +6,10 @@ exports.UnauthorizedResponseObject = {
     statusCode: 401,
     message: "Unauthorized Request",
 };
-const returnSuccessResponseObject = (message) => {
+const returnSuccessResponseObject = (message, statusCode) => {
     return {
         status: true,
-        statusCode: 200,
+        statusCode: statusCode !== null && statusCode !== void 0 ? statusCode : 200,
         message,
     };
 };
