@@ -1,11 +1,13 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { connect } from "mongoose";
-
-import student from "./src/routes/student";
+import bcrypt from "bcryptjs";
 
 import { Student, StudentProps } from "./src/models/Student";
 import admin from "./src/routes/admin";
+import student from "./src/routes/student";
+import lecturer from "./src/routes/lecturer";
+import { Lecturer } from "./src/models/Lecturer";
 
 const app = express();
 app.use(bodyParser({ extended: true }));
@@ -18,6 +20,25 @@ connect(dbConnectString)
     app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
     student(app);
     admin(app);
+    lecturer(app);
+    const genPassword = async () => {
+      const saltRounds = 10;
+
+      bcrypt.genSalt(saltRounds, function (err, salt) {
+        bcrypt.hash("securePassword2024", salt, function (err, hash) {
+          console.log(hash);
+        });
+      });
+    };
+    genPassword();
+    // new Lecturer({
+    //   id: Date.now().toString(),
+    //   firstName: "Lord",
+    //   lastName: "Braavosi",
+    //   email: "me@theajstars.com",
+    //   password: "$2a$10$l.V0HzLVySU5s2MOOZ4PWuydU5MFxIuNmV.CP.Bll2iNx0Ml7lD9S",
+    //   rank: "Air Vice Marshal",
+    // }).save();
   })
   .catch((err) => {
     console.error("Failed to connect to DB", err);

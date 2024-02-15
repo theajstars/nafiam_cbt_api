@@ -8,16 +8,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const Lecturer_1 = require("../models/Lecturer");
 const basePath = "/lecturer";
 function default_1(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        var _a;
         const { id, password } = req.body;
-        res.json({
-            status: true,
-            data: (_a = req.body) !== null && _a !== void 0 ? _a : "undefined",
-        });
+        const lecturer = yield Lecturer_1.Lecturer.findOne({ email: id });
+        if (lecturer) {
+            const isPasswordCorrect = yield bcryptjs_1.default.compare(password, lecturer.password);
+            res.json({
+                status: true,
+                statusCode: isPasswordCorrect ? 200 : 401,
+                admin: isPasswordCorrect ? lecturer : null,
+                token: yield (lecturer.id, "lecturer"),
+            });
+        }
+        else {
+            res.json({
+                status: true,
+                statusCode: 401,
+                message: "Invalid email and password",
+            });
+        }
     }));
 }
 exports.default = default_1;
