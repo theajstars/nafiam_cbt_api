@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
+import cors from "cors";
 import { connect } from "mongoose";
 import bcrypt from "bcryptjs";
 
@@ -10,6 +11,11 @@ import lecturer from "./src/routes/lecturer";
 import { Lecturer } from "./src/models/Lecturer";
 
 const app = express();
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(bodyParser({ extended: true }));
 
 const PORT = 8080;

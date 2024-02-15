@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const cors_1 = __importDefault(require("cors"));
 const mongoose_1 = require("mongoose");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const admin_1 = __importDefault(require("./src/routes/admin"));
@@ -22,6 +23,9 @@ const student_1 = __importDefault(require("./src/routes/student"));
 const lecturer_1 = __importDefault(require("./src/routes/lecturer"));
 const app = (0, express_1.default)();
 exports.app = app;
+app.use((0, cors_1.default)({
+    origin: "*",
+}));
 app.use((0, body_parser_1.default)({ extended: true }));
 const PORT = 8080;
 const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
