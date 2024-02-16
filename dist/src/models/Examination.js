@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Examination = void 0;
+const mongoose_1 = require("mongoose");
+const examinationSchema = new mongoose_1.Schema({
+    id: { type: String, required: true },
+    title: { type: String, required: true },
+    year: { type: String, required: true },
+    course: { type: String, required: true },
+    started: { type: Boolean, required: true },
+    completed: { type: Boolean, required: true },
+});
+const Examination = (0, mongoose_1.model)("Examination", examinationSchema);
+exports.Examination = Examination;
+//# sourceMappingURL=Examination.js.map
