@@ -17,7 +17,7 @@ const Methods_1 = require("../Lib/Methods");
 const basePath = "/examination";
 function default_1(app) {
     app.post(`${basePath}/create`, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, title, year, course } = req.body;
+        const { token, title, year, course, lecturerID } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
         const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
         if (token && lecturer) {
@@ -25,6 +25,7 @@ function default_1(app) {
                 id: (0, Methods_1.generateRandomString)(16),
                 title,
                 year,
+                lecturerID,
                 course,
                 completed: false,
                 started: false,
@@ -44,7 +45,7 @@ function default_1(app) {
         const { id } = (0, JWT_1.verifyToken)(token);
         const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
         if (token && lecturer) {
-            const examinations = yield Examination_1.Examination.find({});
+            const examinations = yield Examination_1.Examination.find({ lecturerID: id });
             res.json((0, Misc_1.returnSuccessResponseObject)("Examination list obtained!", 200, examinations));
         }
         else {

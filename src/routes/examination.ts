@@ -11,7 +11,7 @@ import { generateRandomString } from "../Lib/Methods";
 const basePath = "/examination";
 export default function (app: Express) {
   app.post(`${basePath}/create`, async (req, res) => {
-    const { token, title, year, course } = req.body;
+    const { token, title, year, course, lecturerID } = req.body;
     const { id } = verifyToken(token);
     const lecturer = await Lecturer.findOne({ id });
     if (token && lecturer) {
@@ -19,6 +19,7 @@ export default function (app: Express) {
         id: generateRandomString(16),
         title,
         year,
+        lecturerID,
         course,
         completed: false,
         started: false,
@@ -39,7 +40,7 @@ export default function (app: Express) {
     const { id } = verifyToken(token);
     const lecturer = await Lecturer.findOne({ id });
     if (token && lecturer) {
-      const examinations = await Examination.find({});
+      const examinations = await Examination.find({ lecturerID: id });
       res.json(
         returnSuccessResponseObject(
           "Examination list obtained!",
