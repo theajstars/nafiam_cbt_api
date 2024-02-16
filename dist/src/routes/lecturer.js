@@ -37,6 +37,27 @@ function default_1(app) {
             });
         }
     }));
+    app.post(`${basePath}/profile/get`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id } = (0, JWT_1.verifyToken)(token);
+        const lecturer = yield Lecturer_1.Lecturer.findOne({ id }).select("email firstName lastName id rank");
+        if (lecturer) {
+            console.log(lecturer);
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: lecturer,
+                message: "Profile successfully retrieved!",
+            });
+        }
+        else {
+            res.json({
+                status: true,
+                statusCode: 401,
+                message: "Invalid email and password",
+            });
+        }
+    }));
 }
 exports.default = default_1;
 //# sourceMappingURL=lecturer.js.map

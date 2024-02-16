@@ -30,4 +30,26 @@ export default function (app: Express) {
       });
     }
   });
+  app.post(`${basePath}/profile/get`, async (req, res) => {
+    const { token } = req.body;
+    const { id } = verifyToken(token);
+    const lecturer = await Lecturer.findOne({ id }).select(
+      "email firstName lastName id rank"
+    );
+    if (lecturer) {
+      console.log(lecturer);
+      res.json({
+        status: true,
+        statusCode: 200,
+        data: lecturer,
+        message: "Profile successfully retrieved!",
+      });
+    } else {
+      res.json({
+        status: true,
+        statusCode: 401,
+        message: "Invalid email and password",
+      });
+    }
+  });
 }
