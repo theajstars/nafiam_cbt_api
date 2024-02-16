@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const JWT_1 = require("../Lib/JWT");
 const Lecturer_1 = require("../models/Lecturer");
 const basePath = "/lecturer";
 function default_1(app) {
@@ -24,8 +25,8 @@ function default_1(app) {
             res.json({
                 status: true,
                 statusCode: isPasswordCorrect ? 200 : 401,
-                admin: isPasswordCorrect ? lecturer : null,
-                token: yield (lecturer.id, "lecturer"),
+                message: "Logged In!",
+                token: yield (0, JWT_1.createToken)(lecturer.id, "lecturer"),
             });
         }
         else {

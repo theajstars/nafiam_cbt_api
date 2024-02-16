@@ -15,11 +15,12 @@ export default function (app: Express) {
         password,
         lecturer.password
       );
+
       res.json({
         status: true,
         statusCode: isPasswordCorrect ? 200 : 401,
-        admin: isPasswordCorrect ? lecturer : null,
-        token: await (lecturer.id, "lecturer"),
+        message: "Logged In!",
+        token: await createToken(lecturer.id, "lecturer"),
       });
     } else {
       res.json({
