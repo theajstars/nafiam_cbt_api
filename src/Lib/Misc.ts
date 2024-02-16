@@ -8,11 +8,13 @@ export const UnauthorizedResponseObject = {
 
 export const returnSuccessResponseObject = (
   message?: string,
-  statusCode?: number
+  statusCode?: number,
+  data?: any
 ) => {
   return <DefaultResponse>{
     status: true,
     statusCode: statusCode ?? 200,
     message,
+    data,
   };
 };

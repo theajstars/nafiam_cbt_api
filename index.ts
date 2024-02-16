@@ -8,7 +8,7 @@ import { Student, StudentProps } from "./src/models/Student";
 import admin from "./src/routes/admin";
 import student from "./src/routes/student";
 import lecturer from "./src/routes/lecturer";
-import { Lecturer } from "./src/models/Lecturer";
+import examination from "./src/routes/examination";
 
 const app = express();
 app.use(
@@ -27,6 +27,7 @@ connect(dbConnectString)
     student(app);
     admin(app);
     lecturer(app);
+    examination(app);
     const genPassword = async () => {
       const saltRounds = 10;
 

@@ -8,53 +8,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const JWT_1 = require("../Lib/JWT");
 const Lecturer_1 = require("../models/Lecturer");
-const basePath = "/lecturer";
+const Examination_1 = require("../models/Examination");
+const Misc_1 = require("../Lib/Misc");
+const Methods_1 = require("../Lib/Methods");
+const basePath = "/examination";
 function default_1(app) {
-    app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { id, password } = req.body;
-        const lecturer = yield Lecturer_1.Lecturer.findOne({ email: id });
-        if (lecturer) {
-            const isPasswordCorrect = yield bcryptjs_1.default.compare(password, lecturer.password);
-            res.json({
-                status: true,
-                statusCode: isPasswordCorrect ? 200 : 401,
-                message: "Logged In!",
-                token: yield (0, JWT_1.createToken)(lecturer.id, "lecturer"),
-            });
+    app.post(`${basePath}/create`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, title, year, course } = req.body;
+        const { id } = (0, JWT_1.verifyToken)(token);
+        const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
+        if (token && lecturer) {
+            const examination = yield new Examination_1.Examination({
+                id: (0, Methods_1.generateRandomString)(16),
+                title,
+                year,
+                course,
+                completed: false,
+                started: false,
+            }).save();
+            res.json((0, Misc_1.returnSuccessResponseObject)("Examination created!", 201, examination));
         }
         else {
             res.json({
                 status: true,
                 statusCode: 401,
-                message: "Invalid email and password",
+                message: "Unauthorized",
             });
         }
     }));
-    app.post(`${basePath}/profile/get`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}s/all`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
-        const lecturer = yield Lecturer_1.Lecturer.findOne({ id }).select("email firstName lastName id rank");
-        if (lecturer) {
-            console.log(lecturer);
-            res.json({
-                status: true,
-                statusCode: 200,
-                data: lecturer,
-                message: "Profile successfully retrieved!",
-            });
+        const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
+        if (token && lecturer) {
+            const examinations = yield Examination_1.Examination.find({});
+            res.json((0, Misc_1.returnSuccessResponseObject)("Examination list obtained!", 200, examinations));
         }
         else {
             res.json({
                 status: true,
                 statusCode: 401,
-                message: "Invalid email and password",
+                message: "Unauthorized",
             });
         }
     }));
