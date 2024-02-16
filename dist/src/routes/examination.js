@@ -17,7 +17,7 @@ const Methods_1 = require("../Lib/Methods");
 const basePath = "/examination";
 function default_1(app) {
     app.post(`${basePath}/create`, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, title, year, course, lecturerID } = req.body;
+        const { token, title, year, course } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
         const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
         if (token && lecturer) {
@@ -25,7 +25,7 @@ function default_1(app) {
                 id: (0, Methods_1.generateRandomString)(16),
                 title,
                 year,
-                lecturerID,
+                lecturerID: id,
                 course,
                 completed: false,
                 started: false,
@@ -63,6 +63,27 @@ function default_1(app) {
         if (token && lecturer) {
             const examination = yield Examination_1.Examination.findOne({ id: examinationID });
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination found!", examination === null ? 404 : 200, examination));
+        }
+        else {
+            res.json({
+                status: true,
+                statusCode: 401,
+                message: "Unauthorized",
+            });
+        }
+    }));
+    app.delete(`${basePath}/delete`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID } = req.body;
+        const { id } = (0, JWT_1.verifyToken)(token);
+        const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
+        if (token && lecturer) {
+            const examination = yield Examination_1.Examination.findOneAndDelete({
+                id: examinationID,
+                lecturerID: id,
+            });
+            res.json((0, Misc_1.returnSuccessResponseObject)(examination === null
+                ? "Not Found!"
+                : "Examination deleted successfully!", examination === null ? 404 : 200, examination));
         }
         else {
             res.json({

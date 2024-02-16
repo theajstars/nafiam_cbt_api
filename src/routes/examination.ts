@@ -11,7 +11,7 @@ import { generateRandomString } from "../Lib/Methods";
 const basePath = "/examination";
 export default function (app: Express) {
   app.post(`${basePath}/create`, async (req, res) => {
-    const { token, title, year, course, lecturerID } = req.body;
+    const { token, title, year, course } = req.body;
     const { id } = verifyToken(token);
     const lecturer = await Lecturer.findOne({ id });
     if (token && lecturer) {
@@ -19,7 +19,7 @@ export default function (app: Express) {
         id: generateRandomString(16),
         title,
         year,
-        lecturerID,
+        lecturerID: id,
         course,
         completed: false,
         started: false,
@@ -65,6 +65,32 @@ export default function (app: Express) {
       res.json(
         returnSuccessResponseObject(
           examination === null ? "Not Found!" : "Examination found!",
+          examination === null ? 404 : 200,
+          examination
+        )
+      );
+    } else {
+      res.json({
+        status: true,
+        statusCode: 401,
+        message: "Unauthorized",
+      });
+    }
+  });
+  app.delete(`${basePath}/delete`, async (req, res) => {
+    const { token, examinationID } = req.body;
+    const { id } = verifyToken(token);
+    const lecturer = await Lecturer.findOne({ id });
+    if (token && lecturer) {
+      const examination = await Examination.findOneAndDelete({
+        id: examinationID,
+        lecturerID: id,
+      });
+      res.json(
+        returnSuccessResponseObject(
+          examination === null
+            ? "Not Found!"
+            : "Examination deleted successfully!",
           examination === null ? 404 : 200,
           examination
         )
