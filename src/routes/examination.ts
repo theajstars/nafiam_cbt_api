@@ -55,4 +55,49 @@ export default function (app: Express) {
       });
     }
   });
+  app.post(`${basePath}/get`, async (req, res) => {
+    const { token, examinationID } = req.body;
+    const { id } = verifyToken(token);
+    const lecturer = await Lecturer.findOne({ id });
+    if (token && lecturer) {
+      const examination = await Examination.findOne({ id: examinationID });
+      res.json(
+        returnSuccessResponseObject(
+          examination === null ? "Not Found!" : "Examination found!",
+          examination === null ? 404 : 200,
+          examination
+        )
+      );
+    } else {
+      res.json({
+        status: true,
+        statusCode: 401,
+        message: "Unauthorized",
+      });
+    }
+  });
+  app.post(`${basePath}/edit`, async (req, res) => {
+    const { token, examinationID, questions, title, year, course } = req.body;
+    const { id } = verifyToken(token);
+    const lecturer = await Lecturer.findOne({ id });
+    if (token && lecturer) {
+      const examination = await Examination.findOneAndUpdate(
+        { id: examinationID },
+        { questions, title, year, course }
+      );
+      res.json(
+        returnSuccessResponseObject(
+          examination === null ? "Not Found!" : "Examination updated!",
+          examination === null ? 404 : 201,
+          examination
+        )
+      );
+    } else {
+      res.json({
+        status: true,
+        statusCode: 401,
+        message: "Unauthorized",
+      });
+    }
+  });
 }

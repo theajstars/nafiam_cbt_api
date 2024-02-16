@@ -9,6 +9,7 @@ const examinationSchema = new mongoose_1.Schema({
     course: { type: String, required: true },
     started: { type: Boolean, required: true },
     completed: { type: Boolean, required: true },
+    questions: { type: Array, required: false },
 });
 const Examination = (0, mongoose_1.model)("Examination", examinationSchema);
 exports.Examination = Examination;

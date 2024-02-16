@@ -55,6 +55,38 @@ function default_1(app) {
             });
         }
     }));
+    app.post(`${basePath}/get`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID } = req.body;
+        const { id } = (0, JWT_1.verifyToken)(token);
+        const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
+        if (token && lecturer) {
+            const examination = yield Examination_1.Examination.findOne({ id: examinationID });
+            res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination found!", examination === null ? 404 : 200, examination));
+        }
+        else {
+            res.json({
+                status: true,
+                statusCode: 401,
+                message: "Unauthorized",
+            });
+        }
+    }));
+    app.post(`${basePath}/edit`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID, questions, title, year, course } = req.body;
+        const { id } = (0, JWT_1.verifyToken)(token);
+        const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
+        if (token && lecturer) {
+            const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { questions, title, year, course });
+            res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination updated!", examination === null ? 404 : 201, examination));
+        }
+        else {
+            res.json({
+                status: true,
+                statusCode: 401,
+                message: "Unauthorized",
+            });
+        }
+    }));
 }
 exports.default = default_1;
 //# sourceMappingURL=examination.js.map

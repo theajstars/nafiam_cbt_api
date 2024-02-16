@@ -1,5 +1,17 @@
 import { Schema, Model, model } from "mongoose";
+import { DataTypes } from "sequelize";
 
+export type QuestionOptionProps = {
+  id: string;
+  value: string;
+  label: string;
+};
+export type QuestionProps = {
+  id: string;
+  title: string;
+  options: QuestionOptionProps[];
+  answer: string;
+};
 export interface ExaminationProps {
   id: string;
   title: string;
@@ -7,6 +19,7 @@ export interface ExaminationProps {
   course: string;
   started: boolean;
   completed: boolean;
+  questions: any;
 }
 
 const examinationSchema = new Schema<ExaminationProps, Model<ExaminationProps>>(
@@ -17,6 +30,7 @@ const examinationSchema = new Schema<ExaminationProps, Model<ExaminationProps>>(
     course: { type: String, required: true },
     started: { type: Boolean, required: true },
     completed: { type: Boolean, required: true },
+    questions: { type: Array, required: false },
   }
 );
 
