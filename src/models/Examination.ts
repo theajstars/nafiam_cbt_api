@@ -1,5 +1,4 @@
 import { Schema, Model, model } from "mongoose";
-import { DataTypes } from "sequelize";
 
 export type QuestionOptionProps = {
   id: string;
