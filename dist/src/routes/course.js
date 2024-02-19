@@ -11,16 +11,66 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const JWT_1 = require("../Lib/JWT");
 const Methods_1 = require("../Lib/Methods");
+const Misc_1 = require("../Lib/Misc");
 const Course_1 = require("../models/Course");
 const course_1 = require("../validation/course");
 const basePath = "/course";
 function default_1(app) {
+    app.post(`${basePath}s/all`, course_1.validateGetAllCourses, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (user === "admin") {
+            const course = Course_1.Course.find({});
+            res.json({
+                status: true,
+                statusCode: 201,
+                message: "Course created successfully!",
+                data: course,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}s/lecturer/all`, course_1.validateGetAllCourses, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, lecturerID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (user === "lecturer") {
+            const courses = yield Course_1.Course.find({ lecturerID: lecturerID !== null && lecturerID !== void 0 ? lecturerID : id });
+            res.json({
+                status: true,
+                statusCode: 200,
+                message: "Courses found!",
+                data: courses,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/get`, course_1.validateGetSingleCourseSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, courseID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (user === "lecturer" || user === "admin") {
+            const course = yield Course_1.Course.findOne({ id: courseID });
+            res.json({
+                status: true,
+                statusCode: 200,
+                message: "Course details retrieved!",
+                data: course,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     app.post(`${basePath}/create`, course_1.validateCreateCourse, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { title, code, description, department, token, beans } = req.body;
+        const { title, code, description, department, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (user === "admin" || user === "lecturer") {
             const course = yield new Course_1.Course({
                 id: (0, Methods_1.generateRandomString)(16),
+                lecturerID: id,
                 title,
                 code,
                 description,
