@@ -4,11 +4,11 @@ import cors from "cors";
 import { connect } from "mongoose";
 import bcrypt from "bcryptjs";
 
-import { Student, StudentProps } from "./src/models/Student";
 import admin from "./src/routes/admin";
 import student from "./src/routes/student";
 import lecturer from "./src/routes/lecturer";
 import examination from "./src/routes/examination";
+import course from "./src/routes/course";
 
 const app = express();
 app.use(
@@ -28,6 +28,7 @@ connect(dbConnectString)
     admin(app);
     lecturer(app);
     examination(app);
+    course(app);
     const genPassword = async () => {
       const saltRounds = 10;
 
