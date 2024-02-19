@@ -5,6 +5,7 @@ import { DefaultResponse } from "../Lib/Types";
 import { Course } from "../models/Course";
 
 const basePath = "/course";
+
 export default function (app: Express) {
   app.post(`${basePath}/create`, async (req, res) => {
     const { title, code, description, department, token } = req.body;
