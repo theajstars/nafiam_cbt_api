@@ -8,6 +8,7 @@ import {
   validateCreateCourse,
   validateGetAllCourses,
   validateGetSingleCourseSchema,
+  validateUpdateCourse,
 } from "../validation/course";
 
 const basePath = "/course";
@@ -91,6 +92,29 @@ export default function (app: Express) {
         status: true,
         statusCode: 201,
         message: "Course created successfully!",
+        data: course,
+      });
+    }
+  });
+  app.post(`${basePath}/update`, validateUpdateCourse, async (req, res) => {
+    const { courseID, title, code, description, department, token } = req.body;
+
+    const { id, user } = verifyToken(token);
+
+    if (user === "admin" || user === "lecturer") {
+      const course = await Course.findOneAndUpdate(
+        { id: courseID },
+        {
+          title,
+          code,
+          description,
+          department,
+        }
+      );
+      res.json(<DefaultResponse>{
+        status: true,
+        statusCode: 201,
+        message: "Course details updated successfully!",
         data: course,
       });
     }

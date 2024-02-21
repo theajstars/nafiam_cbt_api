@@ -63,3 +63,29 @@ export const validateGetSingleCourseSchema = (req, res, next) => {
   }
   next();
 };
+
+const updateSchema = Joi.object<
+  CourseProps & { token: string; courseID: string }
+>({
+  courseID: Joi.string().required(),
+  token: Joi.string().required(),
+  code: Joi.string().required(),
+  description: Joi.string().required(),
+  department: Joi.string().required(),
+  title: Joi.string().required(),
+});
+
+export const validateUpdateCourse = (req, res, next) => {
+  const { error } = updateSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  }
+  next();
+};

@@ -84,6 +84,24 @@ function default_1(app) {
             });
         }
     }));
+    app.post(`${basePath}/update`, course_1.validateUpdateCourse, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { courseID, title, code, description, department, token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (user === "admin" || user === "lecturer") {
+            const course = yield Course_1.Course.findOneAndUpdate({ id: courseID }, {
+                title,
+                code,
+                description,
+                department,
+            });
+            res.json({
+                status: true,
+                statusCode: 201,
+                message: "Course details updated successfully!",
+                data: course,
+            });
+        }
+    }));
 }
 exports.default = default_1;
 //# sourceMappingURL=course.js.map
