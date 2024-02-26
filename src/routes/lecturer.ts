@@ -9,6 +9,7 @@ const basePath = "/lecturer";
 export default function (app: Express) {
   app.post(`${basePath}/login`, async (req, res) => {
     const { id, password } = req.body;
+    console.log({ id, password });
     const lecturer = await Lecturer.findOne({ email: id });
     if (lecturer) {
       const isPasswordCorrect = await bcrypt.compare(

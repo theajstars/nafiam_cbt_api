@@ -9,6 +9,7 @@ import student from "./src/routes/student";
 import lecturer from "./src/routes/lecturer";
 import examination from "./src/routes/examination";
 import course from "./src/routes/course";
+import { Lecturer } from "./src/models/Lecturer";
 
 const app = express();
 app.use(
