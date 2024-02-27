@@ -1,5 +1,6 @@
 import Joi from "@hapi/joi";
 import { CourseProps } from "../models/Course";
+import { MaterialProps } from "../models/Material";
 
 const createSchema = Joi.object<CourseProps & { token: string }>({
   token: Joi.string().required(),
@@ -77,6 +78,33 @@ const updateSchema = Joi.object<
 
 export const validateUpdateCourse = (req, res, next) => {
   const { error } = updateSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  }
+  next();
+};
+
+const createCourseMaterialSchema = Joi.object<
+  MaterialProps & { token: string }
+>({
+  courseID: Joi.string().required(),
+  token: Joi.string().required(),
+  title: Joi.string().required(),
+  description: Joi.string().required(),
+  type: Joi.string().required(),
+  category: Joi.string().required(),
+  file: Joi.string().required(),
+});
+
+export const validateCreateCourseMaterial = (req, res, next) => {
+  const { error } = createCourseMaterialSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {
       return e.message;
