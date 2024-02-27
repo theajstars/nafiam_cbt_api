@@ -6,10 +6,12 @@ import { DefaultResponse } from "../Lib/Responses";
 import { Course } from "../models/Course";
 import {
   validateCreateCourse,
+  validateCreateCourseMaterial,
   validateGetAllCourses,
   validateGetSingleCourseSchema,
   validateUpdateCourse,
 } from "../validation/course";
+import { Material } from "../models/Material";
 
 const basePath = "/course";
 
@@ -119,4 +121,33 @@ export default function (app: Express) {
       });
     }
   });
+
+  app.post(
+    `${basePath}/material/create`,
+    validateCreateCourseMaterial,
+    async (req, res) => {
+      const { courseID, token, title, description, type, category, file } =
+        req.body;
+
+      const { id, user } = verifyToken(token);
+
+      if (user === "admin" || user === "lecturer") {
+        const courseMaterial = await new Material({
+          id: generateRandomString(16),
+          courseID,
+          title,
+          description,
+          type,
+          category,
+          file,
+        }).save();
+        res.json(<DefaultResponse>{
+          status: true,
+          statusCode: 201,
+          message: "Course Material uploaded successfully!",
+          data: courseMaterial,
+        });
+      }
+    }
+  );
 }
