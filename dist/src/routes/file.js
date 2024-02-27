@@ -13,10 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const multer_1 = __importDefault(require("multer"));
-const url_1 = __importDefault(require("url"));
+const cloudinary_1 = __importDefault(require("cloudinary"));
 const File_1 = require("../models/File");
 const Methods_1 = require("../Lib/Methods");
 const basePath = "/file";
+const CLOUDINARY_URL = "cloudinary://897745466481853:clC9-fOu0VrHXtKNEfYDggqSeUY@theajstars";
+const cloudinary = cloudinary_1.default.v2;
+cloudinary.config({
+    cloud_name: "theajstars",
+    api_key: "897745466481853",
+    api_secret: "clC9-fOu0VrHXtKNEfYDggqSeUY",
+});
 const storage = multer_1.default.diskStorage({
     destination: (req, file, callback) => {
         callback(null, "./src/files");
@@ -27,21 +34,46 @@ const storage = multer_1.default.diskStorage({
 });
 const upload = (0, multer_1.default)({ storage });
 function default_1(app) {
+    // app.post(`${basePath}/upload`, upload.single("file"), async (req, res) => {
+    //   const { token } = req.body;
+    //   const file = await new File({
+    //     id: generateRandomString(32),
+    //     path: req.file.path,
+    //     name: req.file.filename,
+    //     timestamp: Date.now(),
+    //   }).save();
+    //   res.json({
+    //     token,
+    //     data: {
+    //       file,
+    //       sack: url.fileURLToPath(url.pathToFileURL(req.file.path)),
+    //     },
+    //   });
+    // });
     app.post(`${basePath}/upload`, upload.single("file"), (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token } = req.body;
-        const file = yield new File_1.File({
-            id: (0, Methods_1.generateRandomString)(32),
-            path: req.file.path,
-            name: req.file.filename,
-            timestamp: Date.now(),
-        }).save();
-        res.json({
-            token,
-            data: {
-                file,
-                sack: url_1.default.fileURLToPath(url_1.default.pathToFileURL(req.file.path)),
-            },
-        });
+        cloudinary.uploader.upload(req.file.path, (err, result) => __awaiter(this, void 0, void 0, function* () {
+            if (err) {
+                res.json({
+                    statusCode: 401,
+                    status: true,
+                    message: "An error occurred while uploading files",
+                });
+            }
+            else {
+                const file = yield new File_1.File({
+                    id: (0, Methods_1.generateRandomString)(32),
+                    path: result.url,
+                    timestamp: Date.now(),
+                    name: result.original_filename,
+                }).save();
+                res.json({
+                    statusCode: 201,
+                    status: true,
+                    message: "File Uploaded!",
+                    file,
+                });
+            }
+        }));
     }));
     app.get(`${basePath}s/:file`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         console.log(req.params.file);
