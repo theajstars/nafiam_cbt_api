@@ -23,6 +23,7 @@ const student_1 = __importDefault(require("./src/routes/student"));
 const lecturer_1 = __importDefault(require("./src/routes/lecturer"));
 const examination_1 = __importDefault(require("./src/routes/examination"));
 const course_1 = __importDefault(require("./src/routes/course"));
+const file_1 = __importDefault(require("./src/routes/file"));
 const app = (0, express_1.default)();
 exports.app = app;
 app.use((0, cors_1.default)({
@@ -39,6 +40,7 @@ const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
     (0, lecturer_1.default)(app);
     (0, examination_1.default)(app);
     (0, course_1.default)(app);
+    (0, file_1.default)(app);
     const genPassword = () => __awaiter(void 0, void 0, void 0, function* () {
         const saltRounds = 10;
         bcryptjs_1.default.genSalt(saltRounds, function (err, salt) {

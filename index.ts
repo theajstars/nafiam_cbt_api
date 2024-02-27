@@ -10,6 +10,7 @@ import lecturer from "./src/routes/lecturer";
 import examination from "./src/routes/examination";
 import course from "./src/routes/course";
 import { Lecturer } from "./src/models/Lecturer";
+import file from "./src/routes/file";
 
 const app = express();
 app.use(
@@ -30,6 +31,7 @@ connect(dbConnectString)
     lecturer(app);
     examination(app);
     course(app);
+    file(app);
     const genPassword = async () => {
       const saltRounds = 10;
 
