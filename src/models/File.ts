@@ -1,21 +1,19 @@
 import { Schema, Model, model } from "mongoose";
 
-export interface AdminProps {
+export interface FileProps {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
+  path: string;
+  name: string;
+  timestamp: string;
 }
 
-const adminSchema = new Schema<AdminProps, Model<AdminProps>>({
+const fileSchema = new Schema<FileProps, Model<FileProps>>({
   id: { type: String, required: true },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  email: { type: String, required: true },
-  password: { type: String, required: true },
+  path: { type: String, required: true },
+  name: { type: String, required: true },
+  timestamp: { type: String, required: true },
 });
 
-const Admin = model<AdminProps>("Admin", adminSchema);
+const File = model<FileProps>("File", fileSchema);
 
-export { Admin };
+export { File };

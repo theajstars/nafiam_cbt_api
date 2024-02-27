@@ -13,7 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const multer_1 = __importDefault(require("multer"));
-const fs_1 = __importDefault(require("fs"));
+const url_1 = __importDefault(require("url"));
+const File_1 = require("../models/File");
+const Methods_1 = require("../Lib/Methods");
 const basePath = "/file";
 const storage = multer_1.default.diskStorage({
     destination: (req, file, callback) => {
@@ -27,25 +29,22 @@ const upload = (0, multer_1.default)({ storage });
 function default_1(app) {
     app.post(`${basePath}/upload`, upload.single("file"), (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
+        const file = yield new File_1.File({
+            id: (0, Methods_1.generateRandomString)(32),
+            path: req.file.path,
+            name: req.file.filename,
+            timestamp: Date.now(),
+        }).save();
         res.json({
             token,
-            body: req.file,
+            data: {
+                file,
+                sack: url_1.default.fileURLToPath(url_1.default.pathToFileURL(req.file.path)),
+            },
         });
     }));
     app.get(`${basePath}s/:file`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         console.log(req.params.file);
-        fs_1.default.readFile(`./src/files/${req.params.file}`, (err, file) => {
-            if (err) {
-                res.json({
-                    error: err,
-                });
-            }
-            else {
-                res.json({
-                    file,
-                });
-            }
-        });
     }));
 }
 exports.default = default_1;

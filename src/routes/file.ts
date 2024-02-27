@@ -1,6 +1,9 @@
 import { Express, Request } from "express";
 import multer from "multer";
-import Fs from "fs";
+import fileUrl from "file-url";
+import url from "url";
+import { File } from "../models/File";
+import { generateRandomString } from "../Lib/Methods";
 
 const basePath = "/file";
 const storage = multer.diskStorage({
@@ -16,23 +19,21 @@ export default function (app: Express) {
   app.post(`${basePath}/upload`, upload.single("file"), async (req, res) => {
     const { token } = req.body;
 
+    const file = await new File({
+      id: generateRandomString(32),
+      path: req.file.path,
+      name: req.file.filename,
+      timestamp: Date.now(),
+    }).save();
     res.json({
       token,
-      body: req.file,
+      data: {
+        file,
+        sack: url.fileURLToPath(url.pathToFileURL(req.file.path)),
+      },
     });
   });
   app.get(`${basePath}s/:file`, async (req, res) => {
     console.log(req.params.file);
-    Fs.readFile(`./src/files/${req.params.file}`, (err, file) => {
-      if (err) {
-        res.json({
-          error: err,
-        });
-      } else {
-        res.json({
-          file,
-        });
-      }
-    });
   });
 }
