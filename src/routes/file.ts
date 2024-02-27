@@ -4,7 +4,7 @@ import Cloudinary from "cloudinary";
 import url from "url";
 import { File } from "../models/File";
 import { generateRandomString } from "../Lib/Methods";
-import { DefaultResponse } from "../Lib/Types";
+import { DefaultResponse } from "../Lib/Responses";
 
 const basePath = "/file";
 const CLOUDINARY_URL =

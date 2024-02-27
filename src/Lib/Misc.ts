@@ -1,4 +1,4 @@
-import { DefaultResponse } from "./Types";
+import { DefaultResponse } from "./Responses";
 
 export const UnauthorizedResponseObject = {
   status: true,

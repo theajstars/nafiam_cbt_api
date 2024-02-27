@@ -2,7 +2,7 @@ import { Express } from "express";
 import bcrypt from "bcryptjs";
 
 import { createToken, verifyToken } from "../Lib/JWT";
-import { DefaultResponse } from "../Lib/Types";
+import { DefaultResponse } from "../Lib/Responses";
 
 import { Lecturer } from "../models/Lecturer";
 const basePath = "/lecturer";

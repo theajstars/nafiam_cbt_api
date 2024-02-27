@@ -2,7 +2,7 @@ import { Express, Request } from "express";
 import bcrypt from "bcryptjs";
 import { Admin } from "../models/Admin";
 import { createToken, verifyToken } from "../Lib/JWT";
-import { DefaultResponse } from "../Lib/Types";
+import { DefaultResponse } from "../Lib/Responses";
 import {
   AdminAuthRequiredRequest,
   OnboardStudentRequest,

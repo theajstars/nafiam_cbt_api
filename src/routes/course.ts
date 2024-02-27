@@ -2,7 +2,7 @@ import { Express } from "express";
 import { verifyToken } from "../Lib/JWT";
 import { generateRandomString } from "../Lib/Methods";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
-import { DefaultResponse } from "../Lib/Types";
+import { DefaultResponse } from "../Lib/Responses";
 import { Course } from "../models/Course";
 import {
   validateCreateCourse,
