@@ -7,6 +7,7 @@ import { Course } from "../models/Course";
 import {
   validateCreateCourse,
   validateCreateCourseMaterial,
+  validateGetAllCourseMaterials,
   validateGetAllCourses,
   validateGetSingleCourseSchema,
   validateUpdateCourse,
@@ -147,6 +148,30 @@ export default function (app: Express) {
           message: "Course Material uploaded successfully!",
           data: courseMaterial,
         });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+
+  app.post(
+    `${basePath}/materials/get`,
+    validateGetAllCourseMaterials,
+    async (req, res) => {
+      const { courseID, token } = req.body;
+
+      const { id, user } = verifyToken(token);
+
+      if (user === "admin" || user === "lecturer") {
+        const materials = await Material.find({ courseID });
+        res.json(<DefaultResponse>{
+          status: true,
+          statusCode: 200,
+          message: "Found materials!",
+          data: materials,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
       }
     }
   );

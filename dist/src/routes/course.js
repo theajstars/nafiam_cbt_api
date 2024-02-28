@@ -123,6 +123,25 @@ function default_1(app) {
                 data: courseMaterial,
             });
         }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/materials/get`, course_1.validateGetAllCourseMaterials, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { courseID, token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (user === "admin" || user === "lecturer") {
+            const materials = yield Material_1.Material.find({ courseID });
+            res.json({
+                status: true,
+                statusCode: 200,
+                message: "Found materials!",
+                data: materials,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
     }));
 }
 exports.default = default_1;

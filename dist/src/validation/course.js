@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateCreateCourseMaterial = exports.validateUpdateCourse = exports.validateGetSingleCourseSchema = exports.validateGetAllCourses = exports.validateCreateCourse = void 0;
+exports.validateGetAllCourseMaterials = exports.validateCreateCourseMaterial = exports.validateUpdateCourse = exports.validateGetSingleCourseSchema = exports.validateGetAllCourses = exports.validateCreateCourse = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const createSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -112,4 +112,23 @@ const validateCreateCourseMaterial = (req, res, next) => {
     next();
 };
 exports.validateCreateCourseMaterial = validateCreateCourseMaterial;
+const getAllCourseMaterialsSchema = joi_1.default.object({
+    courseID: joi_1.default.string().required(),
+    token: joi_1.default.string().required(),
+});
+const validateGetAllCourseMaterials = (req, res, next) => {
+    const { error } = getAllCourseMaterialsSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    next();
+};
+exports.validateGetAllCourseMaterials = validateGetAllCourseMaterials;
 //# sourceMappingURL=course.js.map
