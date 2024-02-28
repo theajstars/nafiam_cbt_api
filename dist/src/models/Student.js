@@ -7,6 +7,7 @@ const studentSchema = new mongoose_1.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true },
+    password: { type: String, required: true },
 });
 const Student = (0, mongoose_1.model)("Student", studentSchema);
 exports.Student = Student;

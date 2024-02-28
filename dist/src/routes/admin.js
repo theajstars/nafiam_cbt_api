@@ -17,6 +17,9 @@ const Admin_1 = require("../models/Admin");
 const JWT_1 = require("../Lib/JWT");
 const Misc_1 = require("../Lib/Misc");
 const Student_1 = require("../models/Student");
+const Methods_1 = require("../Lib/Methods");
+const admin_1 = require("../validation/admin");
+const course_1 = require("../validation/course");
 const basePath = "/admin";
 function default_1(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -68,24 +71,49 @@ function default_1(app) {
             });
         }
     }));
-    app.post("/admin/onboard_student", (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const body = req.body;
-        const v = (0, JWT_1.verifyToken)(body.token);
-        if (!body || !body.token || v.user !== "admin") {
+    app.post("/admin/student/onboard", admin_1.validateOnboardStudent, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, firstName, lastName, email } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const saltRounds = 10;
+            bcryptjs_1.default.genSalt(saltRounds, function (err, salt) {
+                const password = (0, Methods_1.generateRandomString)(8);
+                bcryptjs_1.default.hash(password, salt, (err, hash) => __awaiter(this, void 0, void 0, function* () {
+                    const student = yield new Student_1.Student({
+                        id: (0, Methods_1.generateRandomString)(48),
+                        firstName,
+                        lastName,
+                        email,
+                        password: hash,
+                    }).save();
+                    res.json({
+                        status: true,
+                        statusCode: 201,
+                        message: "Student successfully onboarded!",
+                        data: student,
+                        password,
+                    });
+                }));
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post("/admin/students/get", course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { user, id } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user !== "admin") {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
-            const { firstName, lastName, email, rank, id } = body;
-            const student = yield new Student_1.Student({
-                firstName,
-                lastName,
-                email,
-                rank,
-                id,
-            }).save();
-            if (student._id) {
-                res.json((0, Misc_1.returnSuccessResponseObject)("Student created successfully!", 201));
-            }
+            const students = yield Student_1.Student.find({});
+            res.json({
+                data: students,
+                status: true,
+                statusCode: 200,
+                message: "Students found!",
+            });
         }
     }));
     app.post("/admin/getStudent/:studentID", (req, res) => __awaiter(this, void 0, void 0, function* () {

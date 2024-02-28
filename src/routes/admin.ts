@@ -13,6 +13,9 @@ import {
 } from "../Lib/Misc";
 import { Student } from "../models/Student";
 import { Course } from "../models/Course";
+import { generateRandomString } from "../Lib/Methods";
+import { validateOnboardStudent } from "../validation/admin";
+import { validateTokenSchema } from "../validation/course";
 const basePath = "/admin";
 
 export default function (app: Express) {
@@ -65,28 +68,55 @@ export default function (app: Express) {
     }
   });
 
-  app.post("/admin/onboard_student", async (req, res) => {
-    const body: OnboardStudentRequest = req.body;
-    const v = verifyToken(body.token);
-    if (!body || !body.token || v.user !== "admin") {
-      res.json(UnauthorizedResponseObject);
-    } else {
-      const { firstName, lastName, email, rank, id } = body;
-      const student = await new Student({
-        firstName,
-        lastName,
-        email,
-        rank,
-        id,
-      }).save();
-      if (student._id) {
-        res.json(
-          returnSuccessResponseObject("Student created successfully!", 201)
-        );
+  app.post(
+    "/admin/student/onboard",
+    validateOnboardStudent,
+    async (req, res) => {
+      const { token, firstName, lastName, email } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const saltRounds = 10;
+
+        bcrypt.genSalt(saltRounds, function (err, salt) {
+          const password = generateRandomString(8);
+          bcrypt.hash(password, salt, async (err, hash) => {
+            const student = await new Student({
+              id: generateRandomString(48),
+              firstName,
+              lastName,
+              email,
+              password: hash,
+            }).save();
+            res.json({
+              status: true,
+              statusCode: 201,
+              message: "Student successfully onboarded!",
+              data: student,
+              password,
+            });
+          });
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
       }
     }
-  });
+  );
 
+  app.post("/admin/students/get", validateTokenSchema, async (req, res) => {
+    const { token } = req.body;
+    const { user, id } = verifyToken(token);
+    if (id && user && user !== "admin") {
+      res.json(UnauthorizedResponseObject);
+    } else {
+      const students = await Student.find({});
+      res.json(<DefaultResponse>{
+        data: students,
+        status: true,
+        statusCode: 200,
+        message: "Students found!",
+      });
+    }
+  });
   app.post("/admin/getStudent/:studentID", async (req, res) => {
     const body: AdminAuthRequiredRequest = req.body;
 
