@@ -3,28 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateDeleteCourseMaterialSchema = exports.validateGetAllCourseMaterials = exports.validateCreateCourseMaterial = exports.validateUpdateCourse = exports.validateGetSingleCourseSchema = exports.validateGetAllCourses = exports.validateCreateCourse = exports.validateTokenSchema = void 0;
+exports.validateDeleteCourseMaterialSchema = exports.validateGetAllCourseMaterials = exports.validateCreateCourseMaterial = exports.validateUpdateCourse = exports.validateGetSingleCourseSchema = exports.validateGetAllCourses = exports.validateCreateCourse = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
-const tokenSchema = joi_1.default.object({
-    token: joi_1.default.string().required(),
-});
-const validateTokenSchema = (req, res, next) => {
-    const { error } = tokenSchema.validate(req.body);
-    if (error) {
-        const errorResponse = error.details.map((e) => {
-            return e.message;
-        });
-        res.json({
-            status: true,
-            statusCode: 400,
-            message: errorResponse.toString(),
-        });
-    }
-    else {
-        next();
-    }
-};
-exports.validateTokenSchema = validateTokenSchema;
 const createSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     code: joi_1.default.string().required(),
@@ -184,4 +164,4 @@ const validateDeleteCourseMaterialSchema = (req, res, next) => {
     }
 };
 exports.validateDeleteCourseMaterialSchema = validateDeleteCourseMaterialSchema;
-//# sourceMappingURL=course.js.map
+//# sourceMappingURL=course%20copy.js.map

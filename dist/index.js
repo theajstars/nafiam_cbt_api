@@ -46,6 +46,13 @@ const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
         bcryptjs_1.default.genSalt(saltRounds, function (err, salt) {
             bcryptjs_1.default.hash("securePassword2024", salt, function (err, hash) {
                 console.log(hash);
+                // new Admin({
+                //   id: generateRandomString(32),
+                //   firstName: "Zeus",
+                //   lastName: "Olympus",
+                //   email: "me@theajstars.com",
+                //   password: hash,
+                // }).save();
             });
         });
     });

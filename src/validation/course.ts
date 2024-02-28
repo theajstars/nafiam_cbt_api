@@ -2,6 +2,26 @@ import Joi from "@hapi/joi";
 import { CourseProps } from "../models/Course";
 import { MaterialProps } from "../models/Material";
 
+const tokenSchema = Joi.object<{ token: string }>({
+  token: Joi.string().required(),
+});
+
+export const validateTokenSchema = (req, res, next) => {
+  const { error } = tokenSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
+
 const createSchema = Joi.object<CourseProps & { token: string }>({
   token: Joi.string().required(),
   code: Joi.string().required(),

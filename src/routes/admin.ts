@@ -12,6 +12,7 @@ import {
   UnauthorizedResponseObject,
 } from "../Lib/Misc";
 import { Student } from "../models/Student";
+import { Course } from "../models/Course";
 const basePath = "/admin";
 
 export default function (app: Express) {
@@ -31,6 +32,22 @@ export default function (app: Express) {
         status: true,
         statusCode: 401,
       });
+    }
+  });
+  app.post(`${basePath}/profile/get`, async (req, res) => {
+    const { token } = req.body;
+    const { id, user } = verifyToken(token);
+    if (id && user && user === "admin") {
+      const admin = await Admin.findOne({ id }).select(
+        "firstName lastName email"
+      );
+      res.json({
+        status: true,
+        statusCode: 200,
+        data: admin,
+      });
+    } else {
+      res.json(UnauthorizedResponseObject);
     }
   });
   app.post(`${basePath}/verify_token`, async (req, res) => {

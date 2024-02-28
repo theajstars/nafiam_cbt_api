@@ -38,6 +38,21 @@ function default_1(app) {
             });
         }
     }));
+    app.post(`${basePath}/profile/get`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const admin = yield Admin_1.Admin.findOne({ id }).select("firstName lastName email");
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: admin,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     app.post(`${basePath}/verify_token`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const v = (0, JWT_1.verifyToken)(token);

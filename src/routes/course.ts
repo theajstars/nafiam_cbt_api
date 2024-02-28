@@ -11,6 +11,7 @@ import {
   validateGetAllCourseMaterials,
   validateGetAllCourses,
   validateGetSingleCourseSchema,
+  validateTokenSchema,
   validateUpdateCourse,
 } from "../validation/course";
 import { Material } from "../models/Material";
@@ -196,4 +197,19 @@ export default function (app: Express) {
       }
     }
   );
+  app.post("/admin/courses/all", validateTokenSchema, async (req, res) => {
+    const { token } = req.body;
+    const { id, user } = verifyToken(token);
+    if (id && user && user === "admin") {
+      const courses = await Course.find({});
+      res.json(<DefaultResponse>{
+        data: courses,
+        status: true,
+        statusCode: 200,
+        message: "All courses retrieved!",
+      });
+    } else {
+      res.json(UnauthorizedResponseObject);
+    }
+  });
 }

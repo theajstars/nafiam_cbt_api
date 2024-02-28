@@ -158,6 +158,22 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    app.post("/admin/courses/all", course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const courses = yield Course_1.Course.find({});
+            res.json({
+                data: courses,
+                status: true,
+                statusCode: 200,
+                message: "All courses retrieved!",
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
 }
 exports.default = default_1;
 //# sourceMappingURL=course.js.map

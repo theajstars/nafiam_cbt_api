@@ -13,6 +13,8 @@ import { Lecturer } from "./src/models/Lecturer";
 import file from "./src/routes/file";
 import { Examination } from "./src/models/Examination";
 import { Course } from "./src/models/Course";
+import { Admin } from "./src/models/Admin";
+import { generateRandomString } from "./src/Lib/Methods";
 
 const app = express();
 app.use(
@@ -40,6 +42,13 @@ connect(dbConnectString)
       bcrypt.genSalt(saltRounds, function (err, salt) {
         bcrypt.hash("securePassword2024", salt, function (err, hash) {
           console.log(hash);
+          // new Admin({
+          //   id: generateRandomString(32),
+          //   firstName: "Zeus",
+          //   lastName: "Olympus",
+          //   email: "me@theajstars.com",
+          //   password: hash,
+          // }).save();
         });
       });
     };
