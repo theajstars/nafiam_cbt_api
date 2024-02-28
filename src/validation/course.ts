@@ -21,8 +21,9 @@ export const validateCreateCourse = (req, res, next) => {
       statusCode: 400,
       message: errorResponse.toString(),
     });
+  } else {
+    next();
   }
-  next();
 };
 
 const getAllSchema = Joi.object({
@@ -41,8 +42,9 @@ export const validateGetAllCourses = (req, res, next) => {
       statusCode: 400,
       message: errorResponse.toString(),
     });
+  } else {
+    next();
   }
-  next();
 };
 
 const getSingleSchema = Joi.object({
@@ -61,8 +63,9 @@ export const validateGetSingleCourseSchema = (req, res, next) => {
       statusCode: 400,
       message: errorResponse.toString(),
     });
+  } else {
+    next();
   }
-  next();
 };
 
 const updateSchema = Joi.object<
@@ -87,8 +90,9 @@ export const validateUpdateCourse = (req, res, next) => {
       statusCode: 400,
       message: errorResponse.toString(),
     });
+  } else {
+    next();
   }
-  next();
 };
 
 const createCourseMaterialSchema = Joi.object<
@@ -114,8 +118,9 @@ export const validateCreateCourseMaterial = (req, res, next) => {
       statusCode: 400,
       message: errorResponse.toString(),
     });
+  } else {
+    next();
   }
-  next();
 };
 const getAllCourseMaterialsSchema = Joi.object<
   MaterialProps & { token: string }
@@ -135,6 +140,30 @@ export const validateGetAllCourseMaterials = (req, res, next) => {
       statusCode: 400,
       message: errorResponse.toString(),
     });
+  } else {
+    next();
   }
-  next();
+};
+const deleteCourseMaterialSchema = Joi.object<{
+  token: string;
+  materialID: string;
+}>({
+  materialID: Joi.string().required(),
+  token: Joi.string().required(),
+});
+
+export const validateDeleteCourseMaterialSchema = (req, res, next) => {
+  const { error } = deleteCourseMaterialSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
 };

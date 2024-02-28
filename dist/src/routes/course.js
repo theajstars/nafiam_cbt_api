@@ -127,6 +127,21 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    app.delete(`${basePath}/material/delete`, course_1.validateDeleteCourseMaterialSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { materialID, token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (user === "admin" || user === "lecturer") {
+            yield Material_1.Material.deleteOne({ id: materialID });
+            res.json({
+                status: true,
+                statusCode: 204,
+                message: "Course Material deleted successfully!",
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     app.post(`${basePath}/materials/get`, course_1.validateGetAllCourseMaterials, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { courseID, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);

@@ -7,6 +7,7 @@ import { Course } from "../models/Course";
 import {
   validateCreateCourse,
   validateCreateCourseMaterial,
+  validateDeleteCourseMaterialSchema,
   validateGetAllCourseMaterials,
   validateGetAllCourses,
   validateGetSingleCourseSchema,
@@ -147,6 +148,26 @@ export default function (app: Express) {
           statusCode: 201,
           message: "Course Material uploaded successfully!",
           data: courseMaterial,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.delete(
+    `${basePath}/material/delete`,
+    validateDeleteCourseMaterialSchema,
+    async (req, res) => {
+      const { materialID, token } = req.body;
+
+      const { id, user } = verifyToken(token);
+
+      if (user === "admin" || user === "lecturer") {
+        await Material.deleteOne({ id: materialID });
+        res.json(<DefaultResponse>{
+          status: true,
+          statusCode: 204,
+          message: "Course Material deleted successfully!",
         });
       } else {
         res.json(UnauthorizedResponseObject);

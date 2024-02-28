@@ -23,7 +23,6 @@ const student_1 = __importDefault(require("./src/routes/student"));
 const lecturer_1 = __importDefault(require("./src/routes/lecturer"));
 const examination_1 = __importDefault(require("./src/routes/examination"));
 const course_1 = __importDefault(require("./src/routes/course"));
-const Lecturer_1 = require("./src/models/Lecturer");
 const file_1 = __importDefault(require("./src/routes/file"));
 const app = (0, express_1.default)();
 exports.app = app;
@@ -51,14 +50,7 @@ const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
         });
     });
     genPassword();
-    new Lecturer_1.Lecturer({
-        id: Date.now().toString(),
-        firstName: "KIng",
-        lastName: "Braavo",
-        email: "lecturer@theajstars.com",
-        password: "$2a$10$l.V0HzLVySU5s2MOOZ4PWuydU5MFxIuNmV.CP.Bll2iNx0Ml7lD9S",
-        rank: "Squadron Leader",
-    }).save();
+    // Course.updateMany({}, { lecturerID: "1709114865502" }).exec();
 })
     .catch((err) => {
     console.error("Failed to connect to DB", err);

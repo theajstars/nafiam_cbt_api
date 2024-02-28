@@ -11,6 +11,8 @@ import examination from "./src/routes/examination";
 import course from "./src/routes/course";
 import { Lecturer } from "./src/models/Lecturer";
 import file from "./src/routes/file";
+import { Examination } from "./src/models/Examination";
+import { Course } from "./src/models/Course";
 
 const app = express();
 app.use(
@@ -42,14 +44,7 @@ connect(dbConnectString)
       });
     };
     genPassword();
-    new Lecturer({
-      id: Date.now().toString(),
-      firstName: "KIng",
-      lastName: "Braavo",
-      email: "lecturer@theajstars.com",
-      password: "$2a$10$l.V0HzLVySU5s2MOOZ4PWuydU5MFxIuNmV.CP.Bll2iNx0Ml7lD9S",
-      rank: "Squadron Leader",
-    }).save();
+    // Course.updateMany({}, { lecturerID: "1709114865502" }).exec();
   })
   .catch((err) => {
     console.error("Failed to connect to DB", err);
