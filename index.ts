@@ -15,6 +15,7 @@ import { Examination } from "./src/models/Examination";
 import { Course } from "./src/models/Course";
 import { Admin } from "./src/models/Admin";
 import { generateRandomString } from "./src/Lib/Methods";
+import misc from "./src/routes/misc";
 
 const app = express();
 app.use(
@@ -31,6 +32,7 @@ connect(dbConnectString)
   .then(() => {
     app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
     student(app);
+    misc(app);
     admin(app);
     lecturer(app);
     examination(app);

@@ -24,6 +24,7 @@ const lecturer_1 = __importDefault(require("./src/routes/lecturer"));
 const examination_1 = __importDefault(require("./src/routes/examination"));
 const course_1 = __importDefault(require("./src/routes/course"));
 const file_1 = __importDefault(require("./src/routes/file"));
+const misc_1 = __importDefault(require("./src/routes/misc"));
 const app = (0, express_1.default)();
 exports.app = app;
 app.use((0, cors_1.default)({
@@ -36,6 +37,7 @@ const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
     .then(() => {
     app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
     (0, student_1.default)(app);
+    (0, misc_1.default)(app);
     (0, admin_1.default)(app);
     (0, lecturer_1.default)(app);
     (0, examination_1.default)(app);

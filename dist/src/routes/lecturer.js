@@ -17,8 +17,31 @@ const JWT_1 = require("../Lib/JWT");
 const Lecturer_1 = require("../models/Lecturer");
 const course_1 = require("../validation/course");
 const Misc_1 = require("../Lib/Misc");
+const lecturer_1 = require("../validation/lecturer");
 const basePath = "/lecturer";
 function default_1(app) {
+    app.post(`${basePath}/create`, lecturer_1.validateCreateLecturer, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, department, email, firstName, lastName, rank } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const lecturer = yield new Lecturer_1.Lecturer({
+                email,
+                firstName,
+                lastName,
+                rank,
+                department,
+            }).save();
+            res.json({
+                status: true,
+                statusCode: 201,
+                data: lecturer,
+                message: "New Lecturer created",
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password } = req.body;
         console.log({ id, password });

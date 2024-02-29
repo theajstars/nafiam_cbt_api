@@ -7,8 +7,30 @@ import { DefaultResponse } from "../Lib/Responses";
 import { Lecturer } from "../models/Lecturer";
 import { validateTokenSchema } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
+import { validateCreateLecturer } from "../validation/lecturer";
 const basePath = "/lecturer";
 export default function (app: Express) {
+  app.post(`${basePath}/create`, validateCreateLecturer, async (req, res) => {
+    const { token, department, email, firstName, lastName, rank } = req.body;
+    const { id, user } = verifyToken(token);
+    if (id && user && user === "admin") {
+      const lecturer = await new Lecturer({
+        email,
+        firstName,
+        lastName,
+        rank,
+        department,
+      }).save();
+      res.json({
+        status: true,
+        statusCode: 201,
+        data: lecturer,
+        message: "New Lecturer created",
+      });
+    } else {
+      res.json(UnauthorizedResponseObject);
+    }
+  });
   app.post(`${basePath}/login`, async (req, res) => {
     const { id, password } = req.body;
     console.log({ id, password });

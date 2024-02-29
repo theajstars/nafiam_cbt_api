@@ -8,6 +8,7 @@ const lecturerSchema = new mongoose_1.Schema({
     lastName: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
+    department: { type: String, required: true },
     rank: { type: String, required: true },
 });
 const Lecturer = (0, mongoose_1.model)("Lecturer", lecturerSchema);
