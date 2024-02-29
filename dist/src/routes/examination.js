@@ -14,6 +14,7 @@ const Lecturer_1 = require("../models/Lecturer");
 const Examination_1 = require("../models/Examination");
 const Misc_1 = require("../Lib/Misc");
 const Methods_1 = require("../Lib/Methods");
+const examination_1 = require("../validation/examination");
 const basePath = "/examination";
 function default_1(app) {
     app.post(`${basePath}/create`, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -40,12 +41,13 @@ function default_1(app) {
             });
         }
     }));
-    app.post(`${basePath}s/all`, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token } = req.body;
+    app.post(`${basePath}s/all`, examination_1.validateGetAllExaminations, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, isAdmin } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
-        const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
-        if (token && lecturer) {
-            const examinations = yield Examination_1.Examination.find({ lecturerID: id });
+        if (token) {
+            const examinations = isAdmin
+                ? yield Examination_1.Examination.find({})
+                : yield Examination_1.Examination.find({ lecturerID: id });
             res.json((0, Misc_1.returnSuccessResponseObject)("Examination list obtained!", 200, examinations));
         }
         else {

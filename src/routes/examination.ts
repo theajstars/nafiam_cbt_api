@@ -8,6 +8,8 @@ import { Lecturer } from "../models/Lecturer";
 import { Examination } from "../models/Examination";
 import { returnSuccessResponseObject } from "../Lib/Misc";
 import { generateRandomString } from "../Lib/Methods";
+import { validateTokenSchema } from "../validation/course";
+import { validateGetAllExaminations } from "../validation/examination";
 const basePath = "/examination";
 export default function (app: Express) {
   app.post(`${basePath}/create`, async (req, res) => {
@@ -35,12 +37,13 @@ export default function (app: Express) {
       });
     }
   });
-  app.post(`${basePath}s/all`, async (req, res) => {
-    const { token } = req.body;
+  app.post(`${basePath}s/all`, validateGetAllExaminations, async (req, res) => {
+    const { token, isAdmin } = req.body;
     const { id } = verifyToken(token);
-    const lecturer = await Lecturer.findOne({ id });
-    if (token && lecturer) {
-      const examinations = await Examination.find({ lecturerID: id });
+    if (token) {
+      const examinations = isAdmin
+        ? await Examination.find({})
+        : await Examination.find({ lecturerID: id });
       res.json(
         returnSuccessResponseObject(
           "Examination list obtained!",
