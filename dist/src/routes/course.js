@@ -66,12 +66,12 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/create`, course_1.validateCreateCourse, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { title, code, description, department, token } = req.body;
+        const { title, code, description, department, token, lecturerID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (user === "admin" || user === "lecturer") {
             const course = yield new Course_1.Course({
                 id: (0, Methods_1.generateRandomString)(16),
-                lecturerID: id,
+                lecturerID: user === "admin" ? lecturerID : id,
                 title,
                 code,
                 description,

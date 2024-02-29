@@ -28,6 +28,7 @@ const createSchema = Joi.object<CourseProps & { token: string }>({
   description: Joi.string().required(),
   department: Joi.string().required(),
   title: Joi.string().required(),
+  lecturerID: Joi.string().optional(),
 });
 
 export const validateCreateCourse = (req, res, next) => {

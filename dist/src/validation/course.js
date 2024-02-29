@@ -31,6 +31,7 @@ const createSchema = joi_1.default.object({
     description: joi_1.default.string().required(),
     department: joi_1.default.string().required(),
     title: joi_1.default.string().required(),
+    lecturerID: joi_1.default.string().optional(),
 });
 const validateCreateCourse = (req, res, next) => {
     const { error } = createSchema.validate(req.body);

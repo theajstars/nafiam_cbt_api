@@ -5,6 +5,8 @@ import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 
 import { Lecturer } from "../models/Lecturer";
+import { validateTokenSchema } from "../validation/course";
+import { UnauthorizedResponseObject } from "../Lib/Misc";
 const basePath = "/lecturer";
 export default function (app: Express) {
   app.post(`${basePath}/login`, async (req, res) => {
@@ -51,6 +53,23 @@ export default function (app: Express) {
         statusCode: 401,
         message: "Invalid email and password",
       });
+    }
+  });
+  app.post(`${basePath}s/all/get`, validateTokenSchema, async (req, res) => {
+    const { token } = req.body;
+    const { id, user } = verifyToken(token);
+    if (id && user && user === "admin") {
+      const lecturers = await Lecturer.find({}).select(
+        "email firstName lastName id rank"
+      );
+      res.json({
+        status: true,
+        statusCode: 200,
+        data: lecturers,
+        message: "Lecturers retrieved!",
+      });
+    } else {
+      res.json(UnauthorizedResponseObject);
     }
   });
 }

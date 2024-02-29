@@ -80,14 +80,15 @@ export default function (app: Express) {
     }
   );
   app.post(`${basePath}/create`, validateCreateCourse, async (req, res) => {
-    const { title, code, description, department, token } = req.body;
+    const { title, code, description, department, token, lecturerID } =
+      req.body;
 
     const { id, user } = verifyToken(token);
 
     if (user === "admin" || user === "lecturer") {
       const course = await new Course({
         id: generateRandomString(16),
-        lecturerID: id,
+        lecturerID: user === "admin" ? lecturerID : id,
         title,
         code,
         description,
