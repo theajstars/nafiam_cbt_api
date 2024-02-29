@@ -61,10 +61,15 @@ export default function (app: Express) {
   });
   app.post(`${basePath}/get`, async (req, res) => {
     const { token, examinationID } = req.body;
-    const { id } = verifyToken(token);
-    const lecturer = await Lecturer.findOne({ id });
-    if (token && lecturer) {
-      const examination = await Examination.findOne({ id: examinationID });
+    const { id, user } = verifyToken(token);
+
+    if (id && user) {
+      const examination =
+        user === "admin"
+          ? await Examination.findOne({ id: examinationID })
+          : await Examination.findOne({ id: examinationID, lecturerID: id });
+
+      console.log(examination, user, id);
       res.json(
         returnSuccessResponseObject(
           examination === null ? "Not Found!" : "Examination found!",
