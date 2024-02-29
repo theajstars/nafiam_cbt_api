@@ -14,19 +14,29 @@ export default function (app: Express) {
     const { token, department, email, firstName, lastName, rank } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user && user === "admin") {
-      const lecturer = await new Lecturer({
-        email,
-        firstName,
-        lastName,
-        rank,
-        department,
-      }).save();
-      res.json({
-        status: true,
-        statusCode: 201,
-        data: lecturer,
-        message: "New Lecturer created",
-      });
+      const lecturerExists = await Lecturer.findOne({ email });
+      if (!lecturerExists) {
+        const lecturer = await new Lecturer({
+          email,
+          firstName,
+          lastName,
+          rank,
+          department,
+        }).save();
+        res.json({
+          status: true,
+          statusCode: 201,
+          data: lecturer,
+          message: "New Lecturer created",
+        });
+      } else {
+        res.json({
+          status: true,
+          statusCode: 409,
+          data: lecturerExists,
+          message: "New Lecturer created",
+        });
+      }
     } else {
       res.json(UnauthorizedResponseObject);
     }

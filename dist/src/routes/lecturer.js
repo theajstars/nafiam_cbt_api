@@ -24,19 +24,30 @@ function default_1(app) {
         const { token, department, email, firstName, lastName, rank } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const lecturer = yield new Lecturer_1.Lecturer({
-                email,
-                firstName,
-                lastName,
-                rank,
-                department,
-            }).save();
-            res.json({
-                status: true,
-                statusCode: 201,
-                data: lecturer,
-                message: "New Lecturer created",
-            });
+            const lecturerExists = yield Lecturer_1.Lecturer.findOne({ email });
+            if (!lecturerExists) {
+                const lecturer = yield new Lecturer_1.Lecturer({
+                    email,
+                    firstName,
+                    lastName,
+                    rank,
+                    department,
+                }).save();
+                res.json({
+                    status: true,
+                    statusCode: 201,
+                    data: lecturer,
+                    message: "New Lecturer created",
+                });
+            }
+            else {
+                res.json({
+                    status: true,
+                    statusCode: 409,
+                    data: lecturerExists,
+                    message: "New Lecturer created",
+                });
+            }
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);
