@@ -138,7 +138,7 @@ function default_1(app) {
         else {
             const examination = yield Examination_1.Examination.findOneAndUpdate({
                 id: examinationID,
-            }, { approved: true });
+            }, { approved: true, selectedQuestions: questions });
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination published!", examination === null ? 404 : 200, examination));
         }
     }));

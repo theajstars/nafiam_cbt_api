@@ -22,6 +22,7 @@ export interface ExaminationProps {
   published: boolean;
   completed: boolean;
   questions: any;
+  selectedQuestions: any;
 }
 
 const examinationSchema = new Schema<ExaminationProps, Model<ExaminationProps>>(
@@ -36,6 +37,7 @@ const examinationSchema = new Schema<ExaminationProps, Model<ExaminationProps>>(
     published: { type: Boolean, required: true },
     completed: { type: Boolean, required: true },
     questions: { type: Array, required: false },
+    selectedQuestions: { type: Array, required: false },
   }
 );
 

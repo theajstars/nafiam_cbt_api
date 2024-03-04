@@ -79,7 +79,7 @@ const approveExaminationSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     examinationID: joi_1.default.string().required(),
     questions: joi_1.default.any().required(),
-    isAdmin: joi_1.default.boolean().required(),
+    isAdmin: joi_1.default.boolean().optional(),
 });
 const validateApproveExaminationRequest = (req, res, next) => {
     const { error } = approveExaminationSchema.validate(req.body);

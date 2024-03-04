@@ -74,7 +74,7 @@ const approveExaminationSchema = Joi.object({
   token: Joi.string().required(),
   examinationID: Joi.string().required(),
   questions: Joi.any().required(),
-  isAdmin: Joi.boolean().required(),
+  isAdmin: Joi.boolean().optional(),
 });
 
 export const validateApproveExaminationRequest = (req, res, next) => {

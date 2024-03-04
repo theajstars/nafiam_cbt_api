@@ -205,7 +205,7 @@ export default function (app: Express) {
           {
             id: examinationID,
           },
-          { approved: true }
+          { approved: true, selectedQuestions: questions }
         );
         res.json(
           returnSuccessResponseObject(
