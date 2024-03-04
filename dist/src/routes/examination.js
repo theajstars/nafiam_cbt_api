@@ -28,6 +28,7 @@ function default_1(app) {
                 year,
                 lecturerID: id,
                 course,
+                approved: false,
                 completed: false,
                 published: false,
                 started: false,
@@ -118,7 +119,7 @@ function default_1(app) {
         const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
         if (id && user === "lecturer" && lecturer) {
             const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { published: true });
-            res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination updated!", examination === null ? 404 : 201, examination));
+            res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination published!", examination === null ? 404 : 200, examination));
         }
         else {
             res.json({

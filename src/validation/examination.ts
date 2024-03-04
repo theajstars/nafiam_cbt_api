@@ -48,6 +48,8 @@ export const validateCreateExaminationSchema = (req, res, next) => {
 };
 const editExaminationSchema = Joi.object({
   token: Joi.string().required(),
+  examinationID: Joi.string().required(),
+  questions: Joi.any().required(),
   title: Joi.string().required(),
   year: Joi.string().required(),
   course: Joi.string().required(),

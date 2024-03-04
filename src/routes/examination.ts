@@ -33,6 +33,7 @@ export default function (app: Express) {
           year,
           lecturerID: id,
           course,
+          approved: false,
           completed: false,
           published: false,
           started: false,
@@ -176,8 +177,8 @@ export default function (app: Express) {
         );
         res.json(
           returnSuccessResponseObject(
-            examination === null ? "Not Found!" : "Examination updated!",
-            examination === null ? 404 : 201,
+            examination === null ? "Not Found!" : "Examination published!",
+            examination === null ? 404 : 200,
             examination
           )
         );

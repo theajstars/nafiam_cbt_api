@@ -52,6 +52,8 @@ const validateCreateExaminationSchema = (req, res, next) => {
 exports.validateCreateExaminationSchema = validateCreateExaminationSchema;
 const editExaminationSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
+    examinationID: joi_1.default.string().required(),
+    questions: joi_1.default.any().required(),
     title: joi_1.default.string().required(),
     year: joi_1.default.string().required(),
     course: joi_1.default.string().required(),
