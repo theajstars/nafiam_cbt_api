@@ -20,9 +20,10 @@ const Student_1 = require("../models/Student");
 const Methods_1 = require("../Lib/Methods");
 const admin_1 = require("../validation/admin");
 const course_1 = require("../validation/course");
+const default_1 = require("../validation/default");
 const basePath = "/admin";
-function default_1(app) {
-    app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+function default_2(app) {
+    app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password } = req.body;
         const admin = yield Admin_1.Admin.findOne({ email: id });
         if (admin) {
@@ -41,7 +42,7 @@ function default_1(app) {
             });
         }
     }));
-    app.post(`${basePath}/profile/get`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/profile/get`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
@@ -133,5 +134,5 @@ function default_1(app) {
         }
     }));
 }
-exports.default = default_1;
+exports.default = default_2;
 //# sourceMappingURL=admin.js.map

@@ -16,10 +16,11 @@ import { Course } from "../models/Course";
 import { generateRandomString } from "../Lib/Methods";
 import { validateOnboardStudent } from "../validation/admin";
 import { validateTokenSchema } from "../validation/course";
+import { validateLoginRequest } from "../validation/default";
 const basePath = "/admin";
 
 export default function (app: Express) {
-  app.post(`${basePath}/login`, async (req, res) => {
+  app.post(`${basePath}/login`, validateLoginRequest, async (req, res) => {
     const { id, password } = req.body;
     const admin = await Admin.findOne({ email: id });
     if (admin) {
@@ -37,7 +38,7 @@ export default function (app: Express) {
       });
     }
   });
-  app.post(`${basePath}/profile/get`, async (req, res) => {
+  app.post(`${basePath}/profile/get`, validateTokenSchema, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user && user === "admin") {

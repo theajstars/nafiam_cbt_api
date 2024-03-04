@@ -12,7 +12,6 @@ import {
 } from "../Lib/Misc";
 import { generateRandomString } from "../Lib/Methods";
 import { validateTokenSchema } from "../validation/course";
-import { validateGetAllExaminations } from "../validation/examination";
 const basePath = "/misc";
 export default function (app: Express) {
   app.post(`${basePath}/ranks/get`, validateTokenSchema, async (req, res) => {
