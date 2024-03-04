@@ -17,7 +17,7 @@ const Methods_1 = require("../Lib/Methods");
 const examination_1 = require("../validation/examination");
 const basePath = "/examination";
 function default_1(app) {
-    app.post(`${basePath}/create`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/create`, examination_1.validateCreateExaminationSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, title, year, course } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
         const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
@@ -29,6 +29,7 @@ function default_1(app) {
                 lecturerID: id,
                 course,
                 completed: false,
+                published: false,
                 started: false,
             }).save();
             res.json((0, Misc_1.returnSuccessResponseObject)("Examination created!", 201, examination));
@@ -41,24 +42,22 @@ function default_1(app) {
             });
         }
     }));
-    app.post(`${basePath}s/all`, examination_1.validateGetAllExaminations, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}s/all`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, isAdmin } = req.body;
-        const { id } = (0, JWT_1.verifyToken)(token);
-        if (token) {
-            const examinations = isAdmin
-                ? yield Examination_1.Examination.find({})
-                : yield Examination_1.Examination.find({ lecturerID: id });
-            res.json((0, Misc_1.returnSuccessResponseObject)("Examination list obtained!", 200, examinations));
-        }
-        else {
-            res.json({
-                status: true,
-                statusCode: 401,
-                message: "Unauthorized",
-            });
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (token && id) {
+            if (isAdmin && user !== "admin") {
+                res.json(Misc_1.UnauthorizedResponseObject);
+            }
+            else {
+                const examinations = isAdmin && user === "admin"
+                    ? yield Examination_1.Examination.find({})
+                    : yield Examination_1.Examination.find({ lecturerID: id });
+                res.json((0, Misc_1.returnSuccessResponseObject)("Examination list obtained!", 200, examinations));
+            }
         }
     }));
-    app.post(`${basePath}/get`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/get`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
@@ -76,7 +75,7 @@ function default_1(app) {
             });
         }
     }));
-    app.delete(`${basePath}/delete`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.delete(`${basePath}/delete`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
         const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
@@ -97,12 +96,28 @@ function default_1(app) {
             });
         }
     }));
-    app.post(`${basePath}/edit`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/edit`, examination_1.validateEditExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID, questions, title, year, course } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
         const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
         if (token && lecturer) {
             const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { questions, title, year, course });
+            res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination updated!", examination === null ? 404 : 201, examination));
+        }
+        else {
+            res.json({
+                status: true,
+                statusCode: 401,
+                message: "Unauthorized",
+            });
+        }
+    }));
+    app.post(`${basePath}/publish`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
+        if (id && user === "lecturer" && lecturer) {
+            const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { published: true });
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination updated!", examination === null ? 404 : 201, examination));
         }
         else {
