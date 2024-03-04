@@ -129,6 +129,19 @@ function default_1(app) {
             });
         }
     }));
+    app.post(`${basePath}/approve`, examination_1.validateApproveExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID, isAdmin, questions } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (!isAdmin || !id || !user || user !== "admin") {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+        else {
+            const examination = yield Examination_1.Examination.findOneAndUpdate({
+                id: examinationID,
+            }, { approved: true });
+            res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination published!", examination === null ? 404 : 200, examination));
+        }
+    }));
 }
 exports.default = default_1;
 //# sourceMappingURL=examination.js.map

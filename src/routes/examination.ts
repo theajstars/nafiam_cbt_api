@@ -13,6 +13,7 @@ import {
 import { generateRandomString } from "../Lib/Methods";
 import { validateTokenSchema } from "../validation/course";
 import {
+  validateApproveExaminationRequest,
   validateCreateExaminationSchema,
   validateDefaultExaminationRequest,
   validateEditExaminationRequest,
@@ -188,6 +189,31 @@ export default function (app: Express) {
           statusCode: 401,
           message: "Unauthorized",
         });
+      }
+    }
+  );
+  app.post(
+    `${basePath}/approve`,
+    validateApproveExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID, isAdmin, questions } = req.body;
+      const { id, user } = verifyToken(token);
+      if (!isAdmin || !id || !user || user !== "admin") {
+        res.json(UnauthorizedResponseObject);
+      } else {
+        const examination = await Examination.findOneAndUpdate(
+          {
+            id: examinationID,
+          },
+          { approved: true }
+        );
+        res.json(
+          returnSuccessResponseObject(
+            examination === null ? "Not Found!" : "Examination published!",
+            examination === null ? 404 : 200,
+            examination
+          )
+        );
       }
     }
   );
