@@ -10,6 +10,8 @@ const onboardstudentSchema = joi_1.default.object({
     firstName: joi_1.default.string().required(),
     lastName: joi_1.default.string().required(),
     email: joi_1.default.string().required(),
+    rank: joi_1.default.string().required(),
+    serviceNumber: joi_1.default.string().required(),
 });
 const validateOnboardStudent = (req, res, next) => {
     const { error } = onboardstudentSchema.validate(req.body);

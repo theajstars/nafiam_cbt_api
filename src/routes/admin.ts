@@ -73,7 +73,8 @@ export default function (app: Express) {
     "/admin/student/onboard",
     validateOnboardStudent,
     async (req, res) => {
-      const { token, firstName, lastName, email } = req.body;
+      const { token, firstName, lastName, email, rank, serviceNumber } =
+        req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         const saltRounds = 10;
@@ -86,6 +87,8 @@ export default function (app: Express) {
               firstName,
               lastName,
               email,
+              rank,
+              serviceNumber,
               password: hash,
             }).save();
             res.json({
@@ -106,7 +109,7 @@ export default function (app: Express) {
   app.post("/admin/students/get", validateTokenSchema, async (req, res) => {
     const { token } = req.body;
     const { user, id } = verifyToken(token);
-    if (id && user && user !== "admin") {
+    if (!id || !user || user !== "admin") {
       res.json(UnauthorizedResponseObject);
     } else {
       const students = await Student.find({});
@@ -134,4 +137,24 @@ export default function (app: Express) {
       });
     }
   });
+  app.delete(
+    "/admin/student/:studentID",
+    validateTokenSchema,
+    async (req, res) => {
+      const { token } = req.body;
+      const { studentID } = req.params;
+      const { user, id } = verifyToken(token);
+      if (!id || !user || user !== "admin") {
+        res.json(UnauthorizedResponseObject);
+      } else {
+        const student = await Student.findOneAndDelete({ id: studentID });
+        res.json(<DefaultResponse>{
+          data: student,
+          status: true,
+          statusCode: 204,
+          message: "Student deleted!",
+        });
+      }
+    }
+  );
 }

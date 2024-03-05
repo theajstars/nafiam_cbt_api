@@ -6,13 +6,8 @@ export interface StudentProps {
   lastName: string;
   email: string;
   password: string;
-  rank:
-    | "lance_corporal"
-    | "corporal"
-    | "sergeant"
-    | "staff_sergeant"
-    | "warrant officer"
-    | "master_warrant_officer";
+  rank: "string";
+  serviceNumber: "string";
 }
 
 const studentSchema = new Schema<StudentProps>({
@@ -21,6 +16,8 @@ const studentSchema = new Schema<StudentProps>({
   lastName: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
+  rank: { type: String, required: true },
+  serviceNumber: { type: String, required: true },
 });
 
 const Student = model<StudentProps>("Student", studentSchema);

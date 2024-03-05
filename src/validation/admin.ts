@@ -7,6 +7,8 @@ const onboardstudentSchema = Joi.object({
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
   email: Joi.string().required(),
+  rank: Joi.string().required(),
+  serviceNumber: Joi.string().required(),
 });
 
 export const validateOnboardStudent = (req, res, next) => {

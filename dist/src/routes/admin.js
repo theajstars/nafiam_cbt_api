@@ -73,7 +73,7 @@ function default_2(app) {
         }
     }));
     app.post("/admin/student/onboard", admin_1.validateOnboardStudent, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, firstName, lastName, email } = req.body;
+        const { token, firstName, lastName, email, rank, serviceNumber } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const saltRounds = 10;
@@ -85,6 +85,8 @@ function default_2(app) {
                         firstName,
                         lastName,
                         email,
+                        rank,
+                        serviceNumber,
                         password: hash,
                     }).save();
                     res.json({
@@ -104,7 +106,7 @@ function default_2(app) {
     app.post("/admin/students/get", course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { user, id } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user !== "admin") {
+        if (!id || !user || user !== "admin") {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
@@ -130,6 +132,23 @@ function default_2(app) {
                 data: student,
                 status: true,
                 statusCode: student ? 200 : 404,
+            });
+        }
+    }));
+    app.delete("/admin/student/:studentID", course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { studentID } = req.params;
+        const { user, id } = (0, JWT_1.verifyToken)(token);
+        if (!id || !user || user !== "admin") {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+        else {
+            const student = yield Student_1.Student.findOneAndDelete({ id: studentID });
+            res.json({
+                data: student,
+                status: true,
+                statusCode: 204,
+                message: "Student deleted!",
             });
         }
     }));
