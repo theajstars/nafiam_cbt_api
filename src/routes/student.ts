@@ -5,22 +5,36 @@ import { validateTokenSchema } from "../validation/course";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { Student } from "../models/Student";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
+import { Log } from "../models/Log";
+import { generateRandomString } from "../Lib/Methods";
 
 const basePath = "/student";
 export default function (app: Express) {
   app.post(`${basePath}/login`, validateLoginRequest, async (req, res) => {
-    const { id, password } = req.body;
-    const student = await Student.findOne({ email: id });
+    const { id, password, navigatorObject } = req.body;
+    const student = await Student.findOne({ serviceNumber: id });
     if (student) {
       const isPasswordCorrect = await bcrypt.compare(
         password,
         student.password
       );
+      const log = await new Log({
+        personnelID: student.id,
+        id: generateRandomString(32),
+        userType: "student",
+        action: "login",
+        navigatorObject: navigatorObject,
+        comments: isPasswordCorrect ? "Login successful!" : "Invalid Password",
+        timestamp: Date.now(),
+      }).save();
       res.json({
         status: true,
         statusCode: isPasswordCorrect ? 200 : 401,
         student: isPasswordCorrect ? student : null,
-        token: await createToken(student.id, "student"),
+        token: isPasswordCorrect
+          ? await createToken(student.id, "student")
+          : null,
+        log: log.action,
       });
     } else {
       res.json({

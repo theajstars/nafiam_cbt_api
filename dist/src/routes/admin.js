@@ -21,18 +21,28 @@ const Methods_1 = require("../Lib/Methods");
 const admin_1 = require("../validation/admin");
 const course_1 = require("../validation/course");
 const default_1 = require("../validation/default");
+const Log_1 = require("../models/Log");
 const basePath = "/admin";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { id, password } = req.body;
+        const { id, password, navigatorObject } = req.body;
         const admin = yield Admin_1.Admin.findOne({ email: id });
         if (admin) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, admin.password);
+            const log = yield new Log_1.Log({
+                personnelID: admin.id,
+                id: (0, Methods_1.generateRandomString)(32),
+                userType: "admin",
+                action: "login",
+                navigatorObject: navigatorObject,
+                comments: isPasswordCorrect ? "Login successful!" : "Invalid Password",
+                timestamp: Date.now(),
+            }).save();
             res.json({
                 status: true,
                 statusCode: isPasswordCorrect ? 200 : 401,
                 admin: isPasswordCorrect ? admin : null,
-                token: yield (0, JWT_1.createToken)(admin.id, "admin"),
+                token: isPasswordCorrect ? yield (0, JWT_1.createToken)(admin.id, "admin") : null,
             });
         }
         else {
@@ -59,17 +69,23 @@ function default_2(app) {
     }));
     app.post(`${basePath}/verify_token`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
-        const v = (0, JWT_1.verifyToken)(token);
-        if (!v || v.user !== "admin") {
+        const { user, id } = (0, JWT_1.verifyToken)(token);
+        if (!id || !user || user !== "admin") {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
-            res.json({
-                status: true,
-                statusCode: 200,
-                data: v,
-                message: "Verified successfully!",
-            });
+            const admin = yield Admin_1.Admin.findOne({ id });
+            if (admin !== null && admin.id) {
+                res.json({
+                    status: true,
+                    statusCode: 200,
+                    data: admin,
+                    message: "Verified successfully!",
+                });
+            }
+            else {
+                res.json(Misc_1.UnauthorizedResponseObject);
+            }
         }
     }));
     app.post("/admin/student/onboard", admin_1.validateOnboardStudent, (req, res) => __awaiter(this, void 0, void 0, function* () {

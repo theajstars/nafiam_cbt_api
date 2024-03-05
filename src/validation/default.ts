@@ -5,6 +5,7 @@ import { MaterialProps } from "../models/Material";
 const loginValidationSchema = Joi.object({
   id: Joi.string().required(),
   password: Joi.string().required(),
+  navigatorObject: Joi.any().required(),
 });
 
 export const validateLoginRequest = (req, res, next) => {

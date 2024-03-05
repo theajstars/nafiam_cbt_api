@@ -18,32 +18,18 @@ const course_1 = require("../validation/course");
 const JWT_1 = require("../Lib/JWT");
 const Student_1 = require("../models/Student");
 const Misc_1 = require("../Lib/Misc");
-const Log_1 = require("../models/Log");
-const Methods_1 = require("../Lib/Methods");
 const basePath = "/student";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { id, password, navigatorObject } = req.body;
+        const { id, password } = req.body;
         const student = yield Student_1.Student.findOne({ serviceNumber: id });
         if (student) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, student.password);
-            const log = yield new Log_1.Log({
-                personnelID: student.id,
-                id: (0, Methods_1.generateRandomString)(32),
-                userType: "student",
-                action: "login",
-                navigatorObject: navigatorObject,
-                comments: isPasswordCorrect ? "Login successful!" : "Invalid Password",
-                timestamp: Date.now(),
-            }).save();
             res.json({
                 status: true,
                 statusCode: isPasswordCorrect ? 200 : 401,
                 student: isPasswordCorrect ? student : null,
-                token: isPasswordCorrect
-                    ? yield (0, JWT_1.createToken)(student.id, "student")
-                    : null,
-                log: log.action,
+                token: yield (0, JWT_1.createToken)(student.id, "student"),
             });
         }
         else {
@@ -70,4 +56,4 @@ function default_2(app) {
     }));
 }
 exports.default = default_2;
-//# sourceMappingURL=student.js.map
+//# sourceMappingURL=log.js.map

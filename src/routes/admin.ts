@@ -17,19 +17,29 @@ import { generateRandomString } from "../Lib/Methods";
 import { validateOnboardStudent } from "../validation/admin";
 import { validateTokenSchema } from "../validation/course";
 import { validateLoginRequest } from "../validation/default";
+import { Log } from "../models/Log";
 const basePath = "/admin";
 
 export default function (app: Express) {
   app.post(`${basePath}/login`, validateLoginRequest, async (req, res) => {
-    const { id, password } = req.body;
+    const { id, password, navigatorObject } = req.body;
     const admin = await Admin.findOne({ email: id });
     if (admin) {
       const isPasswordCorrect = await bcrypt.compare(password, admin.password);
+      const log = await new Log({
+        personnelID: admin.id,
+        id: generateRandomString(32),
+        userType: "admin",
+        action: "login",
+        navigatorObject: navigatorObject,
+        comments: isPasswordCorrect ? "Login successful!" : "Invalid Password",
+        timestamp: Date.now(),
+      }).save();
       res.json({
         status: true,
         statusCode: isPasswordCorrect ? 200 : 401,
         admin: isPasswordCorrect ? admin : null,
-        token: await createToken(admin.id, "admin"),
+        token: isPasswordCorrect ? await createToken(admin.id, "admin") : null,
       });
     } else {
       res.json({
@@ -56,16 +66,21 @@ export default function (app: Express) {
   });
   app.post(`${basePath}/verify_token`, async (req, res) => {
     const { token } = req.body;
-    const v = verifyToken(token);
-    if (!v || v.user !== "admin") {
+    const { user, id } = verifyToken(token);
+    if (!id || !user || user !== "admin") {
       res.json(UnauthorizedResponseObject);
     } else {
-      res.json(<DefaultResponse>{
-        status: true,
-        statusCode: 200,
-        data: v,
-        message: "Verified successfully!",
-      });
+      const admin = await Admin.findOne({ id });
+      if (admin !== null && admin.id) {
+        res.json(<DefaultResponse>{
+          status: true,
+          statusCode: 200,
+          data: admin,
+          message: "Verified successfully!",
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
     }
   });
 
