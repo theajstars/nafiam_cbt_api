@@ -18,6 +18,11 @@ import { validateOnboardStudent } from "../validation/admin";
 import { validateTokenSchema } from "../validation/course";
 import { validateLoginRequest } from "../validation/default";
 import { Log } from "../models/Log";
+import {
+  validateCreateLecturer,
+  validateUpdateLecturer,
+} from "../validation/admin";
+import { Lecturer } from "../models/Lecturer";
 const basePath = "/admin";
 
 export default function (app: Express) {
@@ -88,33 +93,48 @@ export default function (app: Express) {
     "/admin/student/onboard",
     validateOnboardStudent,
     async (req, res) => {
-      const { token, firstName, lastName, email, rank, serviceNumber } =
-        req.body;
+      const {
+        token,
+        email,
+        firstName,
+        lastName,
+        rank,
+        gender,
+        role,
+        serviceNumber,
+      } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
-        const saltRounds = 10;
-
-        bcrypt.genSalt(saltRounds, function (err, salt) {
-          const password = generateRandomString(8);
-          bcrypt.hash(password, salt, async (err, hash) => {
-            const student = await new Student({
-              id: generateRandomString(48),
-              firstName,
-              lastName,
-              email,
-              rank,
-              serviceNumber,
-              password: hash,
-            }).save();
-            res.json({
-              status: true,
-              statusCode: 201,
-              message: "Student successfully onboarded!",
-              data: student,
-              password,
-            });
-          });
+        const studentExists = await Student.findOne({
+          $or: [{ email: email }, { serviceNumber }],
         });
+        if (!studentExists) {
+          const student = await new Student({
+            id: generateRandomString(32),
+            email,
+            firstName,
+            lastName,
+            rank,
+            role,
+            serviceNumber,
+            gender,
+            password: lastName.toUpperCase(),
+            // department,
+          }).save();
+          res.json({
+            status: true,
+            statusCode: 201,
+            data: student,
+            message: "New Student created",
+          });
+        } else {
+          res.json({
+            status: true,
+            statusCode: 409,
+            data: false,
+            message: "Student exists!",
+          });
+        }
       } else {
         res.json(UnauthorizedResponseObject);
       }
@@ -169,6 +189,159 @@ export default function (app: Express) {
           statusCode: 204,
           message: "Student deleted!",
         });
+      }
+    }
+  );
+
+  //LECTURERS FUNCTIONALITY
+  app.post(
+    `${basePath}/lecturer/create`,
+    validateCreateLecturer,
+    async (req, res) => {
+      const {
+        token,
+        email,
+        firstName,
+        lastName,
+        rank,
+        gender,
+        role,
+        serviceNumber,
+      } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const lecturerExists = await Lecturer.findOne({
+          $or: [{ email: email }, { serviceNumber }],
+        });
+        if (!lecturerExists) {
+          const lecturer = await new Lecturer({
+            id: generateRandomString(32),
+            email,
+            firstName,
+            lastName,
+            rank,
+            role,
+            serviceNumber,
+            gender,
+            password: lastName.toUpperCase(),
+            // department,
+          }).save();
+          res.json({
+            status: true,
+            statusCode: 201,
+            data: lecturer,
+            message: "New Lecturer created",
+          });
+        } else {
+          res.json({
+            status: true,
+            statusCode: 409,
+            data: false,
+            message: "Lecturer exists!",
+          });
+        }
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/lecturer/update`,
+    validateUpdateLecturer,
+    async (req, res) => {
+      const {
+        lecturerID,
+        token,
+        email,
+        firstName,
+        lastName,
+        rank,
+        gender,
+        role,
+        serviceNumber,
+      } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const lecturerExists = await Lecturer.findOne({
+          $or: [{ email: email }, { serviceNumber }],
+        });
+        // console.log(lecturerExists, lecturerID, email);
+        console.log(lecturerExists.id, lecturerID);
+        if (lecturerExists && lecturerExists.id !== lecturerID) {
+          res.json({
+            status: true,
+            statusCode: 409,
+            data: { id: lecturerExists.id, lecturerID },
+            message: "Lecturer exists!",
+          });
+        } else {
+          const lecturer = await Lecturer.findOneAndUpdate(
+            { id: lecturerID },
+            {
+              id: generateRandomString(32),
+              email,
+              firstName,
+              lastName,
+              rank,
+              role,
+              serviceNumber,
+              gender,
+              password: lastName.toUpperCase(),
+              // department,
+            }
+          );
+          res.json({
+            status: true,
+            statusCode: 200,
+            data: lecturer,
+            message: "Lecturer updated",
+          });
+        }
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(`${basePath}/lecturer/get`, async (req, res) => {
+    const { token } = req.body;
+    const { id } = verifyToken(token);
+    const lecturer = await Lecturer.findOne({ id }).select(
+      "email firstName lastName id rank gender serviceNumber role"
+    );
+    if (lecturer) {
+      console.log(lecturer);
+      res.json({
+        status: true,
+        statusCode: 200,
+        data: lecturer,
+        message: "Profile successfully retrieved!",
+      });
+    } else {
+      res.json({
+        status: true,
+        statusCode: 401,
+        message: "Not Found",
+      });
+    }
+  });
+  app.post(
+    `${basePath}/lecturers/all/get`,
+    validateTokenSchema,
+    async (req, res) => {
+      const { token } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const lecturers = await Lecturer.find({}).select(
+          "email firstName lastName id rank gender role serviceNumber"
+        );
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: lecturers,
+          message: "Lecturers retrieved!",
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
       }
     }
   );

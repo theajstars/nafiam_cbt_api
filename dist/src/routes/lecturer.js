@@ -15,51 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const JWT_1 = require("../Lib/JWT");
 const Lecturer_1 = require("../models/Lecturer");
-const course_1 = require("../validation/course");
-const Misc_1 = require("../Lib/Misc");
-const lecturer_1 = require("../validation/lecturer");
-const Methods_1 = require("../Lib/Methods");
 const basePath = "/lecturer";
 function default_1(app) {
-    app.post(`${basePath}/create`, lecturer_1.validateCreateLecturer, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, email, firstName, lastName, rank, role, serviceNumber, } = req.body;
-        const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "admin") {
-            const lecturerExists = yield Lecturer_1.Lecturer.findOne({
-                $or: [{ email: email }, { serviceNumber }],
-            });
-            if (!lecturerExists) {
-                const lecturer = yield new Lecturer_1.Lecturer({
-                    id: (0, Methods_1.generateRandomString)(32),
-                    email,
-                    firstName,
-                    lastName,
-                    rank,
-                    role,
-                    serviceNumber,
-                    password: lastName.toUpperCase(),
-                    // department,
-                }).save();
-                res.json({
-                    status: true,
-                    statusCode: 201,
-                    data: lecturer,
-                    message: "New Lecturer created",
-                });
-            }
-            else {
-                res.json({
-                    status: true,
-                    statusCode: 409,
-                    data: lecturerExists,
-                    message: "New Lecturer created",
-                });
-            }
-        }
-        else {
-            res.json(Misc_1.UnauthorizedResponseObject);
-        }
-    }));
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password } = req.body;
         console.log({ id, password });
@@ -79,43 +36,6 @@ function default_1(app) {
                 statusCode: 401,
                 message: "Invalid email and password",
             });
-        }
-    }));
-    app.post(`${basePath}/profile/get`, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token } = req.body;
-        const { id } = (0, JWT_1.verifyToken)(token);
-        const lecturer = yield Lecturer_1.Lecturer.findOne({ id }).select("email firstName lastName id rank");
-        if (lecturer) {
-            console.log(lecturer);
-            res.json({
-                status: true,
-                statusCode: 200,
-                data: lecturer,
-                message: "Profile successfully retrieved!",
-            });
-        }
-        else {
-            res.json({
-                status: true,
-                statusCode: 401,
-                message: "Invalid email and password",
-            });
-        }
-    }));
-    app.post(`${basePath}s/all/get`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token } = req.body;
-        const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "admin") {
-            const lecturers = yield Lecturer_1.Lecturer.find({}).select("email firstName lastName id rank");
-            res.json({
-                status: true,
-                statusCode: 200,
-                data: lecturers,
-                message: "Lecturers retrieved!",
-            });
-        }
-        else {
-            res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
 }

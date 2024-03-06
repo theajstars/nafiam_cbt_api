@@ -1,4 +1,5 @@
 import { Schema, model, Model } from "mongoose";
+import { Gender } from "./Lecturer";
 
 export interface StudentProps {
   id: string;
@@ -6,8 +7,11 @@ export interface StudentProps {
   lastName: string;
   email: string;
   password: string;
-  rank: "string";
-  serviceNumber: "string";
+  serviceNumber: string;
+  rank: string;
+  gender: Gender;
+  role: "civilian" | "personnel";
+  // department: string;
 }
 
 const studentSchema = new Schema<StudentProps>({
@@ -16,8 +20,11 @@ const studentSchema = new Schema<StudentProps>({
   lastName: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  rank: { type: String, required: true },
   serviceNumber: { type: String, required: true },
+  rank: { type: String, required: true },
+  gender: { type: String, required: true },
+  role: { type: String, required: true },
+  // department: { type: String, required: true },
 });
 
 const Student = model<StudentProps>("Student", studentSchema);

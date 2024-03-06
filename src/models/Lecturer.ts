@@ -1,5 +1,5 @@
 import { Schema, Model, model } from "mongoose";
-
+export type Gender = "male" | "female";
 export type LecturerProps = {
   id: string;
   firstName: string;
@@ -8,6 +8,7 @@ export type LecturerProps = {
   password: string;
   serviceNumber: string;
   rank: string;
+  gender: Gender;
   role: "civilian" | "personnel";
   // department: string;
 };
@@ -19,9 +20,10 @@ const lecturerSchema = new Schema<LecturerProps, Model<LecturerProps>>({
   email: { type: String, required: true },
   password: { type: String, required: true },
   serviceNumber: { type: String, required: true },
-  // department: { type: String, required: true },
   rank: { type: String, required: true },
+  gender: { type: String, required: true },
   role: { type: String, required: true },
+  // department: { type: String, required: true },
 });
 
 const Lecturer = model<LecturerProps>("Lecturer", lecturerSchema);

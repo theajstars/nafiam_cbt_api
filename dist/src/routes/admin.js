@@ -22,6 +22,8 @@ const admin_1 = require("../validation/admin");
 const course_1 = require("../validation/course");
 const default_1 = require("../validation/default");
 const Log_1 = require("../models/Log");
+const admin_2 = require("../validation/admin");
+const Lecturer_1 = require("../models/Lecturer");
 const basePath = "/admin";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -89,31 +91,40 @@ function default_2(app) {
         }
     }));
     app.post("/admin/student/onboard", admin_1.validateOnboardStudent, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, firstName, lastName, email, rank, serviceNumber } = req.body;
+        const { token, email, firstName, lastName, rank, gender, role, serviceNumber, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const saltRounds = 10;
-            bcryptjs_1.default.genSalt(saltRounds, function (err, salt) {
-                const password = (0, Methods_1.generateRandomString)(8);
-                bcryptjs_1.default.hash(password, salt, (err, hash) => __awaiter(this, void 0, void 0, function* () {
-                    const student = yield new Student_1.Student({
-                        id: (0, Methods_1.generateRandomString)(48),
-                        firstName,
-                        lastName,
-                        email,
-                        rank,
-                        serviceNumber,
-                        password: hash,
-                    }).save();
-                    res.json({
-                        status: true,
-                        statusCode: 201,
-                        message: "Student successfully onboarded!",
-                        data: student,
-                        password,
-                    });
-                }));
+            const studentExists = yield Student_1.Student.findOne({
+                $or: [{ email: email }, { serviceNumber }],
             });
+            if (!studentExists) {
+                const student = yield new Student_1.Student({
+                    id: (0, Methods_1.generateRandomString)(32),
+                    email,
+                    firstName,
+                    lastName,
+                    rank,
+                    role,
+                    serviceNumber,
+                    gender,
+                    password: lastName.toUpperCase(),
+                    // department,
+                }).save();
+                res.json({
+                    status: true,
+                    statusCode: 201,
+                    data: student,
+                    message: "New Student created",
+                });
+            }
+            else {
+                res.json({
+                    status: true,
+                    statusCode: 409,
+                    data: false,
+                    message: "Student exists!",
+                });
+            }
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);
@@ -166,6 +177,126 @@ function default_2(app) {
                 statusCode: 204,
                 message: "Student deleted!",
             });
+        }
+    }));
+    //LECTURERS FUNCTIONALITY
+    app.post(`${basePath}/lecturer/create`, admin_2.validateCreateLecturer, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, email, firstName, lastName, rank, gender, role, serviceNumber, } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const lecturerExists = yield Lecturer_1.Lecturer.findOne({
+                $or: [{ email: email }, { serviceNumber }],
+            });
+            if (!lecturerExists) {
+                const lecturer = yield new Lecturer_1.Lecturer({
+                    id: (0, Methods_1.generateRandomString)(32),
+                    email,
+                    firstName,
+                    lastName,
+                    rank,
+                    role,
+                    serviceNumber,
+                    gender,
+                    password: lastName.toUpperCase(),
+                    // department,
+                }).save();
+                res.json({
+                    status: true,
+                    statusCode: 201,
+                    data: lecturer,
+                    message: "New Lecturer created",
+                });
+            }
+            else {
+                res.json({
+                    status: true,
+                    statusCode: 409,
+                    data: false,
+                    message: "Lecturer exists!",
+                });
+            }
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/lecturer/update`, admin_2.validateUpdateLecturer, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { lecturerID, token, email, firstName, lastName, rank, gender, role, serviceNumber, } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const lecturerExists = yield Lecturer_1.Lecturer.findOne({
+                $or: [{ email: email }, { serviceNumber }],
+            });
+            // console.log(lecturerExists, lecturerID, email);
+            console.log(lecturerExists.id, lecturerID);
+            if (lecturerExists && lecturerExists.id !== lecturerID) {
+                res.json({
+                    status: true,
+                    statusCode: 409,
+                    data: { id: lecturerExists.id, lecturerID },
+                    message: "Lecturer exists!",
+                });
+            }
+            else {
+                const lecturer = yield Lecturer_1.Lecturer.findOneAndUpdate({ id: lecturerID }, {
+                    id: (0, Methods_1.generateRandomString)(32),
+                    email,
+                    firstName,
+                    lastName,
+                    rank,
+                    role,
+                    serviceNumber,
+                    gender,
+                    password: lastName.toUpperCase(),
+                    // department,
+                });
+                res.json({
+                    status: true,
+                    statusCode: 200,
+                    data: lecturer,
+                    message: "Lecturer updated",
+                });
+            }
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/lecturer/get`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id } = (0, JWT_1.verifyToken)(token);
+        const lecturer = yield Lecturer_1.Lecturer.findOne({ id }).select("email firstName lastName id rank gender serviceNumber role");
+        if (lecturer) {
+            console.log(lecturer);
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: lecturer,
+                message: "Profile successfully retrieved!",
+            });
+        }
+        else {
+            res.json({
+                status: true,
+                statusCode: 401,
+                message: "Not Found",
+            });
+        }
+    }));
+    app.post(`${basePath}/lecturers/all/get`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const lecturers = yield Lecturer_1.Lecturer.find({}).select("email firstName lastName id rank gender role serviceNumber");
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: lecturers,
+                message: "Lecturers retrieved!",
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
 }

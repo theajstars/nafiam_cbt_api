@@ -30,17 +30,13 @@ export default function (app: Express) {
         "Flight Lieutenant",
         "Flying Officer",
         "Pilot Officer",
-        "Officer Cadet",
-        "Warrant Officer",
+        "Air Warrant Officer",
         "Master Warrant Officer",
+        "Warrant Officer",
         "Flight Sergeant",
         "Sergeant",
         "Corporal",
         "Lance Corporal",
-        "Aircraftman",
-        "Aircraftman Woman",
-        "Leading Aircraftman",
-        "Leading Aircraftwoman",
       ];
 
       res.json({
