@@ -11,7 +11,10 @@ const createLecturerSchema = joi_1.default.object({
     lastName: joi_1.default.string().required(),
     email: joi_1.default.string().required(),
     rank: joi_1.default.string().required(),
-    department: joi_1.default.string().required(),
+    gender: joi_1.default.string().required(),
+    role: joi_1.default.string().required(),
+    serviceNumber: joi_1.default.string().required(),
+    // department: Joi.string().required(),
 });
 const validateCreateLecturer = (req, res, next) => {
     const { error } = createLecturerSchema.validate(req.body);

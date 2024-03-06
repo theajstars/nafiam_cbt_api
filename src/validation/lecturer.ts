@@ -8,7 +8,10 @@ const createLecturerSchema = Joi.object({
   lastName: Joi.string().required(),
   email: Joi.string().required(),
   rank: Joi.string().required(),
-  department: Joi.string().required(),
+  gender: Joi.string().required(),
+  role: Joi.string().required(),
+  serviceNumber: Joi.string().required(),
+  // department: Joi.string().required(),
 });
 
 export const validateCreateLecturer = (req, res, next) => {

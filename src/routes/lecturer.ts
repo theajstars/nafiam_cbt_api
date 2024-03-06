@@ -8,20 +8,37 @@ import { Lecturer } from "../models/Lecturer";
 import { validateTokenSchema } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { validateCreateLecturer } from "../validation/lecturer";
+import { generateRandomString } from "../Lib/Methods";
 const basePath = "/lecturer";
 export default function (app: Express) {
   app.post(`${basePath}/create`, validateCreateLecturer, async (req, res) => {
-    const { token, department, email, firstName, lastName, rank } = req.body;
+    const {
+      token,
+      email,
+      firstName,
+      lastName,
+      rank,
+      role,
+
+      serviceNumber,
+    } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user && user === "admin") {
-      const lecturerExists = await Lecturer.findOne({ email });
+      const lecturerExists = await Lecturer.findOne({
+        $or: [{ email: email }, { serviceNumber }],
+      });
       if (!lecturerExists) {
         const lecturer = await new Lecturer({
+          id: generateRandomString(32),
           email,
           firstName,
           lastName,
           rank,
-          department,
+          role,
+          serviceNumber,
+
+          password: lastName.toUpperCase(),
+          // department,
         }).save();
         res.json({
           status: true,

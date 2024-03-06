@@ -18,20 +18,27 @@ const Lecturer_1 = require("../models/Lecturer");
 const course_1 = require("../validation/course");
 const Misc_1 = require("../Lib/Misc");
 const lecturer_1 = require("../validation/lecturer");
+const Methods_1 = require("../Lib/Methods");
 const basePath = "/lecturer";
 function default_1(app) {
     app.post(`${basePath}/create`, lecturer_1.validateCreateLecturer, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, department, email, firstName, lastName, rank } = req.body;
+        const { token, email, firstName, lastName, rank, role, serviceNumber, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const lecturerExists = yield Lecturer_1.Lecturer.findOne({ email });
+            const lecturerExists = yield Lecturer_1.Lecturer.findOne({
+                $or: [{ email: email }, { serviceNumber }],
+            });
             if (!lecturerExists) {
                 const lecturer = yield new Lecturer_1.Lecturer({
+                    id: (0, Methods_1.generateRandomString)(32),
                     email,
                     firstName,
                     lastName,
                     rank,
-                    department,
+                    role,
+                    serviceNumber,
+                    password: lastName.toUpperCase(),
+                    // department,
                 }).save();
                 res.json({
                     status: true,
