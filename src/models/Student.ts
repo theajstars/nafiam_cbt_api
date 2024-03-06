@@ -11,7 +11,7 @@ export interface StudentProps {
   rank: string;
   gender: Gender;
   role: "civilian" | "personnel";
-  // department: string;
+  // school: string;
 }
 
 const studentSchema = new Schema<StudentProps>({
@@ -24,7 +24,7 @@ const studentSchema = new Schema<StudentProps>({
   rank: { type: String, required: true },
   gender: { type: String, required: true },
   role: { type: String, required: true },
-  // department: { type: String, required: true },
+  // school: { type: String, required: true },
 });
 
 const Student = model<StudentProps>("Student", studentSchema);

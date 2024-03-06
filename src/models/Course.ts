@@ -5,7 +5,7 @@ export type CourseProps = {
   lecturerID: string;
   title: string;
   code: string;
-  department: string;
+  school: string;
   description: string;
 };
 
@@ -14,7 +14,7 @@ const courseSchema = new Schema<CourseProps, Model<CourseProps>>({
   lecturerID: { type: String, required: true },
   title: { type: String, required: true },
   code: { type: String, required: true },
-  department: { type: String, required: true },
+  school: { type: String, required: true },
   description: { type: String, required: true },
 });
 

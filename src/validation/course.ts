@@ -26,7 +26,7 @@ const createSchema = Joi.object<CourseProps & { token: string }>({
   token: Joi.string().required(),
   code: Joi.string().required(),
   description: Joi.string().required(),
-  department: Joi.string().required(),
+  school: Joi.string().required(),
   title: Joi.string().required(),
   lecturerID: Joi.string().optional(),
 });
@@ -96,7 +96,7 @@ const updateSchema = Joi.object<
   token: Joi.string().required(),
   code: Joi.string().required(),
   description: Joi.string().required(),
-  department: Joi.string().required(),
+  school: Joi.string().required(),
   title: Joi.string().required(),
 });
 

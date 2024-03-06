@@ -66,7 +66,7 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/create`, course_1.validateCreateCourse, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { title, code, description, department, token, lecturerID } = req.body;
+        const { title, code, description, school, token, lecturerID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (user === "admin" || user === "lecturer") {
             const course = yield new Course_1.Course({
@@ -75,7 +75,7 @@ function default_1(app) {
                 title,
                 code,
                 description,
-                department,
+                school,
             }).save();
             res.json({
                 status: true,
@@ -86,14 +86,14 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/update`, course_1.validateUpdateCourse, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { courseID, title, code, description, department, token } = req.body;
+        const { courseID, title, code, description, school, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (user === "admin" || user === "lecturer") {
             const course = yield Course_1.Course.findOneAndUpdate({ id: courseID }, {
                 title,
                 code,
                 description,
-                department,
+                school,
             });
             res.json({
                 status: true,

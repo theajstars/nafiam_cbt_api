@@ -98,6 +98,9 @@ function default_2(app) {
                 $or: [{ email: email }, { serviceNumber }],
             });
             if (!studentExists) {
+                const saltRounds = 10;
+                const salt = yield bcryptjs_1.default.genSalt(saltRounds);
+                const hash = yield bcryptjs_1.default.hash(lastName.toUpperCase(), salt);
                 const student = yield new Student_1.Student({
                     id: (0, Methods_1.generateRandomString)(32),
                     email,
@@ -107,8 +110,8 @@ function default_2(app) {
                     role,
                     serviceNumber,
                     gender,
-                    password: lastName.toUpperCase(),
-                    // department,
+                    password: hash,
+                    // school,
                 }).save();
                 res.json({
                     status: true,
@@ -123,6 +126,45 @@ function default_2(app) {
                     statusCode: 409,
                     data: false,
                     message: "Student exists!",
+                });
+            }
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/student/update`, admin_1.validateUpdateStudent, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { studentID, token, email, firstName, lastName, rank, gender, role, serviceNumber, } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const studentExists = yield Student_1.Student.findOne({
+                $or: [{ email: email }, { serviceNumber }],
+            });
+            if (studentExists && studentExists.id !== studentID) {
+                res.json({
+                    status: true,
+                    statusCode: 409,
+                    data: { id: studentExists.id, studentID },
+                    message: "Student exists!",
+                });
+            }
+            else {
+                const student = yield Student_1.Student.findOneAndUpdate({ id: studentID }, {
+                    id: (0, Methods_1.generateRandomString)(32),
+                    email,
+                    firstName,
+                    lastName,
+                    rank,
+                    role,
+                    serviceNumber,
+                    gender,
+                    // school,
+                });
+                res.json({
+                    status: true,
+                    statusCode: 200,
+                    data: student,
+                    message: "Student updated",
                 });
             }
         }
@@ -188,6 +230,9 @@ function default_2(app) {
                 $or: [{ email: email }, { serviceNumber }],
             });
             if (!lecturerExists) {
+                const saltRounds = 10;
+                const salt = yield bcryptjs_1.default.genSalt(saltRounds);
+                const hash = yield bcryptjs_1.default.hash(lastName.toUpperCase(), salt);
                 const lecturer = yield new Lecturer_1.Lecturer({
                     id: (0, Methods_1.generateRandomString)(32),
                     email,
@@ -197,8 +242,8 @@ function default_2(app) {
                     role,
                     serviceNumber,
                     gender,
-                    password: lastName.toUpperCase(),
-                    // department,
+                    password: hash,
+                    // school,
                 }).save();
                 res.json({
                     status: true,
@@ -227,8 +272,6 @@ function default_2(app) {
             const lecturerExists = yield Lecturer_1.Lecturer.findOne({
                 $or: [{ email: email }, { serviceNumber }],
             });
-            // console.log(lecturerExists, lecturerID, email);
-            console.log(lecturerExists.id, lecturerID);
             if (lecturerExists && lecturerExists.id !== lecturerID) {
                 res.json({
                     status: true,
@@ -247,8 +290,7 @@ function default_2(app) {
                     role,
                     serviceNumber,
                     gender,
-                    password: lastName.toUpperCase(),
-                    // department,
+                    // school,
                 });
                 res.json({
                     status: true,
@@ -267,7 +309,6 @@ function default_2(app) {
         const { id } = (0, JWT_1.verifyToken)(token);
         const lecturer = yield Lecturer_1.Lecturer.findOne({ id }).select("email firstName lastName id rank gender serviceNumber role");
         if (lecturer) {
-            console.log(lecturer);
             res.json({
                 status: true,
                 statusCode: 200,

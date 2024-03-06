@@ -7,7 +7,7 @@ const courseSchema = new mongoose_1.Schema({
     lecturerID: { type: String, required: true },
     title: { type: String, required: true },
     code: { type: String, required: true },
-    department: { type: String, required: true },
+    school: { type: String, required: true },
     description: { type: String, required: true },
 });
 const Course = (0, mongoose_1.model)("Course", courseSchema);

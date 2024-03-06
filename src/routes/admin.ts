@@ -14,7 +14,10 @@ import {
 import { Student } from "../models/Student";
 import { Course } from "../models/Course";
 import { generateRandomString } from "../Lib/Methods";
-import { validateOnboardStudent } from "../validation/admin";
+import {
+  validateOnboardStudent,
+  validateUpdateStudent,
+} from "../validation/admin";
 import { validateTokenSchema } from "../validation/course";
 import { validateLoginRequest } from "../validation/default";
 import { Log } from "../models/Log";
@@ -109,6 +112,10 @@ export default function (app: Express) {
           $or: [{ email: email }, { serviceNumber }],
         });
         if (!studentExists) {
+          const saltRounds = 10;
+
+          const salt = await bcrypt.genSalt(saltRounds);
+          const hash = await bcrypt.hash(lastName.toUpperCase(), salt);
           const student = await new Student({
             id: generateRandomString(32),
             email,
@@ -118,8 +125,8 @@ export default function (app: Express) {
             role,
             serviceNumber,
             gender,
-            password: lastName.toUpperCase(),
-            // department,
+            password: hash,
+            // school,
           }).save();
           res.json({
             status: true,
@@ -133,6 +140,61 @@ export default function (app: Express) {
             statusCode: 409,
             data: false,
             message: "Student exists!",
+          });
+        }
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+
+  app.post(
+    `${basePath}/student/update`,
+    validateUpdateStudent,
+    async (req, res) => {
+      const {
+        studentID,
+        token,
+        email,
+        firstName,
+        lastName,
+        rank,
+        gender,
+        role,
+        serviceNumber,
+      } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const studentExists = await Student.findOne({
+          $or: [{ email: email }, { serviceNumber }],
+        });
+        if (studentExists && studentExists.id !== studentID) {
+          res.json({
+            status: true,
+            statusCode: 409,
+            data: { id: studentExists.id, studentID },
+            message: "Student exists!",
+          });
+        } else {
+          const student = await Student.findOneAndUpdate(
+            { id: studentID },
+            {
+              id: generateRandomString(32),
+              email,
+              firstName,
+              lastName,
+              rank,
+              role,
+              serviceNumber,
+              gender,
+              // school,
+            }
+          );
+          res.json({
+            status: true,
+            statusCode: 200,
+            data: student,
+            message: "Student updated",
           });
         }
       } else {
@@ -214,6 +276,10 @@ export default function (app: Express) {
           $or: [{ email: email }, { serviceNumber }],
         });
         if (!lecturerExists) {
+          const saltRounds = 10;
+
+          const salt = await bcrypt.genSalt(saltRounds);
+          const hash = await bcrypt.hash(lastName.toUpperCase(), salt);
           const lecturer = await new Lecturer({
             id: generateRandomString(32),
             email,
@@ -223,8 +289,8 @@ export default function (app: Express) {
             role,
             serviceNumber,
             gender,
-            password: lastName.toUpperCase(),
-            // department,
+            password: hash,
+            // school,
           }).save();
           res.json({
             status: true,
@@ -265,8 +331,6 @@ export default function (app: Express) {
         const lecturerExists = await Lecturer.findOne({
           $or: [{ email: email }, { serviceNumber }],
         });
-        // console.log(lecturerExists, lecturerID, email);
-        console.log(lecturerExists.id, lecturerID);
         if (lecturerExists && lecturerExists.id !== lecturerID) {
           res.json({
             status: true,
@@ -286,8 +350,7 @@ export default function (app: Express) {
               role,
               serviceNumber,
               gender,
-              password: lastName.toUpperCase(),
-              // department,
+              // school,
             }
           );
           res.json({
@@ -309,7 +372,6 @@ export default function (app: Express) {
       "email firstName lastName id rank gender serviceNumber role"
     );
     if (lecturer) {
-      console.log(lecturer);
       res.json({
         status: true,
         statusCode: 200,

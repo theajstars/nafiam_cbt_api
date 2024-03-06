@@ -80,8 +80,7 @@ export default function (app: Express) {
     }
   );
   app.post(`${basePath}/create`, validateCreateCourse, async (req, res) => {
-    const { title, code, description, department, token, lecturerID } =
-      req.body;
+    const { title, code, description, school, token, lecturerID } = req.body;
 
     const { id, user } = verifyToken(token);
 
@@ -92,7 +91,7 @@ export default function (app: Express) {
         title,
         code,
         description,
-        department,
+        school,
       }).save();
       res.json(<DefaultResponse>{
         status: true,
@@ -103,7 +102,7 @@ export default function (app: Express) {
     }
   });
   app.post(`${basePath}/update`, validateUpdateCourse, async (req, res) => {
-    const { courseID, title, code, description, department, token } = req.body;
+    const { courseID, title, code, description, school, token } = req.body;
 
     const { id, user } = verifyToken(token);
 
@@ -114,7 +113,7 @@ export default function (app: Express) {
           title,
           code,
           description,
-          department,
+          school,
         }
       );
       res.json(<DefaultResponse>{

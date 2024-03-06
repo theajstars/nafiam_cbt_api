@@ -44,19 +44,17 @@ const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
     (0, course_1.default)(app);
     (0, file_1.default)(app);
     const genPassword = () => __awaiter(void 0, void 0, void 0, function* () {
+        // new Admin({
+        //   id: generateRandomString(32),
+        //   firstName: "Zeus",
+        //   lastName: "Olympus",
+        //   email: "me@theajstars.com",
+        //   password: hash,
+        // }).save();
         const saltRounds = 10;
-        bcryptjs_1.default.genSalt(saltRounds, function (err, salt) {
-            bcryptjs_1.default.hash("securePassword2024", salt, function (err, hash) {
-                console.log(hash);
-                // new Admin({
-                //   id: generateRandomString(32),
-                //   firstName: "Zeus",
-                //   lastName: "Olympus",
-                //   email: "me@theajstars.com",
-                //   password: hash,
-                // }).save();
-            });
-        });
+        const salt = yield bcryptjs_1.default.genSalt(saltRounds);
+        const hash = yield bcryptjs_1.default.hash("securePassword2024", salt);
+        console.log("Thine Hash", hash);
     });
     genPassword();
     // Course.updateMany({}, { lecturerID: "1709114865502" }).exec();

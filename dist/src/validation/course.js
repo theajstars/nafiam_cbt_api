@@ -29,7 +29,7 @@ const createSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     code: joi_1.default.string().required(),
     description: joi_1.default.string().required(),
-    department: joi_1.default.string().required(),
+    school: joi_1.default.string().required(),
     title: joi_1.default.string().required(),
     lecturerID: joi_1.default.string().optional(),
 });
@@ -97,7 +97,7 @@ const updateSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     code: joi_1.default.string().required(),
     description: joi_1.default.string().required(),
-    department: joi_1.default.string().required(),
+    school: joi_1.default.string().required(),
     title: joi_1.default.string().required(),
 });
 const validateUpdateCourse = (req, res, next) => {

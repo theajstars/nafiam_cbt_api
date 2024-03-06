@@ -39,20 +39,18 @@ connect(dbConnectString)
     course(app);
     file(app);
     const genPassword = async () => {
+      // new Admin({
+      //   id: generateRandomString(32),
+      //   firstName: "Zeus",
+      //   lastName: "Olympus",
+      //   email: "me@theajstars.com",
+      //   password: hash,
+      // }).save();
       const saltRounds = 10;
 
-      bcrypt.genSalt(saltRounds, function (err, salt) {
-        bcrypt.hash("securePassword2024", salt, function (err, hash) {
-          console.log(hash);
-          // new Admin({
-          //   id: generateRandomString(32),
-          //   firstName: "Zeus",
-          //   lastName: "Olympus",
-          //   email: "me@theajstars.com",
-          //   password: hash,
-          // }).save();
-        });
-      });
+      const salt = await bcrypt.genSalt(saltRounds);
+      const hash = await bcrypt.hash("securePassword2024", salt);
+      console.log("Thine Hash", hash);
     };
     genPassword();
     // Course.updateMany({}, { lecturerID: "1709114865502" }).exec();
