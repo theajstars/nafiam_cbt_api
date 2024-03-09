@@ -290,7 +290,6 @@ function default_2(app) {
                     role,
                     serviceNumber,
                     gender,
-                    // school,
                 });
                 res.json({
                     status: true,
@@ -305,10 +304,10 @@ function default_2(app) {
         }
     }));
     app.post(`${basePath}/lecturer/get`, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token } = req.body;
-        const { id } = (0, JWT_1.verifyToken)(token);
-        const lecturer = yield Lecturer_1.Lecturer.findOne({ id }).select("email firstName lastName id rank gender serviceNumber role");
-        if (lecturer) {
+        const { token, lecturerID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user === "admin") {
+            const lecturer = yield Lecturer_1.Lecturer.findOne({ id: lecturerID }).select("email firstName lastName id rank gender serviceNumber role");
             res.json({
                 status: true,
                 statusCode: 200,
@@ -317,11 +316,23 @@ function default_2(app) {
             });
         }
         else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.delete(`${basePath}/lecturer/delete`, admin_1.validateSingleLecturerRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, lecturerID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const lecturer = yield Lecturer_1.Lecturer.findOneAndDelete({ id: lecturerID });
             res.json({
                 status: true,
-                statusCode: 401,
-                message: "Not Found",
+                statusCode: 200,
+                data: lecturer,
+                message: "Profile successfully deleted!",
             });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
     app.post(`${basePath}/lecturers/all/get`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {

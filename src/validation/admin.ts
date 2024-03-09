@@ -85,6 +85,26 @@ export const validateUpdateLecturer = (req, res, next) => {
     next();
   }
 };
+const singleLecturerSchema = Joi.object({
+  token: Joi.string().required(),
+  lecturerID: Joi.string().required(),
+});
+
+export const validateSingleLecturerRequest = (req, res, next) => {
+  const { error } = singleLecturerSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
 const updateStudentSchema = Joi.object({
   token: Joi.string().required(),
   studentID: Joi.string().required(),

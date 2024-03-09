@@ -16,6 +16,7 @@ import { Course } from "../models/Course";
 import { generateRandomString } from "../Lib/Methods";
 import {
   validateOnboardStudent,
+  validateSingleLecturerRequest,
   validateUpdateStudent,
 } from "../validation/admin";
 import { validateTokenSchema } from "../validation/course";
@@ -350,7 +351,6 @@ export default function (app: Express) {
               role,
               serviceNumber,
               gender,
-              // school,
             }
           );
           res.json({
@@ -366,12 +366,13 @@ export default function (app: Express) {
     }
   );
   app.post(`${basePath}/lecturer/get`, async (req, res) => {
-    const { token } = req.body;
-    const { id } = verifyToken(token);
-    const lecturer = await Lecturer.findOne({ id }).select(
-      "email firstName lastName id rank gender serviceNumber role"
-    );
-    if (lecturer) {
+    const { token, lecturerID } = req.body;
+    const { id, user } = verifyToken(token);
+    if (id && user === "admin") {
+      const lecturer = await Lecturer.findOne({ id: lecturerID }).select(
+        "email firstName lastName id rank gender serviceNumber role"
+      );
+
       res.json({
         status: true,
         statusCode: 200,
@@ -379,13 +380,29 @@ export default function (app: Express) {
         message: "Profile successfully retrieved!",
       });
     } else {
-      res.json({
-        status: true,
-        statusCode: 401,
-        message: "Not Found",
-      });
+      res.json(UnauthorizedResponseObject);
     }
   });
+  app.delete(
+    `${basePath}/lecturer/delete`,
+    validateSingleLecturerRequest,
+    async (req, res) => {
+      const { token, lecturerID } = req.body;
+
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const lecturer = await Lecturer.findOneAndDelete({ id: lecturerID });
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: lecturer,
+          message: "Profile successfully deleted!",
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
   app.post(
     `${basePath}/lecturers/all/get`,
     validateTokenSchema,

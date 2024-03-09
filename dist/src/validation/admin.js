@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateSingleSchoolRequest = exports.validateUpdateSchoolRequest = exports.validateCreateSchoolRequest = exports.validateUpdateStudent = exports.validateUpdateLecturer = exports.validateCreateLecturer = exports.validateOnboardStudent = void 0;
+exports.validateSingleSchoolRequest = exports.validateUpdateSchoolRequest = exports.validateCreateSchoolRequest = exports.validateUpdateStudent = exports.validateSingleLecturerRequest = exports.validateUpdateLecturer = exports.validateCreateLecturer = exports.validateOnboardStudent = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const onboardstudentSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -90,6 +90,27 @@ const validateUpdateLecturer = (req, res, next) => {
     }
 };
 exports.validateUpdateLecturer = validateUpdateLecturer;
+const singleLecturerSchema = joi_1.default.object({
+    token: joi_1.default.string().required(),
+    lecturerID: joi_1.default.string().required(),
+});
+const validateSingleLecturerRequest = (req, res, next) => {
+    const { error } = singleLecturerSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateSingleLecturerRequest = validateSingleLecturerRequest;
 const updateStudentSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     studentID: joi_1.default.string().required(),
