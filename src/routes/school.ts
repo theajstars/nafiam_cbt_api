@@ -8,14 +8,16 @@ import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { generateRandomString } from "../Lib/Methods";
 import {
   validateCreateSchoolRequest,
-  validateDeleteSchoolRequest,
+  validateSingleSchoolRequest,
   validateUpdateSchoolRequest,
 } from "../validation/admin";
+import { Lecturer } from "../models/Lecturer";
+import { Course } from "../models/Course";
 
 const basePath = "/school";
 
 export default function (app: Express) {
-  app.post(`${basePath}s/get`, validateTokenSchema, async (req, res) => {
+  app.post(`${basePath}s/all`, validateTokenSchema, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user) {
@@ -24,6 +26,29 @@ export default function (app: Express) {
         status: true,
         statusCode: 200,
         data: schools,
+      });
+    } else {
+      res.json(UnauthorizedResponseObject);
+    }
+  });
+  app.post(`${basePath}/get`, validateSingleSchoolRequest, async (req, res) => {
+    const { token, schoolID } = req.body;
+    const { id, user } = verifyToken(token);
+    if (id && user) {
+      const school = await School.findOne({ id: schoolID });
+      const lecturer = await Lecturer.findOne({
+        id: school ? school.dean : "",
+      }).select("rank gender role serviceNumber email firstName lastName id");
+      const courses = await Course.find({ school: schoolID });
+
+      res.json({
+        status: true,
+        statusCode: 200,
+        data: {
+          school,
+          dean: lecturer,
+          courses,
+        },
       });
     } else {
       res.json(UnauthorizedResponseObject);
@@ -79,7 +104,7 @@ export default function (app: Express) {
   );
   app.delete(
     `${basePath}/delete`,
-    validateDeleteSchoolRequest,
+    validateSingleSchoolRequest,
     async (req, res) => {
       const { token, schoolID } = req.body;
       // 'dean' refers to lecturer ID

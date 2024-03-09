@@ -155,13 +155,13 @@ export const validateUpdateSchoolRequest = (req, res, next) => {
     next();
   }
 };
-const deleteSchoolSchema = Joi.object({
+const singleSchoolSchema = Joi.object({
   token: Joi.string().required(),
   schoolID: Joi.string().required(),
 });
 
-export const validateDeleteSchoolRequest = (req, res, next) => {
-  const { error } = deleteSchoolSchema.validate(req.body);
+export const validateSingleSchoolRequest = (req, res, next) => {
+  const { error } = singleSchoolSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {
       return e.message;

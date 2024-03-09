@@ -15,9 +15,11 @@ const Schools_1 = require("../models/Schools");
 const Misc_1 = require("../Lib/Misc");
 const Methods_1 = require("../Lib/Methods");
 const admin_1 = require("../validation/admin");
+const Lecturer_1 = require("../models/Lecturer");
+const Course_1 = require("../models/Course");
 const basePath = "/school";
 function default_1(app) {
-    app.post(`${basePath}s/get`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}s/all`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
@@ -26,6 +28,29 @@ function default_1(app) {
                 status: true,
                 statusCode: 200,
                 data: schools,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/get`, admin_1.validateSingleSchoolRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, schoolID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            const school = yield Schools_1.School.findOne({ id: schoolID });
+            const lecturer = yield Lecturer_1.Lecturer.findOne({
+                id: school ? school.dean : "",
+            }).select("rank gender role serviceNumber email firstName lastName id");
+            const courses = yield Course_1.Course.find({ school: schoolID });
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: {
+                    school,
+                    dean: lecturer,
+                    courses,
+                },
             });
         }
         else {
@@ -71,7 +96,7 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.delete(`${basePath}/delete`, admin_1.validateDeleteSchoolRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.delete(`${basePath}/delete`, admin_1.validateSingleSchoolRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, schoolID } = req.body;
         // 'dean' refers to lecturer ID
         const { id, user } = (0, JWT_1.verifyToken)(token);

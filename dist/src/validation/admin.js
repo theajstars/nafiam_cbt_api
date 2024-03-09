@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateDeleteSchoolRequest = exports.validateUpdateSchoolRequest = exports.validateCreateSchoolRequest = exports.validateUpdateStudent = exports.validateUpdateLecturer = exports.validateCreateLecturer = exports.validateOnboardStudent = void 0;
+exports.validateSingleSchoolRequest = exports.validateUpdateSchoolRequest = exports.validateCreateSchoolRequest = exports.validateUpdateStudent = exports.validateUpdateLecturer = exports.validateCreateLecturer = exports.validateOnboardStudent = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const onboardstudentSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -163,12 +163,12 @@ const validateUpdateSchoolRequest = (req, res, next) => {
     }
 };
 exports.validateUpdateSchoolRequest = validateUpdateSchoolRequest;
-const deleteSchoolSchema = joi_1.default.object({
+const singleSchoolSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     schoolID: joi_1.default.string().required(),
 });
-const validateDeleteSchoolRequest = (req, res, next) => {
-    const { error } = deleteSchoolSchema.validate(req.body);
+const validateSingleSchoolRequest = (req, res, next) => {
+    const { error } = singleSchoolSchema.validate(req.body);
     if (error) {
         const errorResponse = error.details.map((e) => {
             return e.message;
@@ -183,5 +183,5 @@ const validateDeleteSchoolRequest = (req, res, next) => {
         next();
     }
 };
-exports.validateDeleteSchoolRequest = validateDeleteSchoolRequest;
+exports.validateSingleSchoolRequest = validateSingleSchoolRequest;
 //# sourceMappingURL=admin.js.map
