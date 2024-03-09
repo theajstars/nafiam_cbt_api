@@ -8,6 +8,7 @@ import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { generateRandomString } from "../Lib/Methods";
 import {
   validateCreateSchoolRequest,
+  validateDeleteSchoolRequest,
   validateUpdateSchoolRequest,
 } from "../validation/admin";
 
@@ -66,6 +67,25 @@ export default function (app: Express) {
             dean,
           }
         );
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: school,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.delete(
+    `${basePath}/delete`,
+    validateDeleteSchoolRequest,
+    async (req, res) => {
+      const { token, schoolID } = req.body;
+      // 'dean' refers to lecturer ID
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const school = await School.findOneAndDelete({ id: schoolID });
         res.json({
           status: true,
           statusCode: 200,

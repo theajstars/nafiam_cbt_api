@@ -133,16 +133,35 @@ export const validateCreateSchoolRequest = (req, res, next) => {
     next();
   }
 };
-const updateSchoolRequest = Joi.object({
+const updateSchoolSchema = Joi.object({
   token: Joi.string().required(),
   schoolID: Joi.string().required(),
-
   name: Joi.string().required(),
   dean: Joi.string().required(),
 });
 
 export const validateUpdateSchoolRequest = (req, res, next) => {
-  const { error } = updateSchoolRequest.validate(req.body);
+  const { error } = updateSchoolSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
+const deleteSchoolSchema = Joi.object({
+  token: Joi.string().required(),
+  schoolID: Joi.string().required(),
+});
+
+export const validateDeleteSchoolRequest = (req, res, next) => {
+  const { error } = deleteSchoolSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {
       return e.message;

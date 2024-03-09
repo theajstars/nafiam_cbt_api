@@ -71,6 +71,22 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    app.delete(`${basePath}/delete`, admin_1.validateDeleteSchoolRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, schoolID } = req.body;
+        // 'dean' refers to lecturer ID
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const school = yield Schools_1.School.findOneAndDelete({ id: schoolID });
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: school,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
 }
 exports.default = default_1;
 //# sourceMappingURL=school.js.map
