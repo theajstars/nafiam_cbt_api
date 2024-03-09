@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateUpdateStudent = exports.validateUpdateLecturer = exports.validateCreateLecturer = exports.validateOnboardStudent = void 0;
+exports.validateUpdateSchoolRequest = exports.validateCreateSchoolRequest = exports.validateUpdateStudent = exports.validateUpdateLecturer = exports.validateCreateLecturer = exports.validateOnboardStudent = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const onboardstudentSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -118,4 +118,49 @@ const validateUpdateStudent = (req, res, next) => {
     }
 };
 exports.validateUpdateStudent = validateUpdateStudent;
+const createSchoolSchema = joi_1.default.object({
+    token: joi_1.default.string().required(),
+    name: joi_1.default.string().required(),
+    dean: joi_1.default.string().required(),
+});
+const validateCreateSchoolRequest = (req, res, next) => {
+    const { error } = createSchoolSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateCreateSchoolRequest = validateCreateSchoolRequest;
+const updateSchoolRequest = joi_1.default.object({
+    token: joi_1.default.string().required(),
+    schoolID: joi_1.default.string().required(),
+    name: joi_1.default.string().required(),
+    dean: joi_1.default.string().required(),
+});
+const validateUpdateSchoolRequest = (req, res, next) => {
+    const { error } = updateSchoolRequest.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateUpdateSchoolRequest = validateUpdateSchoolRequest;
 //# sourceMappingURL=admin.js.map

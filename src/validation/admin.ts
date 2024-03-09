@@ -112,3 +112,47 @@ export const validateUpdateStudent = (req, res, next) => {
     next();
   }
 };
+const createSchoolSchema = Joi.object({
+  token: Joi.string().required(),
+  name: Joi.string().required(),
+  dean: Joi.string().required(),
+});
+
+export const validateCreateSchoolRequest = (req, res, next) => {
+  const { error } = createSchoolSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
+const updateSchoolRequest = Joi.object({
+  token: Joi.string().required(),
+  schoolID: Joi.string().required(),
+
+  name: Joi.string().required(),
+  dean: Joi.string().required(),
+});
+
+export const validateUpdateSchoolRequest = (req, res, next) => {
+  const { error } = updateSchoolRequest.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
