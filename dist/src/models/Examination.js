@@ -14,6 +14,7 @@ const examinationSchema = new mongoose_1.Schema({
     completed: { type: Boolean, required: true },
     questions: { type: Array, required: false },
     selectedQuestions: { type: Array, required: false },
+    password: { type: String, required: false },
 });
 const Examination = (0, mongoose_1.model)("Examination", examinationSchema);
 exports.Examination = Examination;

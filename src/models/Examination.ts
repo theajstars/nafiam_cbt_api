@@ -17,12 +17,13 @@ export interface ExaminationProps {
   year: string;
   course: string;
   lecturerID: string;
-  started: boolean;
   approved: boolean;
   published: boolean;
+  started: boolean;
   completed: boolean;
   questions: any;
   selectedQuestions: any;
+  password?: string;
 }
 
 const examinationSchema = new Schema<ExaminationProps, Model<ExaminationProps>>(
@@ -38,6 +39,7 @@ const examinationSchema = new Schema<ExaminationProps, Model<ExaminationProps>>(
     completed: { type: Boolean, required: true },
     questions: { type: Array, required: false },
     selectedQuestions: { type: Array, required: false },
+    password: { type: String, required: false },
   }
 );
 
