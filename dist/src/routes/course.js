@@ -159,6 +159,22 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    app.post(`${basePath}/enroll`, course_1.validateCourseEnrollmentRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { courseID, token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "student") {
+            const course = yield Course_1.Course.findOneAndUpdate({ id: courseID }, { $push: { students: id } });
+            res.json({
+                status: true,
+                statusCode: 200,
+                message: "Enrollment successful!",
+                data: course,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
 }
 exports.default = default_1;
 //# sourceMappingURL=course.js.map

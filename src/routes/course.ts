@@ -5,6 +5,7 @@ import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { DefaultResponse } from "../Lib/Responses";
 import { Course } from "../models/Course";
 import {
+  validateCourseEnrollmentRequest,
   validateCreateCourse,
   validateCreateCourseMaterial,
   validateDeleteCourseMaterialSchema,
@@ -192,6 +193,30 @@ export default function (app: Express) {
           statusCode: 200,
           message: "Found materials!",
           data: materials,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/enroll`,
+    validateCourseEnrollmentRequest,
+    async (req, res) => {
+      const { courseID, token } = req.body;
+
+      const { id, user } = verifyToken(token);
+
+      if (id && user && user === "student") {
+        const course = await Course.findOneAndUpdate(
+          { id: courseID },
+          { $push: { students: id } }
+        );
+        res.json(<DefaultResponse>{
+          status: true,
+          statusCode: 200,
+          message: "Enrollment successful!",
+          data: course,
         });
       } else {
         res.json(UnauthorizedResponseObject);

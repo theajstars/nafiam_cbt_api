@@ -58,7 +58,7 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const admin = yield Admin_1.Admin.findOne({ id }).select("firstName lastName email");
+            const admin = yield Admin_1.Admin.findOne({ id }).select("id firstName lastName email");
             res.json({
                 status: true,
                 statusCode: 200,

@@ -62,7 +62,7 @@ export default function (app: Express) {
     const { id, user } = verifyToken(token);
     if (id && user && user === "admin") {
       const admin = await Admin.findOne({ id }).select(
-        "firstName lastName email"
+        "id firstName lastName email"
       );
       res.json({
         status: true,

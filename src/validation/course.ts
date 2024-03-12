@@ -188,3 +188,23 @@ export const validateDeleteCourseMaterialSchema = (req, res, next) => {
     next();
   }
 };
+const courseEnrollSchema = Joi.object({
+  courseID: Joi.string().required(),
+  token: Joi.string().required(),
+});
+
+export const validateCourseEnrollmentRequest = (req, res, next) => {
+  const { error } = courseEnrollSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
