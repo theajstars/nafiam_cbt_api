@@ -38,6 +38,8 @@ export default function (app: Express) {
           completed: false,
           published: false,
           started: false,
+          password: "",
+          students: [],
         }).save();
         res.json(
           returnSuccessResponseObject("Examination created!", 201, examination)

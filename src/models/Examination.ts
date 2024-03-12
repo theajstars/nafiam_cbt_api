@@ -23,6 +23,7 @@ export interface ExaminationProps {
   completed: boolean;
   questions: any;
   selectedQuestions: any;
+  students?: any;
   password?: string;
 }
 
@@ -38,6 +39,7 @@ const examinationSchema = new Schema<ExaminationProps, Model<ExaminationProps>>(
     published: { type: Boolean, required: true },
     completed: { type: Boolean, required: true },
     questions: { type: Array, required: false },
+    students: { type: Array, required: false },
     selectedQuestions: { type: Array, required: false },
     password: { type: String, required: false },
   }

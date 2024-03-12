@@ -20,13 +20,13 @@ function default_1(app) {
     app.post(`${basePath}s/all`, course_1.validateGetAllCourses, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (user === "admin") {
-            const course = Course_1.Course.find({});
+        if (id && user) {
+            const courses = yield Course_1.Course.find({});
             res.json({
                 status: true,
-                statusCode: 201,
-                message: "Course created successfully!",
-                data: course,
+                statusCode: 200,
+                message: "Courses found!",
+                data: courses,
             });
         }
         else {
@@ -52,7 +52,7 @@ function default_1(app) {
     app.post(`${basePath}/get`, course_1.validateGetSingleCourseSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, courseID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (user === "lecturer" || user === "admin") {
+        if (user && id) {
             const course = yield Course_1.Course.findOne({ id: courseID });
             res.json({
                 status: true,
@@ -76,6 +76,7 @@ function default_1(app) {
                 code,
                 description,
                 school,
+                students: [],
             }).save();
             res.json({
                 status: true,
@@ -152,22 +153,6 @@ function default_1(app) {
                 statusCode: 200,
                 message: "Found materials!",
                 data: materials,
-            });
-        }
-        else {
-            res.json(Misc_1.UnauthorizedResponseObject);
-        }
-    }));
-    app.post("/admin/courses/all", course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token } = req.body;
-        const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "admin") {
-            const courses = yield Course_1.Course.find({});
-            res.json({
-                data: courses,
-                status: true,
-                statusCode: 200,
-                message: "All courses retrieved!",
             });
         }
         else {

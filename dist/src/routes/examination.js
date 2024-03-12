@@ -32,6 +32,8 @@ function default_1(app) {
                 completed: false,
                 published: false,
                 started: false,
+                password: "",
+                students: [],
             }).save();
             res.json((0, Misc_1.returnSuccessResponseObject)("Examination created!", 201, examination));
         }

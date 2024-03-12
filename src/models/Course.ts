@@ -7,6 +7,7 @@ export type CourseProps = {
   code: string;
   school: string;
   description: string;
+  students: any;
 };
 
 const courseSchema = new Schema<CourseProps, Model<CourseProps>>({
@@ -16,6 +17,7 @@ const courseSchema = new Schema<CourseProps, Model<CourseProps>>({
   code: { type: String, required: true },
   school: { type: String, required: true },
   description: { type: String, required: true },
+  students: { type: Array, required: true },
 });
 
 const Course = model<CourseProps>("Course", courseSchema);

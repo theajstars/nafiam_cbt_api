@@ -24,13 +24,13 @@ export default function (app: Express) {
 
     const { id, user } = verifyToken(token);
 
-    if (user === "admin") {
-      const course = Course.find({});
+    if (id && user) {
+      const courses = await Course.find({});
       res.json(<DefaultResponse>{
         status: true,
-        statusCode: 201,
-        message: "Course created successfully!",
-        data: course,
+        statusCode: 200,
+        message: "Courses found!",
+        data: courses,
       });
     } else {
       res.json(UnauthorizedResponseObject);
@@ -66,7 +66,7 @@ export default function (app: Express) {
 
       const { id, user } = verifyToken(token);
 
-      if (user === "lecturer" || user === "admin") {
+      if (user && id) {
         const course = await Course.findOne({ id: courseID });
         res.json(<DefaultResponse>{
           status: true,
@@ -92,6 +92,7 @@ export default function (app: Express) {
         code,
         description,
         school,
+        students: [],
       }).save();
       res.json(<DefaultResponse>{
         status: true,
@@ -197,19 +198,4 @@ export default function (app: Express) {
       }
     }
   );
-  app.post("/admin/courses/all", validateTokenSchema, async (req, res) => {
-    const { token } = req.body;
-    const { id, user } = verifyToken(token);
-    if (id && user && user === "admin") {
-      const courses = await Course.find({});
-      res.json(<DefaultResponse>{
-        data: courses,
-        status: true,
-        statusCode: 200,
-        message: "All courses retrieved!",
-      });
-    } else {
-      res.json(UnauthorizedResponseObject);
-    }
-  });
 }

@@ -13,6 +13,7 @@ const examinationSchema = new mongoose_1.Schema({
     published: { type: Boolean, required: true },
     completed: { type: Boolean, required: true },
     questions: { type: Array, required: false },
+    students: { type: Array, required: false },
     selectedQuestions: { type: Array, required: false },
     password: { type: String, required: false },
 });
