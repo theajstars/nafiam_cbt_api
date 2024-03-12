@@ -217,4 +217,30 @@ export default function (app: Express) {
       }
     }
   );
+  app.post(
+    `${basePath}/start`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID, isAdmin } = req.body;
+      const { id, user } = verifyToken(token);
+      if (!isAdmin || !id || !user || user !== "admin") {
+        res.json(UnauthorizedResponseObject);
+      } else {
+        const password = generateRandomString(6, "ALPHABET");
+        const examination = await Examination.findOneAndUpdate(
+          {
+            id: examinationID,
+          },
+          { started: true }
+        );
+        res.json(
+          returnSuccessResponseObject(
+            examination === null ? "Not Found!" : "Examination published!",
+            examination === null ? 404 : 200,
+            examination
+          )
+        );
+      }
+    }
+  );
 }

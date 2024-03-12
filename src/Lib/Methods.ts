@@ -1,7 +1,13 @@
-function generateRandomString(length: number) {
+function generateRandomString(
+  length: number,
+  charset: "ALL" | "ALPHABET" = "ALL"
+) {
   let result = "";
   const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    charset === "ALL"
+      ? "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+      : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
   const charactersLength = characters.length;
   let counter = 0;
   while (counter < length) {
