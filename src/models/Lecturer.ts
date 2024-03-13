@@ -10,7 +10,7 @@ export type LecturerProps = {
   rank: string;
   gender: Gender;
   role: "civilian" | "personnel";
-  // school: string;
+  dateCreated: number;
 };
 
 const lecturerSchema = new Schema<LecturerProps, Model<LecturerProps>>({
@@ -23,6 +23,8 @@ const lecturerSchema = new Schema<LecturerProps, Model<LecturerProps>>({
   rank: { type: String, required: true },
   gender: { type: String, required: true },
   role: { type: String, required: true },
+  dateCreated: { type: Number, required: true },
+
   // school: { type: String, required: true },
 });
 

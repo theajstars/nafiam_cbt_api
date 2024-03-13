@@ -111,6 +111,7 @@ function default_2(app) {
                     serviceNumber,
                     gender,
                     password: hash,
+                    dateCreated: Date.now(),
                     // school,
                 }).save();
                 res.json({
@@ -243,6 +244,7 @@ function default_2(app) {
                     serviceNumber,
                     gender,
                     password: hash,
+                    dateCreated: Date.now(),
                     // school,
                 }).save();
                 res.json({

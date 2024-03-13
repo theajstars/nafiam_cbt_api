@@ -12,6 +12,7 @@ const lecturerSchema = new mongoose_1.Schema({
     rank: { type: String, required: true },
     gender: { type: String, required: true },
     role: { type: String, required: true },
+    dateCreated: { type: Number, required: true },
     // school: { type: String, required: true },
 });
 const Lecturer = (0, mongoose_1.model)("Lecturer", lecturerSchema);
