@@ -5,10 +5,6 @@ import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 
 import { Lecturer } from "../models/Lecturer";
-import { validateTokenSchema } from "../validation/course";
-import { UnauthorizedResponseObject } from "../Lib/Misc";
-import { validateCreateLecturer } from "../validation/admin";
-import { generateRandomString } from "../Lib/Methods";
 const basePath = "/lecturer";
 export default function (app: Express) {
   app.post(`${basePath}/login`, async (req, res) => {
