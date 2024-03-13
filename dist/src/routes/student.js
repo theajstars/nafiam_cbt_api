@@ -20,6 +20,7 @@ const Student_1 = require("../models/Student");
 const Misc_1 = require("../Lib/Misc");
 const Log_1 = require("../models/Log");
 const Methods_1 = require("../Lib/Methods");
+const student_1 = require("../validation/student");
 const basePath = "/student";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -57,7 +58,22 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
-            const student = yield Student_1.Student.findOne({ id }).select("id firstName lastName email");
+            const student = yield Student_1.Student.findOne({ id }).select("id firstName lastName email rank serviceNumber gender role");
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: student,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/profile/update`, student_1.validateUpdateStudentProfileRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, firstName, lastName, email } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "student") {
+            const student = yield Student_1.Student.findOneAndUpdate({ id }, { firstName, lastName, email });
             res.json({
                 status: true,
                 statusCode: 200,

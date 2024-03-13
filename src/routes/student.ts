@@ -7,6 +7,7 @@ import { Student } from "../models/Student";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { Log } from "../models/Log";
 import { generateRandomString } from "../Lib/Methods";
+import { validateUpdateStudentProfileRequest } from "../validation/student";
 
 const basePath = "/student";
 export default function (app: Express) {
@@ -48,7 +49,7 @@ export default function (app: Express) {
     const { id, user } = verifyToken(token);
     if (id && user && user === "student") {
       const student = await Student.findOne({ id }).select(
-        "id firstName lastName email"
+        "id firstName lastName email rank serviceNumber gender role"
       );
       res.json({
         status: true,
@@ -59,4 +60,25 @@ export default function (app: Express) {
       res.json(UnauthorizedResponseObject);
     }
   });
+  app.post(
+    `${basePath}/profile/update`,
+    validateUpdateStudentProfileRequest,
+    async (req, res) => {
+      const { token, firstName, lastName, email } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "student") {
+        const student = await Student.findOneAndUpdate(
+          { id },
+          { firstName, lastName, email }
+        );
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: student,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
 }
