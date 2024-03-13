@@ -25,7 +25,7 @@ const basePath = "/student";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password, navigatorObject } = req.body;
-        const student = yield Student_1.Student.findOne({ serviceNumber: id });
+        const student = yield Student_1.Student.findOne({ serviceNumber: id.toUpperCase() });
         if (student) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, student.password);
             const log = yield new Log_1.Log({
@@ -40,6 +40,7 @@ function default_2(app) {
             res.json({
                 status: true,
                 statusCode: isPasswordCorrect ? 200 : 401,
+                message: "Incorrect password",
                 student: isPasswordCorrect ? student : null,
                 token: isPasswordCorrect
                     ? yield (0, JWT_1.createToken)(student.id, "student")
@@ -50,6 +51,7 @@ function default_2(app) {
         else {
             res.json({
                 status: true,
+                message: "Student not found",
                 statusCode: 401,
             });
         }

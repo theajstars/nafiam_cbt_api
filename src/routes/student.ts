@@ -13,7 +13,7 @@ const basePath = "/student";
 export default function (app: Express) {
   app.post(`${basePath}/login`, validateLoginRequest, async (req, res) => {
     const { id, password, navigatorObject } = req.body;
-    const student = await Student.findOne({ serviceNumber: id });
+    const student = await Student.findOne({ serviceNumber: id.toUpperCase() });
     if (student) {
       const isPasswordCorrect = await bcrypt.compare(
         password,
@@ -31,6 +31,7 @@ export default function (app: Express) {
       res.json({
         status: true,
         statusCode: isPasswordCorrect ? 200 : 401,
+        message: "Incorrect password",
         student: isPasswordCorrect ? student : null,
         token: isPasswordCorrect
           ? await createToken(student.id, "student")
@@ -40,6 +41,7 @@ export default function (app: Express) {
     } else {
       res.json({
         status: true,
+        message: "Student not found",
         statusCode: 401,
       });
     }

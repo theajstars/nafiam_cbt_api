@@ -14,7 +14,7 @@ export default function (app: Express) {
   app.post(`${basePath}/login`, async (req, res) => {
     const { id, password } = req.body;
     console.log({ id, password });
-    const lecturer = await Lecturer.findOne({ email: id });
+    const lecturer = await Lecturer.findOne({ email: id.toUpperCase() });
     if (lecturer) {
       const isPasswordCorrect = await bcrypt.compare(
         password,
