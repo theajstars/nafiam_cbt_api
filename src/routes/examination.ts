@@ -113,12 +113,11 @@ export default function (app: Express) {
     validateDefaultExaminationRequest,
     async (req, res) => {
       const { token, examinationID } = req.body;
-      const { id } = verifyToken(token);
-      const lecturer = await Lecturer.findOne({ id });
-      if (token && lecturer) {
+      const { id, user } = verifyToken(token);
+
+      if (id && user && user !== "student") {
         const examination = await Examination.findOneAndDelete({
           id: examinationID,
-          lecturerID: id,
         });
         res.json(
           returnSuccessResponseObject(

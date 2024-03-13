@@ -80,12 +80,10 @@ function default_1(app) {
     }));
     app.delete(`${basePath}/delete`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID } = req.body;
-        const { id } = (0, JWT_1.verifyToken)(token);
-        const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
-        if (token && lecturer) {
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user !== "student") {
             const examination = yield Examination_1.Examination.findOneAndDelete({
                 id: examinationID,
-                lecturerID: id,
             });
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null
                 ? "Not Found!"
