@@ -28,7 +28,7 @@ const basePath = "/admin";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password, navigatorObject } = req.body;
-        const admin = yield Admin_1.Admin.findOne({ email: id.toUpperCase() });
+        const admin = yield Admin_1.Admin.findOne({ email: id });
         if (admin) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, admin.password);
             const log = yield new Log_1.Log({

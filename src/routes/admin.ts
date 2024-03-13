@@ -32,7 +32,7 @@ const basePath = "/admin";
 export default function (app: Express) {
   app.post(`${basePath}/login`, validateLoginRequest, async (req, res) => {
     const { id, password, navigatorObject } = req.body;
-    const admin = await Admin.findOne({ email: id.toUpperCase() });
+    const admin = await Admin.findOne({ email: id });
     if (admin) {
       const isPasswordCorrect = await bcrypt.compare(password, admin.password);
       const log = await new Log({

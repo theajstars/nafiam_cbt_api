@@ -20,7 +20,9 @@ function default_1(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password } = req.body;
         console.log({ id, password });
-        const lecturer = yield Lecturer_1.Lecturer.findOne({ email: id.toUpperCase() });
+        const lecturer = yield Lecturer_1.Lecturer.findOne({
+            serviceNumber: id.toUpperCase(),
+        });
         if (lecturer) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, lecturer.password);
             res.json({
@@ -34,7 +36,7 @@ function default_1(app) {
             res.json({
                 status: true,
                 statusCode: 401,
-                message: "Invalid email and password",
+                message: "Account not found",
             });
         }
     }));

@@ -10,7 +10,9 @@ export default function (app: Express) {
   app.post(`${basePath}/login`, async (req, res) => {
     const { id, password } = req.body;
     console.log({ id, password });
-    const lecturer = await Lecturer.findOne({ email: id.toUpperCase() });
+    const lecturer = await Lecturer.findOne({
+      serviceNumber: id.toUpperCase(),
+    });
     if (lecturer) {
       const isPasswordCorrect = await bcrypt.compare(
         password,
@@ -27,7 +29,7 @@ export default function (app: Express) {
       res.json({
         status: true,
         statusCode: 401,
-        message: "Invalid email and password",
+        message: "Account not found",
       });
     }
   });
