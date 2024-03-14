@@ -18,22 +18,24 @@ import {
   validateDefaultExaminationRequest,
   validateEditExaminationRequest,
 } from "../validation/examination";
+import { Course } from "../models/Course";
 const basePath = "/examination";
 export default function (app: Express) {
   app.post(
     `${basePath}/create`,
     validateCreateExaminationSchema,
     async (req, res) => {
-      const { token, title, year, course } = req.body;
+      const { token, title, year, course: courseCode } = req.body;
       const { id } = verifyToken(token);
       const lecturer = await Lecturer.findOne({ id });
       if (token && lecturer) {
+        const course = await Course.findOne({ code: courseCode });
         const examination = await new Examination({
           id: generateRandomString(16),
           title,
           year,
           lecturerID: id,
-          course,
+          course: course.id,
           approved: false,
           completed: false,
           published: false,
@@ -265,6 +267,29 @@ export default function (app: Express) {
             examination
           )
         );
+      }
+    }
+  );
+  app.post(
+    `${basePath}/students/get`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID, isAdmin } = req.body;
+      const { id, user } = verifyToken(token);
+      if (!isAdmin || !id || !user || user !== "admin") {
+        res.json(UnauthorizedResponseObject);
+      } else {
+        const examination = await Examination.findOne({
+          id: examinationID,
+        });
+        const course = await Course.findOne({ id: examination.course });
+        const { students } = course;
+        res.json({
+          statusCode: 200,
+          status: true,
+          message: "Students found!",
+          data: students,
+        });
       }
     }
   );

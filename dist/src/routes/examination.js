@@ -15,19 +15,21 @@ const Examination_1 = require("../models/Examination");
 const Misc_1 = require("../Lib/Misc");
 const Methods_1 = require("../Lib/Methods");
 const examination_1 = require("../validation/examination");
+const Course_1 = require("../models/Course");
 const basePath = "/examination";
 function default_1(app) {
     app.post(`${basePath}/create`, examination_1.validateCreateExaminationSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, title, year, course } = req.body;
+        const { token, title, year, course: courseCode } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
         const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
         if (token && lecturer) {
+            const course = yield Course_1.Course.findOne({ code: courseCode });
             const examination = yield new Examination_1.Examination({
                 id: (0, Methods_1.generateRandomString)(16),
                 title,
                 year,
                 lecturerID: id,
-                course,
+                course: course.id,
                 approved: false,
                 completed: false,
                 published: false,
@@ -172,6 +174,26 @@ function default_1(app) {
                 id: examinationID,
             }, { password: "" });
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination timer started!", examination === null ? 404 : 200, examination));
+        }
+    }));
+    app.post(`${basePath}/students/get`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID, isAdmin } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (!isAdmin || !id || !user || user !== "admin") {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+        else {
+            const examination = yield Examination_1.Examination.findOne({
+                id: examinationID,
+            });
+            const course = yield Course_1.Course.findOne({ id: examination.course });
+            const { students } = course;
+            res.json({
+                statusCode: 200,
+                status: true,
+                message: "Students found!",
+                data: students,
+            });
         }
     }));
 }
