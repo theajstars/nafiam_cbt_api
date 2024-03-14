@@ -1,6 +1,6 @@
 import { Express } from "express";
 import bcrypt from "bcryptjs";
-
+import ws from "ws";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 
@@ -227,16 +227,40 @@ export default function (app: Express) {
       if (!isAdmin || !id || !user || user !== "admin") {
         res.json(UnauthorizedResponseObject);
       } else {
-        const password = generateRandomString(6, "ALPHABET");
+        const password = generateRandomString(6, "ALPHABET").toUpperCase();
         const examination = await Examination.findOneAndUpdate(
           {
             id: examinationID,
           },
-          { started: true }
+          { started: true, password }
+        );
+        res.json({
+          statusCode: 200,
+          status: true,
+          message: "Examination starting",
+          data: { password },
+        });
+      }
+    }
+  );
+  app.post(
+    `${basePath}/timer/start`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID, isAdmin } = req.body;
+      const { id, user } = verifyToken(token);
+      if (!isAdmin || !id || !user || user !== "admin") {
+        res.json(UnauthorizedResponseObject);
+      } else {
+        const examination = await Examination.findOneAndUpdate(
+          {
+            id: examinationID,
+          },
+          { password: "" }
         );
         res.json(
           returnSuccessResponseObject(
-            examination === null ? "Not Found!" : "Examination published!",
+            examination === null ? "Not Found!" : "Examination timer started!",
             examination === null ? 404 : 200,
             examination
           )
