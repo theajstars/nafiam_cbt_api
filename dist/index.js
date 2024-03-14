@@ -18,6 +18,8 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const mongoose_1 = require("mongoose");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const http_1 = __importDefault(require("http"));
+const ws_1 = __importDefault(require("ws"));
 const admin_1 = __importDefault(require("./src/routes/admin"));
 const student_1 = __importDefault(require("./src/routes/student"));
 const lecturer_1 = __importDefault(require("./src/routes/lecturer"));
@@ -28,20 +30,29 @@ const misc_1 = __importDefault(require("./src/routes/misc"));
 const school_1 = __importDefault(require("./src/routes/school"));
 const app = (0, express_1.default)();
 exports.app = app;
+const server = http_1.default.createServer(app);
+const wss = new ws_1.default.Server({ server });
 app.use((0, cors_1.default)({
     origin: "*",
 }));
 app.use((0, body_parser_1.default)({ extended: true }));
+wss.on("connection", (ws) => {
+    console.log("A new client connected!", ws);
+    ws.send("Welcome new client");
+    ws.on("message", (message) => {
+        console.log("Received new mesage: ", message);
+    });
+});
 const PORT = 8080;
 const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
 (0, mongoose_1.connect)(dbConnectString)
     .then(() => {
-    app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
+    server.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
     (0, student_1.default)(app);
     (0, misc_1.default)(app);
     (0, admin_1.default)(app);
     (0, lecturer_1.default)(app);
-    (0, examination_1.default)(app);
+    (0, examination_1.default)(app, wss);
     (0, course_1.default)(app);
     (0, file_1.default)(app);
     (0, school_1.default)(app);

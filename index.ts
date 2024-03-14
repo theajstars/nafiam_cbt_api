@@ -3,7 +3,8 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { connect } from "mongoose";
 import bcrypt from "bcryptjs";
-
+import http from "http";
+import WebSocket from "ws";
 import admin from "./src/routes/admin";
 import student from "./src/routes/student";
 import lecturer from "./src/routes/lecturer";
@@ -19,24 +20,33 @@ import misc from "./src/routes/misc";
 import school from "./src/routes/school";
 
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
 app.use(
   cors({
     origin: "*",
   })
 );
 app.use(bodyParser({ extended: true }));
-
+wss.on("connection", (ws) => {
+  console.log("A new client connected!", ws);
+  ws.send("Welcome new client");
+  ws.on("message", (message) => {
+    console.log("Received new mesage: ", message);
+  });
+});
 const PORT = 8080;
 const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
 
 connect(dbConnectString)
   .then(() => {
-    app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
+    server.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
     student(app);
     misc(app);
     admin(app);
     lecturer(app);
-    examination(app);
+    examination(app, wss);
     course(app);
     file(app);
     school(app);

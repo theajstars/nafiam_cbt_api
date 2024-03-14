@@ -1,8 +1,6 @@
 import { Express } from "express";
-import bcrypt from "bcryptjs";
-import ws from "ws";
+import { WebSocket, Server } from "ws";
 import { createToken, verifyToken } from "../Lib/JWT";
-import { DefaultResponse } from "../Lib/Responses";
 
 import { Lecturer } from "../models/Lecturer";
 import { Examination } from "../models/Examination";
@@ -19,7 +17,7 @@ import {
   validateEditExaminationRequest,
 } from "../validation/examination";
 const basePath = "/examination";
-export default function (app: Express) {
+export default function (app: Express, wss: Server) {
   app.post(
     `${basePath}/create`,
     validateCreateExaminationSchema,
@@ -247,6 +245,13 @@ export default function (app: Express) {
     `${basePath}/timer/start`,
     validateDefaultExaminationRequest,
     async (req, res) => {
+      wss.on("admin_start_timer", (ws) => {
+        console.log("A new client connected!", ws);
+        ws.send("Welcome new client");
+        ws.on("message", (message) => {
+          console.log("Received new mesage: ", message);
+        });
+      });
       const { token, examinationID, isAdmin } = req.body;
       const { id, user } = verifyToken(token);
       if (!isAdmin || !id || !user || user !== "admin") {

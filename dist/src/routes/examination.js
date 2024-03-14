@@ -16,7 +16,7 @@ const Misc_1 = require("../Lib/Misc");
 const Methods_1 = require("../Lib/Methods");
 const examination_1 = require("../validation/examination");
 const basePath = "/examination";
-function default_1(app) {
+function default_1(app, wss) {
     app.post(`${basePath}/create`, examination_1.validateCreateExaminationSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, title, year, course } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
@@ -162,6 +162,13 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/timer/start`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        wss.on("admin_start_timer", (ws) => {
+            console.log("A new client connected!", ws);
+            ws.send("Welcome new client");
+            ws.on("message", (message) => {
+                console.log("Received new mesage: ", message);
+            });
+        });
         const { token, examinationID, isAdmin } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (!isAdmin || !id || !user || user !== "admin") {
