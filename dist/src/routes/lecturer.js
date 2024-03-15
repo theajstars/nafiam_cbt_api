@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const JWT_1 = require("../Lib/JWT");
 const Lecturer_1 = require("../models/Lecturer");
+const course_1 = require("../validation/course");
+const Misc_1 = require("../Lib/Misc");
 const basePath = "/lecturer";
 function default_1(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -38,6 +40,22 @@ function default_1(app) {
                 statusCode: 401,
                 message: "Account not found",
             });
+        }
+    }));
+    app.post(`${basePath}s/all`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const lecturers = yield Lecturer_1.Lecturer.find({}).select("email firstName lastName id rank gender role serviceNumber");
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: lecturers,
+                message: "Lecturers retrieved!",
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
 }

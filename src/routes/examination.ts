@@ -41,7 +41,7 @@ export default function (app: Express) {
           published: false,
           started: false,
           password: "",
-          students: [],
+          students: course.students,
         }).save();
         res.json(
           returnSuccessResponseObject("Examination created!", 201, examination)
@@ -94,6 +94,61 @@ export default function (app: Express) {
             : await Examination.findOne({ id: examinationID, lecturerID: id });
 
         console.log(examination, user, id);
+        res.json(
+          returnSuccessResponseObject(
+            examination === null ? "Not Found!" : "Examination found!",
+            examination === null ? 404 : 200,
+            examination
+          )
+        );
+      } else {
+        res.json({
+          status: true,
+          statusCode: 401,
+          message: "Unauthorized",
+        });
+      }
+    }
+  );
+  app.post(
+    `${basePath}s/unsullied/all`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token } = req.body;
+      const { id, user } = verifyToken(token);
+
+      if (id && user && user === "student") {
+        const examination = await Examination.find({
+          started: true,
+          students: { $in: [id] },
+        });
+
+        res.json(
+          returnSuccessResponseObject(
+            examination === null ? "Not Found!" : "Examination found!",
+            examination === null ? 404 : 200,
+            examination
+          )
+        );
+      } else {
+        res.json({
+          status: true,
+          statusCode: 401,
+          message: "Unauthorized",
+        });
+      }
+    }
+  );
+  app.post(
+    `${basePath}/unsullied/get`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID } = req.body;
+      const { id, user } = verifyToken(token);
+
+      if (id && user && user === "student") {
+        const examination = await Examination.findOne({ id: examinationID });
+
         res.json(
           returnSuccessResponseObject(
             examination === null ? "Not Found!" : "Examination found!",
@@ -242,6 +297,31 @@ export default function (app: Express) {
           message: "Examination starting",
           data: { password },
         });
+      }
+    }
+  );
+  app.post(
+    `${basePath}/validate-password`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID, password } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user) {
+        const examination = await Examination.findOne({
+          id: examinationID,
+        });
+        res.json({
+          statusCode: password === examination.password ? 200 : 404,
+          status: true,
+
+          message:
+            password === examination.password
+              ? "Correct password!"
+              : "Incorrect password",
+          data: { password },
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
       }
     }
   );

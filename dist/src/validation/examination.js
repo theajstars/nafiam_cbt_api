@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateApproveExaminationRequest = exports.validateEditExaminationRequest = exports.validateCreateExaminationSchema = exports.validateDefaultExaminationRequest = void 0;
+exports.validateExaminationPasswordRequest = exports.validateApproveExaminationRequest = exports.validateEditExaminationRequest = exports.validateCreateExaminationSchema = exports.validateDefaultExaminationRequest = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const defaultExaminationSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -98,4 +98,26 @@ const validateApproveExaminationRequest = (req, res, next) => {
     }
 };
 exports.validateApproveExaminationRequest = validateApproveExaminationRequest;
+const validateExaminationPasswordSchema = joi_1.default.object({
+    token: joi_1.default.string().required(),
+    examinationID: joi_1.default.string().required(),
+    password: joi_1.default.string().required(),
+});
+const validateExaminationPasswordRequest = (req, res, next) => {
+    const { error } = validateExaminationPasswordSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateExaminationPasswordRequest = validateExaminationPasswordRequest;
 //# sourceMappingURL=examination.js.map
