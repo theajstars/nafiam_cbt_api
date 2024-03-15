@@ -39,6 +39,7 @@ export default function (app: Express) {
           year,
           lecturerID: id,
           course: course.id,
+          courseTitle: course.title,
           approved: false,
           completed: false,
           published: false,
@@ -293,6 +294,26 @@ export default function (app: Express) {
     }
   );
   app.post(
+    `${basePath}/students/all`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID, isAdmin } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && isAdmin && user !== "student") {
+        const examination = await Examination.findOne({ id: examinationID });
+        const students = examination.students;
+        res.json({
+          statusCode: 200,
+          message: "Examination eligible students found!",
+          data: students,
+          status: true,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
     `${basePath}/start`,
     validateDefaultExaminationRequest,
     async (req, res) => {
@@ -363,24 +384,62 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
       if (id && user && user === "student") {
         const examination = await Examination.findOne({ id: examinationID });
-        const examinationQuestions = examination.selectedQuestions.map(
-          (sQuestion) => {
-            return examination.questions.find(
-              (eQuestion) => eQuestion.id === sQuestion
-            );
-          }
-        );
-        const totalObtainable = examination.selectedQuestions.length;
-        const count = questions
-          .map((q) => {
+        const course = await Course.findOne({ id: examination.course });
+        const attendance = await Attendance.findOne({
+          examinationID: examinationID,
+        });
+        const students = attendance.students;
+        if (students.includes(id)) {
+          const examinationQuestions = examination.selectedQuestions.map(
+            (sQuestion) => {
+              return examination.questions.find(
+                (eQuestion) => eQuestion.id === sQuestion
+              );
+            }
+          );
+          const marksObtainable = examination.selectedQuestions.length;
+          const count = questions.map((q) => {
             const foundQuestion = examinationQuestions.find(
               (eQuestion) => eQuestion.id === q.id
             );
             return foundQuestion.answer === q.answer;
-          })
-          .filter((val) => val === true);
-        console.log(count);
-        console.log("Marks Obtainable", totalObtainable);
+          });
+
+          const correctCount = count.filter((val) => val === true);
+          const percent = (correctCount.length / marksObtainable) * 100;
+          res.json({
+            statusCode: 200,
+            status: true,
+            message: "Examination successfully graded!💀💀",
+            data: {
+              grading: {
+                marksObtainable,
+                numberCorrect: correctCount.length,
+                percent,
+              },
+              exam: {
+                title: examination.title,
+                courseTitle: examination.courseTitle,
+                year: examination.year,
+              },
+              course: {
+                title: course.title,
+                code: course.code,
+                school: course.school,
+              },
+              attendance: {
+                date: attendance.timestamp,
+              },
+            },
+          });
+          console.log("Marks Obtainable", marksObtainable);
+        } else {
+          res.json({
+            statusCode: 401,
+            status: true,
+            message: "You are not eligible to write this examination",
+          });
+        }
         // const
       } else {
         res.json(UnauthorizedResponseObject);

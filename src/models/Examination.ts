@@ -16,6 +16,7 @@ export interface ExaminationProps {
   title: string;
   year: string;
   course: string;
+  courseTitle: string;
   lecturerID: string;
   approved: boolean;
   published: boolean;
@@ -33,6 +34,7 @@ const examinationSchema = new Schema<ExaminationProps, Model<ExaminationProps>>(
     title: { type: String, required: true },
     year: { type: String, required: true },
     course: { type: String, required: true },
+    courseTitle: { type: String, required: true },
     lecturerID: { type: String, required: true },
     started: { type: Boolean, required: true },
     approved: { type: Boolean, required: true },
