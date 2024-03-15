@@ -16,6 +16,7 @@ const Misc_1 = require("../Lib/Misc");
 const Methods_1 = require("../Lib/Methods");
 const examination_1 = require("../validation/examination");
 const Course_1 = require("../models/Course");
+const Attendance_1 = require("../models/Attendance");
 const basePath = "/examination";
 function default_1(app) {
     app.post(`${basePath}/create`, examination_1.validateCreateExaminationSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -102,8 +103,28 @@ function default_1(app) {
         const { token, examinationID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
-            const examination = yield Examination_1.Examination.findOne({ id: examinationID });
-            res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination found!", examination === null ? 404 : 200, examination));
+            const examination = yield Examination_1.Examination.findOne({
+                id: examinationID,
+                started: true,
+            });
+            if (examination) {
+                const didStudentRegisterForExamination = examination.students.includes(id);
+                res.json({
+                    status: true,
+                    statusCode: didStudentRegisterForExamination ? 200 : 401,
+                    message: didStudentRegisterForExamination
+                        ? "Examination found!"
+                        : "You are not eligible to write this examination",
+                    data: examination,
+                });
+            }
+            else {
+                res.json({
+                    status: true,
+                    statusCode: 404,
+                    message: "Examination does not exist",
+                });
+            }
         }
         else {
             res.json({
@@ -188,6 +209,12 @@ function default_1(app) {
             const examination = yield Examination_1.Examination.findOneAndUpdate({
                 id: examinationID,
             }, { started: true, password });
+            yield new Attendance_1.Attendance({
+                id: (0, Methods_1.generateRandomString)(32),
+                examinationID,
+                timestamp: Date.now(),
+                students: [],
+            }).save();
             res.json({
                 statusCode: 200,
                 status: true,
@@ -196,13 +223,16 @@ function default_1(app) {
             });
         }
     }));
-    app.post(`${basePath}/validate-password`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/validate-password`, examination_1.validateExaminationPasswordRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID, password } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
             const examination = yield Examination_1.Examination.findOne({
                 id: examinationID,
             });
+            if (password === examination.password) {
+                yield Attendance_1.Attendance.findOneAndUpdate({ examinationID }, { $push: { students: id } });
+            }
             res.json({
                 statusCode: password === examination.password ? 200 : 404,
                 status: true,
@@ -216,37 +246,27 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}/timer/start`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, isAdmin } = req.body;
+    app.post(`${basePath}/submit-paper`, examination_1.validateStudentSubmissionRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID, questions } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (!isAdmin || !id || !user || user !== "admin") {
-            res.json(Misc_1.UnauthorizedResponseObject);
+        if (id && user && user === "student") {
+            const examination = yield Examination_1.Examination.findOne({ id: examinationID });
+            const examinationQuestions = examination.selectedQuestions.map((sQuestion) => {
+                return examination.questions.find((eQuestion) => eQuestion.id === sQuestion);
+            });
+            const totalObtainable = examination.selectedQuestions.length;
+            const count = questions
+                .map((q) => {
+                const foundQuestion = examinationQuestions.find((eQuestion) => eQuestion.id === q.id);
+                return foundQuestion.answer === q.answer;
+            })
+                .filter((val) => val === true);
+            console.log(count);
+            console.log("Marks Obtainable", totalObtainable);
+            // const
         }
         else {
-            const examination = yield Examination_1.Examination.findOneAndUpdate({
-                id: examinationID,
-            }, { password: "" });
-            res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination timer started!", examination === null ? 404 : 200, examination));
-        }
-    }));
-    app.post(`${basePath}/students/get`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, isAdmin } = req.body;
-        const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (!isAdmin || !id || !user || user !== "admin") {
             res.json(Misc_1.UnauthorizedResponseObject);
-        }
-        else {
-            const examination = yield Examination_1.Examination.findOne({
-                id: examinationID,
-            });
-            const course = yield Course_1.Course.findOne({ id: examination.course });
-            const { students } = course;
-            res.json({
-                statusCode: 200,
-                status: true,
-                message: "Students found!",
-                data: students,
-            });
         }
     }));
 }

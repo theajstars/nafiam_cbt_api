@@ -17,8 +17,11 @@ import {
   validateCreateExaminationSchema,
   validateDefaultExaminationRequest,
   validateEditExaminationRequest,
+  validateExaminationPasswordRequest,
+  validateStudentSubmissionRequest,
 } from "../validation/examination";
 import { Course } from "../models/Course";
+import { Attendance } from "../models/Attendance";
 const basePath = "/examination";
 export default function (app: Express) {
   app.post(
@@ -147,15 +150,29 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
 
       if (id && user && user === "student") {
-        const examination = await Examination.findOne({ id: examinationID });
+        const examination = await Examination.findOne({
+          id: examinationID,
+          started: true,
+        });
 
-        res.json(
-          returnSuccessResponseObject(
-            examination === null ? "Not Found!" : "Examination found!",
-            examination === null ? 404 : 200,
-            examination
-          )
-        );
+        if (examination) {
+          const didStudentRegisterForExamination =
+            examination.students.includes(id);
+          res.json({
+            status: true,
+            statusCode: didStudentRegisterForExamination ? 200 : 401,
+            message: didStudentRegisterForExamination
+              ? "Examination found!"
+              : "You are not eligible to write this examination",
+            data: examination,
+          });
+        } else {
+          res.json({
+            status: true,
+            statusCode: 404,
+            message: "Examination does not exist",
+          });
+        }
       } else {
         res.json({
           status: true,
@@ -291,6 +308,12 @@ export default function (app: Express) {
           },
           { started: true, password }
         );
+        await new Attendance({
+          id: generateRandomString(32),
+          examinationID,
+          timestamp: Date.now(),
+          students: [],
+        }).save();
         res.json({
           statusCode: 200,
           status: true,
@@ -302,7 +325,7 @@ export default function (app: Express) {
   );
   app.post(
     `${basePath}/validate-password`,
-    validateDefaultExaminationRequest,
+    validateExaminationPasswordRequest,
     async (req, res) => {
       const { token, examinationID, password } = req.body;
       const { id, user } = verifyToken(token);
@@ -310,6 +333,12 @@ export default function (app: Express) {
         const examination = await Examination.findOne({
           id: examinationID,
         });
+        if (password === examination.password) {
+          await Attendance.findOneAndUpdate(
+            { examinationID },
+            { $push: { students: id } }
+          );
+        }
         res.json({
           statusCode: password === examination.password ? 200 : 404,
           status: true,
@@ -325,51 +354,36 @@ export default function (app: Express) {
       }
     }
   );
+
   app.post(
-    `${basePath}/timer/start`,
-    validateDefaultExaminationRequest,
+    `${basePath}/submit-paper`,
+    validateStudentSubmissionRequest,
     async (req, res) => {
-      const { token, examinationID, isAdmin } = req.body;
+      const { token, examinationID, questions } = req.body;
       const { id, user } = verifyToken(token);
-      if (!isAdmin || !id || !user || user !== "admin") {
-        res.json(UnauthorizedResponseObject);
-      } else {
-        const examination = await Examination.findOneAndUpdate(
-          {
-            id: examinationID,
-          },
-          { password: "" }
+      if (id && user && user === "student") {
+        const examination = await Examination.findOne({ id: examinationID });
+        const examinationQuestions = examination.selectedQuestions.map(
+          (sQuestion) => {
+            return examination.questions.find(
+              (eQuestion) => eQuestion.id === sQuestion
+            );
+          }
         );
-        res.json(
-          returnSuccessResponseObject(
-            examination === null ? "Not Found!" : "Examination timer started!",
-            examination === null ? 404 : 200,
-            examination
-          )
-        );
-      }
-    }
-  );
-  app.post(
-    `${basePath}/students/get`,
-    validateDefaultExaminationRequest,
-    async (req, res) => {
-      const { token, examinationID, isAdmin } = req.body;
-      const { id, user } = verifyToken(token);
-      if (!isAdmin || !id || !user || user !== "admin") {
-        res.json(UnauthorizedResponseObject);
+        const totalObtainable = examination.selectedQuestions.length;
+        const count = questions
+          .map((q) => {
+            const foundQuestion = examinationQuestions.find(
+              (eQuestion) => eQuestion.id === q.id
+            );
+            return foundQuestion.answer === q.answer;
+          })
+          .filter((val) => val === true);
+        console.log(count);
+        console.log("Marks Obtainable", totalObtainable);
+        // const
       } else {
-        const examination = await Examination.findOne({
-          id: examinationID,
-        });
-        const course = await Course.findOne({ id: examination.course });
-        const { students } = course;
-        res.json({
-          statusCode: 200,
-          status: true,
-          message: "Students found!",
-          data: students,
-        });
+        res.json(UnauthorizedResponseObject);
       }
     }
   );

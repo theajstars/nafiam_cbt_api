@@ -113,3 +113,24 @@ export const validateExaminationPasswordRequest = (req, res, next) => {
     next();
   }
 };
+const studentSubmitSchema = Joi.object({
+  token: Joi.string().required(),
+  examinationID: Joi.string().required(),
+  questions: Joi.any().required(),
+});
+
+export const validateStudentSubmissionRequest = (req, res, next) => {
+  const { error } = studentSubmitSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
