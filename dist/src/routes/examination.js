@@ -17,6 +17,7 @@ const Methods_1 = require("../Lib/Methods");
 const examination_1 = require("../validation/examination");
 const Course_1 = require("../models/Course");
 const Attendance_1 = require("../models/Attendance");
+const Results_1 = require("../models/Results");
 const basePath = "/examination";
 function default_1(app) {
     app.post(`${basePath}/create`, examination_1.validateCreateExaminationSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -285,30 +286,32 @@ function default_1(app) {
                 });
                 const correctCount = count.filter((val) => val === true);
                 const percent = (correctCount.length / marksObtainable) * 100;
+                const result = {
+                    grading: {
+                        marksObtainable,
+                        numberCorrect: correctCount.length,
+                        percent,
+                    },
+                    exam: {
+                        title: examination.title,
+                        courseTitle: examination.courseTitle,
+                        year: examination.year,
+                    },
+                    course: {
+                        title: course.title,
+                        code: course.code,
+                        school: course.school,
+                    },
+                    attendance: {
+                        date: attendance.timestamp,
+                    },
+                };
+                yield new Results_1.Result(Object.assign({ id: (0, Methods_1.generateRandomString)(32), examinationID, studentID: id }, result)).save();
                 res.json({
                     statusCode: 200,
                     status: true,
-                    message: "Examination successfully graded!💀💀",
-                    data: {
-                        grading: {
-                            marksObtainable,
-                            numberCorrect: correctCount.length,
-                            percent,
-                        },
-                        exam: {
-                            title: examination.title,
-                            courseTitle: examination.courseTitle,
-                            year: examination.year,
-                        },
-                        course: {
-                            title: course.title,
-                            code: course.code,
-                            school: course.school,
-                        },
-                        attendance: {
-                            date: attendance.timestamp,
-                        },
-                    },
+                    message: "Examination successfully graded!",
+                    data: result,
                 });
                 console.log("Marks Obtainable", marksObtainable);
             }

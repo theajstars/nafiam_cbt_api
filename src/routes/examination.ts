@@ -22,6 +22,7 @@ import {
 } from "../validation/examination";
 import { Course } from "../models/Course";
 import { Attendance } from "../models/Attendance";
+import { Result } from "../models/Results";
 const basePath = "/examination";
 export default function (app: Express) {
   app.post(
@@ -407,30 +408,37 @@ export default function (app: Express) {
 
           const correctCount = count.filter((val) => val === true);
           const percent = (correctCount.length / marksObtainable) * 100;
+          const result = {
+            grading: {
+              marksObtainable,
+              numberCorrect: correctCount.length,
+              percent,
+            },
+            exam: {
+              title: examination.title,
+              courseTitle: examination.courseTitle,
+              year: examination.year,
+            },
+            course: {
+              title: course.title,
+              code: course.code,
+              school: course.school,
+            },
+            attendance: {
+              date: attendance.timestamp,
+            },
+          };
+          await new Result({
+            id: generateRandomString(32),
+            examinationID,
+            studentID: id,
+            ...result,
+          }).save();
           res.json({
             statusCode: 200,
             status: true,
-            message: "Examination successfully graded!💀💀",
-            data: {
-              grading: {
-                marksObtainable,
-                numberCorrect: correctCount.length,
-                percent,
-              },
-              exam: {
-                title: examination.title,
-                courseTitle: examination.courseTitle,
-                year: examination.year,
-              },
-              course: {
-                title: course.title,
-                code: course.code,
-                school: course.school,
-              },
-              attendance: {
-                date: attendance.timestamp,
-              },
-            },
+            message: "Examination successfully graded!",
+            data: result,
           });
           console.log("Marks Obtainable", marksObtainable);
         } else {
