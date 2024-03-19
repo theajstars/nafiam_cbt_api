@@ -249,17 +249,54 @@ function default_1(app) {
             const examination = yield Examination_1.Examination.findOne({
                 id: examinationID,
             });
-            if (password === examination.password) {
-                yield Attendance_1.Attendance.findOneAndUpdate({ examinationID }, { $push: { students: id } });
+            if (examination.blacklist.includes(id)) {
+                res.json({
+                    status: true,
+                    statusCode: 401,
+                    messasge: "You are not permitted to write this paper. Please contact Admin!",
+                });
             }
-            res.json({
-                statusCode: password === examination.password ? 200 : 404,
-                status: true,
-                message: password === examination.password
-                    ? "Correct password!"
-                    : "Incorrect password",
-                data: { password },
-            });
+            else {
+                if (password === examination.password) {
+                    yield Attendance_1.Attendance.findOneAndUpdate({ examinationID }, { $push: { students: id } });
+                }
+                res.json({
+                    statusCode: password === examination.password ? 200 : 404,
+                    status: true,
+                    message: password === examination.password
+                        ? "Correct password!"
+                        : "Incorrect password",
+                    data: { password },
+                });
+            }
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/blacklist`, examination_1.validateStudentBlacklistRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID, studentID, action } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            if (action === "add") {
+                //Add Student to examination blacklist
+                const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { $push: { blacklist: studentID } });
+                res.json({
+                    status: true,
+                    statusCode: 200,
+                    message: `Student has been blacklisted from ${examination.title}`,
+                });
+            }
+            else {
+                const examination = yield Examination_1.Examination.findOne({ id: examinationID });
+                const newBlacklist = examination.blacklist.filter((s) => s !== studentID);
+                yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { blacklist: newBlacklist });
+                res.json({
+                    status: true,
+                    statusCode: 200,
+                    message: `Student has been whitelisted into ${examination.title}`,
+                });
+            }
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);
@@ -274,8 +311,9 @@ function default_1(app) {
             const attendance = yield Attendance_1.Attendance.findOne({
                 examinationID: examinationID,
             });
+            const isStudentInBlacklist = examination.blacklist.includes(id);
             const students = attendance.students;
-            if (students.includes(id)) {
+            if (students.includes(id) && !isStudentInBlacklist) {
                 const examinationQuestions = examination.selectedQuestions.map((sQuestion) => {
                     return examination.questions.find((eQuestion) => eQuestion.id === sQuestion);
                 });
@@ -319,7 +357,7 @@ function default_1(app) {
                 res.json({
                     statusCode: 401,
                     status: true,
-                    message: "You are not eligible to write this examination",
+                    message: "You are not eligible to write this examination. Please contact Admin",
                 });
             }
             // const

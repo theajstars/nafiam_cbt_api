@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateStudentSubmissionRequest = exports.validateExaminationPasswordRequest = exports.validateApproveExaminationRequest = exports.validateEditExaminationRequest = exports.validateCreateExaminationSchema = exports.validateDefaultExaminationRequest = void 0;
+exports.validateStudentBlacklistRequest = exports.validateStudentSubmissionRequest = exports.validateExaminationPasswordRequest = exports.validateApproveExaminationRequest = exports.validateEditExaminationRequest = exports.validateCreateExaminationSchema = exports.validateDefaultExaminationRequest = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const defaultExaminationSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -142,4 +142,27 @@ const validateStudentSubmissionRequest = (req, res, next) => {
     }
 };
 exports.validateStudentSubmissionRequest = validateStudentSubmissionRequest;
+const studentBlacklistSchema = joi_1.default.object({
+    token: joi_1.default.string().required(),
+    examinationID: joi_1.default.string().required(),
+    studentID: joi_1.default.string().required(),
+    action: joi_1.default.string().required(),
+});
+const validateStudentBlacklistRequest = (req, res, next) => {
+    const { error } = studentBlacklistSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateStudentBlacklistRequest = validateStudentBlacklistRequest;
 //# sourceMappingURL=examination.js.map

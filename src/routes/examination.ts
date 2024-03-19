@@ -18,6 +18,7 @@ import {
   validateDefaultExaminationRequest,
   validateEditExaminationRequest,
   validateExaminationPasswordRequest,
+  validateStudentBlacklistRequest,
   validateStudentSubmissionRequest,
 } from "../validation/examination";
 import { Course } from "../models/Course";
@@ -355,28 +356,75 @@ export default function (app: Express) {
         const examination = await Examination.findOne({
           id: examinationID,
         });
-        if (password === examination.password) {
-          await Attendance.findOneAndUpdate(
-            { examinationID },
-            { $push: { students: id } }
-          );
-        }
-        res.json({
-          statusCode: password === examination.password ? 200 : 404,
-          status: true,
+        if (examination.blacklist.includes(id)) {
+          res.json({
+            status: true,
+            statusCode: 401,
+            messasge:
+              "You are not permitted to write this paper. Please contact Admin!",
+          });
+        } else {
+          if (password === examination.password) {
+            await Attendance.findOneAndUpdate(
+              { examinationID },
+              { $push: { students: id } }
+            );
+          }
+          res.json({
+            statusCode: password === examination.password ? 200 : 404,
+            status: true,
 
-          message:
-            password === examination.password
-              ? "Correct password!"
-              : "Incorrect password",
-          data: { password },
-        });
+            message:
+              password === examination.password
+                ? "Correct password!"
+                : "Incorrect password",
+            data: { password },
+          });
+        }
       } else {
         res.json(UnauthorizedResponseObject);
       }
     }
   );
 
+  app.post(
+    `${basePath}/blacklist`,
+    validateStudentBlacklistRequest,
+    async (req, res) => {
+      const { token, examinationID, studentID, action } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        if (action === "add") {
+          //Add Student to examination blacklist
+          const examination = await Examination.findOneAndUpdate(
+            { id: examinationID },
+            { $push: { blacklist: studentID } }
+          );
+          res.json({
+            status: true,
+            statusCode: 200,
+            message: `Student has been blacklisted from ${examination.title}`,
+          });
+        } else {
+          const examination = await Examination.findOne({ id: examinationID });
+          const newBlacklist = examination.blacklist.filter(
+            (s) => s !== studentID
+          );
+          await Examination.findOneAndUpdate(
+            { id: examinationID },
+            { blacklist: newBlacklist }
+          );
+          res.json({
+            status: true,
+            statusCode: 200,
+            message: `Student has been whitelisted into ${examination.title}`,
+          });
+        }
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
   app.post(
     `${basePath}/submit-paper`,
     validateStudentSubmissionRequest,
@@ -389,8 +437,9 @@ export default function (app: Express) {
         const attendance = await Attendance.findOne({
           examinationID: examinationID,
         });
+        const isStudentInBlacklist = examination.blacklist.includes(id);
         const students = attendance.students;
-        if (students.includes(id)) {
+        if (students.includes(id) && !isStudentInBlacklist) {
           const examinationQuestions = examination.selectedQuestions.map(
             (sQuestion) => {
               return examination.questions.find(
@@ -445,7 +494,8 @@ export default function (app: Express) {
           res.json({
             statusCode: 401,
             status: true,
-            message: "You are not eligible to write this examination",
+            message:
+              "You are not eligible to write this examination. Please contact Admin",
           });
         }
         // const
