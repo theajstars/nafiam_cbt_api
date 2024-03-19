@@ -17,6 +17,7 @@ import { Admin } from "./src/models/Admin";
 import { generateRandomString } from "./src/Lib/Methods";
 import misc from "./src/routes/misc";
 import school from "./src/routes/school";
+import result from "./src/routes/result";
 
 const app = express();
 app.use(
@@ -40,6 +41,7 @@ connect(dbConnectString)
     course(app);
     file(app);
     school(app);
+    result(app);
     const genPassword = async () => {
       // new Admin({
       //   id: generateRandomString(32),
