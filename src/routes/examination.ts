@@ -161,8 +161,9 @@ export default function (app: Express) {
 
         if (examination) {
           const didStudentRegisterForExaminationAndIsNotInAttendance =
-            examination.students.includes(id) &&
-            !attendance.students.includes(id);
+            examination.students.includes(id);
+          // &&
+          // !attendance.students.includes(id);
 
           res.json({
             status: true,
@@ -370,10 +371,13 @@ export default function (app: Express) {
           });
         } else {
           if (password === examination.password) {
-            await Attendance.findOneAndUpdate(
-              { examinationID },
-              { $push: { students: id } }
-            );
+            const attendance = await Attendance.findOne({ examinationID });
+            if (!attendance.students.includes(id)) {
+              await Attendance.findOneAndUpdate(
+                { examinationID },
+                { $push: { students: id } }
+              );
+            }
           }
           res.json({
             statusCode: password === examination.password ? 200 : 404,

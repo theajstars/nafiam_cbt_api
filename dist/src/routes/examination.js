@@ -111,8 +111,9 @@ function default_1(app) {
             });
             const attendance = yield Attendance_1.Attendance.findOne({ examinationID });
             if (examination) {
-                const didStudentRegisterForExaminationAndIsNotInAttendance = examination.students.includes(id) &&
-                    !attendance.students.includes(id);
+                const didStudentRegisterForExaminationAndIsNotInAttendance = examination.students.includes(id);
+                // &&
+                // !attendance.students.includes(id);
                 res.json({
                     status: true,
                     statusCode: didStudentRegisterForExaminationAndIsNotInAttendance
@@ -262,7 +263,10 @@ function default_1(app) {
             }
             else {
                 if (password === examination.password) {
-                    yield Attendance_1.Attendance.findOneAndUpdate({ examinationID }, { $push: { students: id } });
+                    const attendance = yield Attendance_1.Attendance.findOne({ examinationID });
+                    if (!attendance.students.includes(id)) {
+                        yield Attendance_1.Attendance.findOneAndUpdate({ examinationID }, { $push: { students: id } });
+                    }
                 }
                 res.json({
                     statusCode: password === examination.password ? 200 : 404,
