@@ -27,7 +27,7 @@ function default_1(app) {
         if (token && lecturer) {
             const course = yield Course_1.Course.findOne({ code: courseCode });
             const examination = yield new Examination_1.Examination({
-                id: (0, Methods_1.generateRandomString)(16),
+                id: (0, Methods_1.generateRandomString)(32),
                 title,
                 year,
                 lecturerID: id,
@@ -109,28 +109,39 @@ function default_1(app) {
                 id: examinationID,
                 started: true,
             });
-            const attendance = yield Attendance_1.Attendance.findOne({ examinationID });
-            if (examination) {
-                const didStudentRegisterForExaminationAndIsNotInAttendance = examination.students.includes(id);
-                // &&
-                // !attendance.students.includes(id);
+            const resultIfExists = yield Results_1.Result.findOne({
+                examinationID,
+                studentID: id,
+            });
+            if (resultIfExists && resultIfExists.id) {
+                //Student result exists for examination so student is not eligible to write paper
                 res.json({
                     status: true,
-                    statusCode: didStudentRegisterForExaminationAndIsNotInAttendance
-                        ? 200
-                        : 401,
-                    message: didStudentRegisterForExaminationAndIsNotInAttendance
-                        ? "Examination found!"
-                        : "You are not eligible to write this examination",
-                    data: examination,
+                    statusCode: 401,
+                    message: "You have already written this paper",
                 });
             }
             else {
-                res.json({
-                    status: true,
-                    statusCode: 404,
-                    message: "Examination does not exist",
-                });
+                if (examination) {
+                    const didStudentRegisterForExamination = examination.students.includes(id);
+                    // &&
+                    // !attendance.students.includes(id);
+                    res.json({
+                        status: true,
+                        statusCode: didStudentRegisterForExamination ? 200 : 401,
+                        message: didStudentRegisterForExamination
+                            ? "Examination found!"
+                            : "You are not eligible to write this examination",
+                        data: examination,
+                    });
+                }
+                else {
+                    res.json({
+                        status: true,
+                        statusCode: 404,
+                        message: "Examination does not exist",
+                    });
+                }
             }
         }
         else {
