@@ -157,14 +157,19 @@ export default function (app: Express) {
           id: examinationID,
           started: true,
         });
+        const attendance = await Attendance.findOne({ examinationID });
 
         if (examination) {
-          const didStudentRegisterForExamination =
-            examination.students.includes(id);
+          const didStudentRegisterForExaminationAndIsNotInAttendance =
+            examination.students.includes(id) &&
+            !attendance.students.includes(id);
+
           res.json({
             status: true,
-            statusCode: didStudentRegisterForExamination ? 200 : 401,
-            message: didStudentRegisterForExamination
+            statusCode: didStudentRegisterForExaminationAndIsNotInAttendance
+              ? 200
+              : 401,
+            message: didStudentRegisterForExaminationAndIsNotInAttendance
               ? "Examination found!"
               : "You are not eligible to write this examination",
             data: examination,
@@ -388,13 +393,31 @@ export default function (app: Express) {
   );
 
   app.post(
-    `${basePath}/blacklist`,
+    `${basePath}/blacklist/get`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user !== "student") {
+        const examination = await Examination.findOne({ id: examinationID });
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: examination?.blacklist ?? [],
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/blacklist/update`,
     validateStudentBlacklistRequest,
     async (req, res) => {
       const { token, examinationID, studentID, action } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
-        if (action === "add") {
+        if (action === "blacklist") {
           //Add Student to examination blacklist
           const examination = await Examination.findOneAndUpdate(
             { id: examinationID },

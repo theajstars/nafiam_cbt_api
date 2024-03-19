@@ -109,12 +109,16 @@ function default_1(app) {
                 id: examinationID,
                 started: true,
             });
+            const attendance = yield Attendance_1.Attendance.findOne({ examinationID });
             if (examination) {
-                const didStudentRegisterForExamination = examination.students.includes(id);
+                const didStudentRegisterForExaminationAndIsNotInAttendance = examination.students.includes(id) &&
+                    !attendance.students.includes(id);
                 res.json({
                     status: true,
-                    statusCode: didStudentRegisterForExamination ? 200 : 401,
-                    message: didStudentRegisterForExamination
+                    statusCode: didStudentRegisterForExaminationAndIsNotInAttendance
+                        ? 200
+                        : 401,
+                    message: didStudentRegisterForExaminationAndIsNotInAttendance
                         ? "Examination found!"
                         : "You are not eligible to write this examination",
                     data: examination,
@@ -274,11 +278,27 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}/blacklist`, examination_1.validateStudentBlacklistRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/blacklist/get`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        const { token, examinationID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user !== "student") {
+            const examination = yield Examination_1.Examination.findOne({ id: examinationID });
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: (_a = examination === null || examination === void 0 ? void 0 : examination.blacklist) !== null && _a !== void 0 ? _a : [],
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/blacklist/update`, examination_1.validateStudentBlacklistRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID, studentID, action } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            if (action === "add") {
+            if (action === "blacklist") {
                 //Add Student to examination blacklist
                 const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { $push: { blacklist: studentID } });
                 res.json({
