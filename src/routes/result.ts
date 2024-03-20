@@ -16,7 +16,7 @@ import {
 } from "../validation/student";
 const basePath = "/result";
 export default function (app: Express) {
-  // Get One student Results for One Examination
+  // Get One student Result for One Examination
   app.post(
     `${basePath}/student/get`,
     validateGetSingleResultRequest,

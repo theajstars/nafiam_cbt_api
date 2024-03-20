@@ -24,6 +24,7 @@ import {
 import { Course } from "../models/Course";
 import { Attendance } from "../models/Attendance";
 import { Result } from "../models/Results";
+import { Student } from "../models/Student";
 const basePath = "/examination";
 export default function (app: Express) {
   app.post(
@@ -364,6 +365,30 @@ export default function (app: Express) {
     }
   );
   app.post(
+    `${basePath}/end`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user !== "admin") {
+        const examination = await Examination.findOneAndUpdate(
+          {
+            id: examinationID,
+          },
+          { completed: true }
+        );
+
+        res.json({
+          statusCode: 200,
+          status: true,
+          message: "Examination completed",
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
     `${basePath}/validate-password`,
     validateExaminationPasswordRequest,
     async (req, res) => {
@@ -472,6 +497,7 @@ export default function (app: Express) {
       if (id && user && user === "student") {
         const examination = await Examination.findOne({ id: examinationID });
         const course = await Course.findOne({ id: examination.course });
+        const student = await Student.findOne({ id });
         const attendance = await Attendance.findOne({
           examinationID: examinationID,
         });
@@ -521,6 +547,9 @@ export default function (app: Express) {
             id: generateRandomString(32),
             examinationID,
             studentID: id,
+            firstName: student.firstName,
+            lastName: student.lastName,
+            serviceNumber: student.serviceNumber,
             ...result,
           }).save();
           res.json({

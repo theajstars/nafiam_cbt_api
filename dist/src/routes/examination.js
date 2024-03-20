@@ -18,6 +18,7 @@ const examination_1 = require("../validation/examination");
 const Course_1 = require("../models/Course");
 const Attendance_1 = require("../models/Attendance");
 const Results_1 = require("../models/Results");
+const Student_1 = require("../models/Student");
 const basePath = "/examination";
 function default_1(app) {
     app.post(`${basePath}/create`, examination_1.validateCreateExaminationSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -260,6 +261,23 @@ function default_1(app) {
             });
         }
     }));
+    app.post(`${basePath}/end`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user !== "admin") {
+            const examination = yield Examination_1.Examination.findOneAndUpdate({
+                id: examinationID,
+            }, { completed: true });
+            res.json({
+                statusCode: 200,
+                status: true,
+                message: "Examination completed",
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     app.post(`${basePath}/validate-password`, examination_1.validateExaminationPasswordRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID, password } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
@@ -345,6 +363,7 @@ function default_1(app) {
         if (id && user && user === "student") {
             const examination = yield Examination_1.Examination.findOne({ id: examinationID });
             const course = yield Course_1.Course.findOne({ id: examination.course });
+            const student = yield Student_1.Student.findOne({ id });
             const attendance = yield Attendance_1.Attendance.findOne({
                 examinationID: examinationID,
             });
@@ -383,7 +402,7 @@ function default_1(app) {
                         date: attendance.timestamp,
                     },
                 };
-                yield new Results_1.Result(Object.assign({ id: (0, Methods_1.generateRandomString)(32), examinationID, studentID: id }, result)).save();
+                yield new Results_1.Result(Object.assign({ id: (0, Methods_1.generateRandomString)(32), examinationID, studentID: id, firstName: student.firstName, lastName: student.lastName, serviceNumber: student.serviceNumber }, result)).save();
                 res.json({
                     statusCode: 200,
                     status: true,

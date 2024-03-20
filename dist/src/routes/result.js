@@ -14,7 +14,7 @@ const Results_1 = require("../models/Results");
 const student_1 = require("../validation/student");
 const basePath = "/result";
 function default_1(app) {
-    // Get One student Results for One Examination
+    // Get One student Result for One Examination
     app.post(`${basePath}/student/get`, student_1.validateGetSingleResultRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID, studentID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
