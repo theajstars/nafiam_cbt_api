@@ -77,4 +77,18 @@ export default function (app: Express) {
       }
     }
   );
+  // Get All Results all at once
+  app.post(`${basePath}s/all`, validateTokenSchema, async (req, res) => {
+    const { token } = req.body;
+    const { id, user } = verifyToken(token);
+    if (id && user && user !== "student") {
+      const results = await Result.find();
+      res.json({
+        status: true,
+        statusCode: 200,
+        message: "Results found!",
+        data: results,
+      });
+    }
+  });
 }
