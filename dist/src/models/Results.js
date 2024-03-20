@@ -15,6 +15,8 @@ const resultSchema = new mongoose_1.Schema({
         title: { type: String, required: true },
         courseTitle: { type: String, required: true },
         year: { type: String, required: true },
+        questions: { type: Array, required: true },
+        studentQuestions: { type: Array, required: true },
     },
     course: {
         title: { type: String, required: true },

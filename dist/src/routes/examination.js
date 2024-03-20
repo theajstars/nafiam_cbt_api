@@ -89,6 +89,7 @@ function default_1(app) {
         if (id && user && user === "student") {
             const examination = yield Examination_1.Examination.find({
                 started: true,
+                completed: false,
                 students: { $in: [id] },
             });
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination found!", examination === null ? 404 : 200, examination));
@@ -108,6 +109,7 @@ function default_1(app) {
             const examination = yield Examination_1.Examination.findOne({
                 id: examinationID,
                 started: true,
+                completed: false,
             });
             const resultIfExists = yield Results_1.Result.findOne({
                 examinationID,
@@ -369,6 +371,8 @@ function default_1(app) {
                         title: examination.title,
                         courseTitle: examination.courseTitle,
                         year: examination.year,
+                        questions: examination.questions,
+                        studentQuestions: questions,
                     },
                     course: {
                         title: course.title,

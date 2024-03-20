@@ -13,6 +13,9 @@ export type ResultProps = {
     title: string;
     courseTitle: string;
     year: string;
+
+    questions: any;
+    studentQuestions: any;
   };
   course: {
     title: string;
@@ -37,6 +40,9 @@ const resultSchema = new Schema<ResultProps, Model<ResultProps>>({
     title: { type: String, required: true },
     courseTitle: { type: String, required: true },
     year: { type: String, required: true },
+
+    questions: { type: Array, required: true },
+    studentQuestions: { type: Array, required: true },
   },
   course: {
     title: { type: String, required: true },

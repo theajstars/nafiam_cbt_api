@@ -126,6 +126,7 @@ export default function (app: Express) {
       if (id && user && user === "student") {
         const examination = await Examination.find({
           started: true,
+          completed: false,
           students: { $in: [id] },
         });
 
@@ -156,6 +157,7 @@ export default function (app: Express) {
         const examination = await Examination.findOne({
           id: examinationID,
           started: true,
+          completed: false,
         });
         const resultIfExists = await Result.findOne({
           examinationID,
@@ -503,6 +505,8 @@ export default function (app: Express) {
               title: examination.title,
               courseTitle: examination.courseTitle,
               year: examination.year,
+              questions: examination.questions,
+              studentQuestions: questions,
             },
             course: {
               title: course.title,
