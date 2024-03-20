@@ -264,7 +264,7 @@ function default_1(app) {
     app.post(`${basePath}/end`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user !== "admin") {
+        if (id && user && user === "admin") {
             const examination = yield Examination_1.Examination.findOneAndUpdate({
                 id: examinationID,
             }, { completed: true });

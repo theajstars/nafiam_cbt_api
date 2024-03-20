@@ -370,7 +370,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, examinationID } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user && user !== "admin") {
+      if (id && user && user === "admin") {
         const examination = await Examination.findOneAndUpdate(
           {
             id: examinationID,
