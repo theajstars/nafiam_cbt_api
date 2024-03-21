@@ -538,6 +538,7 @@ export default function (app: Express) {
               title: course.title,
               code: course.code,
               school: course.school,
+              id: course.id,
             },
             attendance: {
               date: attendance.timestamp,

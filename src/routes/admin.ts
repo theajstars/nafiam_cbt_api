@@ -181,7 +181,6 @@ export default function (app: Express) {
           const student = await Student.findOneAndUpdate(
             { id: studentID },
             {
-              id: generateRandomString(32),
               email,
               firstName,
               lastName,
@@ -345,7 +344,6 @@ export default function (app: Express) {
           const lecturer = await Lecturer.findOneAndUpdate(
             { id: lecturerID },
             {
-              id: generateRandomString(32),
               email,
               firstName,
               lastName,

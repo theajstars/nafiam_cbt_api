@@ -25,6 +25,7 @@ const resultSchema = new mongoose_1.Schema({
         title: { type: String, required: true },
         code: { type: String, required: true },
         school: { type: String, required: true },
+        id: { type: String, required: true },
     },
     attendance: {
         date: { type: Number, required: true },

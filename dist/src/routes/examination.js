@@ -397,6 +397,7 @@ function default_1(app) {
                         title: course.title,
                         code: course.code,
                         school: course.school,
+                        id: course.id,
                     },
                     attendance: {
                         date: attendance.timestamp,

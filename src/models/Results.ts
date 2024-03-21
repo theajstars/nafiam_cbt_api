@@ -24,6 +24,7 @@ export type ResultProps = {
     title: string;
     code: string;
     school: string;
+    id: string;
   };
   attendance: {
     date: number;
@@ -54,6 +55,7 @@ const resultSchema = new Schema<ResultProps, Model<ResultProps>>({
     title: { type: String, required: true },
     code: { type: String, required: true },
     school: { type: String, required: true },
+    id: { type: String, required: true },
   },
   attendance: {
     date: { type: Number, required: true },

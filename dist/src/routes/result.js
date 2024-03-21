@@ -13,6 +13,7 @@ const JWT_1 = require("../Lib/JWT");
 const course_1 = require("../validation/course");
 const Results_1 = require("../models/Results");
 const student_1 = require("../validation/student");
+const Attendance_1 = require("../models/Attendance");
 const basePath = "/result";
 function default_1(app) {
     // Get One student Result for One Examination
@@ -75,6 +76,20 @@ function default_1(app) {
                 statusCode: 200,
                 message: "Results found!",
                 data: results,
+            });
+        }
+    }));
+    // Get All Examination Attendances
+    app.post(`${basePath}s/attendances/all`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user !== "student") {
+            const attendances = yield Attendance_1.Attendance.find();
+            res.json({
+                status: true,
+                statusCode: 200,
+                message: "Attendances found!",
+                data: attendances,
             });
         }
     }));

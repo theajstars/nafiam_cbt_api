@@ -14,6 +14,7 @@ import {
   validateGetAllStudentinResultsRequest,
   validateGetOneStudentAllResultRequest,
 } from "../validation/student";
+import { Attendance } from "../models/Attendance";
 const basePath = "/result";
 export default function (app: Express) {
   // Get One student Result for One Examination
@@ -91,4 +92,23 @@ export default function (app: Express) {
       });
     }
   });
+
+  // Get All Examination Attendances
+  app.post(
+    `${basePath}s/attendances/all`,
+    validateTokenSchema,
+    async (req, res) => {
+      const { token } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user !== "student") {
+        const attendances = await Attendance.find();
+        res.json({
+          status: true,
+          statusCode: 200,
+          message: "Attendances found!",
+          data: attendances,
+        });
+      }
+    }
+  );
 }

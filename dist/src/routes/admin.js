@@ -151,7 +151,6 @@ function default_2(app) {
             }
             else {
                 const student = yield Student_1.Student.findOneAndUpdate({ id: studentID }, {
-                    id: (0, Methods_1.generateRandomString)(32),
                     email,
                     firstName,
                     lastName,
@@ -284,7 +283,6 @@ function default_2(app) {
             }
             else {
                 const lecturer = yield Lecturer_1.Lecturer.findOneAndUpdate({ id: lecturerID }, {
-                    id: (0, Methods_1.generateRandomString)(32),
                     email,
                     firstName,
                     lastName,
