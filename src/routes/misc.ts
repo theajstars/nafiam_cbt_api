@@ -14,6 +14,13 @@ import { generateRandomString } from "../Lib/Methods";
 import { validateTokenSchema } from "../validation/course";
 const basePath = "/misc";
 export default function (app: Express) {
+  app.get("/", (req, res) => {
+    res.json({
+      status: "true",
+      statusCode: 200,
+      message: "Server is live!!",
+    });
+  });
   app.post(`${basePath}/ranks/get`, validateTokenSchema, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);

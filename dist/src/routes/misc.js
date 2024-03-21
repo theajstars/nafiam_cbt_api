@@ -14,6 +14,13 @@ const Misc_1 = require("../Lib/Misc");
 const course_1 = require("../validation/course");
 const basePath = "/misc";
 function default_1(app) {
+    app.get("/", (req, res) => {
+        res.json({
+            status: "true",
+            statusCode: 200,
+            message: "Server is live!!",
+        });
+    });
     app.post(`${basePath}/ranks/get`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
