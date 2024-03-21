@@ -21,6 +21,8 @@ const Misc_1 = require("../Lib/Misc");
 const Log_1 = require("../models/Log");
 const Methods_1 = require("../Lib/Methods");
 const student_1 = require("../validation/student");
+const Lecturer_1 = require("../models/Lecturer");
+const Admin_1 = require("../models/Admin");
 const basePath = "/student";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -81,6 +83,38 @@ function default_2(app) {
                 statusCode: 200,
                 data: student,
             });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/password/update`, student_1.validateUpdateStudentProfileRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, password, user: userCase } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            if (user === userCase) {
+                const newPassword = yield (0, Methods_1.genPassword)(password);
+                switch (userCase) {
+                    case "student":
+                        Student_1.Student.findOneAndUpdate({ id }, { password: newPassword });
+                        break;
+                    case "lecturer":
+                        Lecturer_1.Lecturer.findOneAndUpdate({ id }, { password: newPassword });
+                        break;
+                    case "admin":
+                        Admin_1.Admin.findOneAndUpdate({ id }, { password: newPassword });
+                        break;
+                }
+                res.json({
+                    status: true,
+                    statusCode: 200,
+                    data: {},
+                    message: "Your password has been successfully updated!",
+                });
+            }
+            else {
+                res.json(Misc_1.UnauthorizedResponseObject);
+            }
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);

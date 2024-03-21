@@ -6,8 +6,10 @@ import { createToken, verifyToken } from "../Lib/JWT";
 import { Student } from "../models/Student";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { Log } from "../models/Log";
-import { generateRandomString } from "../Lib/Methods";
+import { genPassword, generateRandomString } from "../Lib/Methods";
 import { validateUpdateStudentProfileRequest } from "../validation/student";
+import { Lecturer } from "../models/Lecturer";
+import { Admin } from "../models/Admin";
 
 const basePath = "/student";
 export default function (app: Express) {
@@ -78,6 +80,40 @@ export default function (app: Express) {
           statusCode: 200,
           data: student,
         });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/password/update`,
+    validateUpdateStudentProfileRequest,
+    async (req, res) => {
+      const { token, password, user: userCase } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user) {
+        if (user === userCase) {
+          const newPassword = await genPassword(password);
+          switch (userCase) {
+            case "student":
+              Student.findOneAndUpdate({ id }, { password: newPassword });
+              break;
+            case "lecturer":
+              Lecturer.findOneAndUpdate({ id }, { password: newPassword });
+              break;
+            case "admin":
+              Admin.findOneAndUpdate({ id }, { password: newPassword });
+              break;
+          }
+          res.json({
+            status: true,
+            statusCode: 200,
+            data: {},
+            message: "Your password has been successfully updated!",
+          });
+        } else {
+          res.json(UnauthorizedResponseObject);
+        }
       } else {
         res.json(UnauthorizedResponseObject);
       }

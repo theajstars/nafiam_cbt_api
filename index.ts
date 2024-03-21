@@ -14,7 +14,7 @@ import file from "./src/routes/file";
 import { Examination } from "./src/models/Examination";
 import { Course } from "./src/models/Course";
 import { Admin } from "./src/models/Admin";
-import { generateRandomString } from "./src/Lib/Methods";
+import { genPassword, generateRandomString } from "./src/Lib/Methods";
 import misc from "./src/routes/misc";
 import school from "./src/routes/school";
 import result from "./src/routes/result";
@@ -44,21 +44,15 @@ connect(dbConnectString)
     file(app);
     school(app);
     result(app);
-    const genPassword = async () => {
-      // new Admin({
-      //   id: generateRandomString(32),
-      //   firstName: "Zeus",
-      //   lastName: "Olympus",
-      //   email: "me@theajstars.com",
-      //   password: hash,
-      // }).save();
-      const saltRounds = 10;
+    // new Admin({
+    //   id: generateRandomString(32),
+    //   firstName: "Zeus",
+    //   lastName: "Olympus",
+    //   email: "me@theajstars.com",
+    //   password: hash,
+    // }).save();
 
-      const salt = await bcrypt.genSalt(saltRounds);
-      const hash = await bcrypt.hash("securePassword2024", salt);
-      console.log("Thine Hash", hash);
-    };
-    genPassword();
+    genPassword("securePassword2024");
     // Course.updateMany({}, { lecturerID: "1709114865502" }).exec();
   })
   .catch((err) => {

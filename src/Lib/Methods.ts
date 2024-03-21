@@ -1,7 +1,8 @@
-function generateRandomString(
+import bcrypt from "bcryptjs";
+export const generateRandomString = (
   length: number,
   charset: "ALL" | "ALPHABET" = "ALL"
-) {
+) => {
   let result = "";
   const characters =
     charset === "ALL"
@@ -15,6 +16,12 @@ function generateRandomString(
     counter += 1;
   }
   return result;
-}
+};
+export const genPassword = async (password: string) => {
+  const saltRounds = 10;
 
-export { generateRandomString };
+  const salt = await bcrypt.genSalt(saltRounds);
+  const hash = await bcrypt.hash(password, salt);
+  console.log("Thine Hash", hash);
+  return hash;
+};
