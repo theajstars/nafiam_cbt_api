@@ -10,8 +10,11 @@ import {
   UnauthorizedResponseObject,
   returnSuccessResponseObject,
 } from "../Lib/Misc";
-import { generateRandomString } from "../Lib/Methods";
+import { genPassword, generateRandomString } from "../Lib/Methods";
 import { validateTokenSchema } from "../validation/course";
+import { validateUpdatePasswordRequest } from "../validation/default";
+import { Student } from "../models/Student";
+import { Admin } from "../models/Admin";
 const basePath = "/misc";
 export default function (app: Express) {
   app.get("/", (req, res) => {
@@ -56,4 +59,47 @@ export default function (app: Express) {
       res.json(UnauthorizedResponseObject);
     }
   });
+  app.post(
+    `${basePath}/password/update`,
+    validateUpdatePasswordRequest,
+    async (req, res) => {
+      const { token, password, user: userCase } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user) {
+        if (user === userCase) {
+          const newPassword = await genPassword(password);
+          switch (userCase) {
+            case "student":
+              Student.findOneAndUpdate(
+                { id },
+                { password: newPassword, isChangedPassword: true }
+              );
+              break;
+            case "lecturer":
+              Lecturer.findOneAndUpdate(
+                { id },
+                { password: newPassword, isChangedPassword: true }
+              );
+              break;
+            case "admin":
+              Admin.findOneAndUpdate(
+                { id },
+                { password: newPassword, isChangedPassword: true }
+              );
+              break;
+          }
+          res.json({
+            status: true,
+            statusCode: 200,
+            data: {},
+            message: "Your password has been successfully updated!",
+          });
+        } else {
+          res.json(UnauthorizedResponseObject);
+        }
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
 }

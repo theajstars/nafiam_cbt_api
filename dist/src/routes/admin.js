@@ -110,6 +110,7 @@ function default_2(app) {
                     role,
                     serviceNumber,
                     gender,
+                    isChangedPassword: false,
                     password: hash,
                     dateCreated: Date.now(),
                     // school,
@@ -244,6 +245,7 @@ function default_2(app) {
                     gender,
                     password: hash,
                     dateCreated: Date.now(),
+                    isChangedPassword: false,
                     // school,
                 }).save();
                 res.json({

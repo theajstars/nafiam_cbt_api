@@ -13,6 +13,7 @@ const studentSchema = new mongoose_1.Schema({
     gender: { type: String, required: true },
     role: { type: String, required: true },
     dateCreated: { type: Number, required: true },
+    isChangedPassword: { type: Boolean, required: true },
     // school: { type: String, required: true },
 });
 const Student = (0, mongoose_1.model)("Student", studentSchema);

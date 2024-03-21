@@ -8,6 +8,7 @@ const adminSchema = new mongoose_1.Schema({
     lastName: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
+    isChangedPassword: { type: Boolean, required: true },
 });
 const Admin = (0, mongoose_1.model)("Admin", adminSchema);
 exports.Admin = Admin;

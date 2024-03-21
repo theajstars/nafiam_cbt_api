@@ -11,6 +11,7 @@ export type LecturerProps = {
   gender: Gender;
   role: "civilian" | "personnel";
   dateCreated: number;
+  isChangedPassword: boolean;
 };
 
 const lecturerSchema = new Schema<LecturerProps, Model<LecturerProps>>({
@@ -24,6 +25,7 @@ const lecturerSchema = new Schema<LecturerProps, Model<LecturerProps>>({
   gender: { type: String, required: true },
   role: { type: String, required: true },
   dateCreated: { type: Number, required: true },
+  isChangedPassword: { type: Boolean, required: true },
 
   // school: { type: String, required: true },
 });

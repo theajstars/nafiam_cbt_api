@@ -126,6 +126,7 @@ export default function (app: Express) {
             role,
             serviceNumber,
             gender,
+            isChangedPassword: false,
             password: hash,
             dateCreated: Date.now(),
             // school,
@@ -292,6 +293,7 @@ export default function (app: Express) {
             gender,
             password: hash,
             dateCreated: Date.now(),
+            isChangedPassword: false,
             // school,
           }).save();
           res.json({
