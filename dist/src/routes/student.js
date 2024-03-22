@@ -60,7 +60,7 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
-            const student = yield Student_1.Student.findOne({ id }).select("id firstName lastName email rank serviceNumber gender role");
+            const student = yield Student_1.Student.findOne({ id }).select("id firstName lastName email rank serviceNumber gender role isChangedPassword");
             res.json({
                 status: true,
                 statusCode: 200,
