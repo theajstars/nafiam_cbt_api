@@ -15,6 +15,7 @@ import { validateTokenSchema } from "../validation/course";
 import { validateUpdatePasswordRequest } from "../validation/default";
 import { Student } from "../models/Student";
 import { Admin } from "../models/Admin";
+import { Log } from "../models/Log";
 const basePath = "/misc";
 export default function (app: Express) {
   app.get("/", (req, res) => {
@@ -63,37 +64,106 @@ export default function (app: Express) {
     `${basePath}/password/update`,
     validateUpdatePasswordRequest,
     async (req, res) => {
-      const { token, password, user: userCase } = req.body;
+      const {
+        token,
+        newPassword: newPasswordString,
+        oldPassword,
+        user: userCase,
+        navigatorObject,
+      } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user) {
         if (user === userCase) {
-          const newPassword = await genPassword(password);
-          switch (userCase) {
+          const newPassword = await genPassword(newPasswordString);
+          switch (user) {
             case "student":
-              Student.findOneAndUpdate(
-                { id },
-                { password: newPassword, isChangedPassword: true }
+              var isPasswordCorrect = await bcrypt.compare(
+                oldPassword,
+                (
+                  await Student.findOne({ id })
+                ).password
               );
+              if (isPasswordCorrect) {
+                await Student.findOneAndUpdate(
+                  { id },
+                  { password: newPassword, isChangedPassword: true }
+                );
+                res.json({
+                  status: true,
+                  statusCode: 200,
+                  data: {},
+                  message:
+                    "Your STUDENT password has been successfully updated!",
+                });
+              } else {
+                res.json({
+                  ...UnauthorizedResponseObject,
+                  message: "Incorrect password",
+                });
+              }
               break;
             case "lecturer":
-              Lecturer.findOneAndUpdate(
-                { id },
-                { password: newPassword, isChangedPassword: true }
+              var isPasswordCorrect = await bcrypt.compare(
+                oldPassword,
+                (
+                  await Lecturer.findOne({ id })
+                ).password
               );
+              if (isPasswordCorrect) {
+                await Lecturer.findOneAndUpdate(
+                  { id },
+                  { password: newPassword, isChangedPassword: true }
+                );
+                res.json({
+                  status: true,
+                  statusCode: 200,
+                  data: {},
+                  message: "Your password has been successfully updated!",
+                });
+              } else {
+                res.json({
+                  ...UnauthorizedResponseObject,
+                  message: "Incorrect password",
+                });
+              }
               break;
             case "admin":
-              Admin.findOneAndUpdate(
-                { id },
-                { password: newPassword, isChangedPassword: true }
+              var isPasswordCorrect = await bcrypt.compare(
+                oldPassword,
+                (
+                  await Admin.findOne({ id })
+                ).password
               );
+              if (isPasswordCorrect) {
+                await Admin.findOneAndUpdate(
+                  { id },
+                  { password: newPassword, isChangedPassword: true }
+                );
+                res.json({
+                  status: true,
+                  statusCode: 200,
+                  data: {},
+                  message: "Your password has been successfully updated!",
+                });
+              } else {
+                res.json({
+                  ...UnauthorizedResponseObject,
+                  message: "Incorrect password",
+                });
+              }
               break;
           }
-          res.json({
-            status: true,
-            statusCode: 200,
-            data: {},
-            message: "Your password has been successfully updated!",
-          });
+          const log = await new Log({
+            id: generateRandomString(32),
+            personnelID: id,
+            timestamp: Date.now(),
+            navigatorObject,
+            comments: isPasswordCorrect
+              ? "Password changed!"
+              : "Password was not changed",
+            userType: user,
+            action: "change_password",
+          }).save();
         } else {
           res.json(UnauthorizedResponseObject);
         }

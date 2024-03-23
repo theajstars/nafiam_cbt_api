@@ -4,7 +4,7 @@ export interface LogProps {
   id: string;
   personnelID: string;
   userType: "admin" | "student" | "lecturer";
-  action: "login";
+  action: "login" | "change_password";
   timestamp: number;
   navigatorObject: any;
   comments?: string;

@@ -18,6 +18,7 @@ const Methods_1 = require("./src/Lib/Methods");
 const misc_1 = __importDefault(require("./src/routes/misc"));
 const school_1 = __importDefault(require("./src/routes/school"));
 const result_1 = __importDefault(require("./src/routes/result"));
+const log_1 = __importDefault(require("./src/routes/log"));
 const app = (0, express_1.default)();
 exports.app = app;
 app.use((0, cors_1.default)({
@@ -39,6 +40,7 @@ const dbConnectString = "mongodb+srv://theajstars:XS4582oDGlvmhAub@data.hy4gux2.
     (0, file_1.default)(app);
     (0, school_1.default)(app);
     (0, result_1.default)(app);
+    (0, log_1.default)(app);
     // new Admin({
     //   id: generateRandomString(32),
     //   firstName: "Zeus",
@@ -46,7 +48,7 @@ const dbConnectString = "mongodb+srv://theajstars:XS4582oDGlvmhAub@data.hy4gux2.
     //   email: "me@theajstars.com",
     //   password: hash,
     // }).save();
-    (0, Methods_1.genPassword)("securePassword2024");
+    (0, Methods_1.genPassword)("AJIBOYE");
     // Course.updateMany({}, { lecturerID: "1709114865502" }).exec();
 })
     .catch((err) => {

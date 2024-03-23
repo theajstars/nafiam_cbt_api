@@ -18,6 +18,7 @@ import { genPassword, generateRandomString } from "./src/Lib/Methods";
 import misc from "./src/routes/misc";
 import school from "./src/routes/school";
 import result from "./src/routes/result";
+import log from "./src/routes/log";
 
 const app = express();
 app.use(
@@ -44,6 +45,7 @@ connect(dbConnectString)
     file(app);
     school(app);
     result(app);
+    log(app);
     // new Admin({
     //   id: generateRandomString(32),
     //   firstName: "Zeus",
@@ -52,7 +54,7 @@ connect(dbConnectString)
     //   password: hash,
     // }).save();
 
-    genPassword("securePassword2024");
+    genPassword("AJIBOYE");
     // Course.updateMany({}, { lecturerID: "1709114865502" }).exec();
   })
   .catch((err) => {

@@ -51,4 +51,4 @@ const validateUpdatePasswordRequest = (req, res, next) => {
     }
 };
 exports.validateUpdatePasswordRequest = validateUpdatePasswordRequest;
-//# sourceMappingURL=default.js.map
+//# sourceMappingURL=default%20copy.js.map

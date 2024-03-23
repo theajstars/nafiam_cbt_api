@@ -141,4 +141,4 @@ function default_2(app) {
     }));
 }
 exports.default = default_2;
-//# sourceMappingURL=misc.js.map
+//# sourceMappingURL=logs.js.map
