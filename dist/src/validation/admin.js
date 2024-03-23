@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateSingleSchoolRequest = exports.validateUpdateSchoolRequest = exports.validateCreateSchoolRequest = exports.validateUpdateStudent = exports.validateSingleLecturerRequest = exports.validateUpdateLecturer = exports.validateCreateLecturer = exports.validateOnboardStudent = void 0;
+exports.validateUpdateAdminRequest = exports.validateCreateAdminRequest = exports.validateSingleSchoolRequest = exports.validateUpdateSchoolRequest = exports.validateCreateSchoolRequest = exports.validateUpdateStudent = exports.validateSingleLecturerRequest = exports.validateUpdateLecturer = exports.validateCreateLecturer = exports.validateOnboardStudent = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const onboardstudentSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -205,4 +205,55 @@ const validateSingleSchoolRequest = (req, res, next) => {
     }
 };
 exports.validateSingleSchoolRequest = validateSingleSchoolRequest;
+const createAdminSchema = joi_1.default.object({
+    token: joi_1.default.string().required(),
+    firstName: joi_1.default.string().required(),
+    lastName: joi_1.default.string().required(),
+    email: joi_1.default.string().required(),
+    serviceNumber: joi_1.default.string().required(),
+    rank: joi_1.default.string().required(),
+});
+const validateCreateAdminRequest = (req, res, next) => {
+    const { error } = createAdminSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateCreateAdminRequest = validateCreateAdminRequest;
+const updateAdminSchema = joi_1.default.object({
+    adminID: joi_1.default.string().required(),
+    token: joi_1.default.string().required(),
+    firstName: joi_1.default.string().required(),
+    lastName: joi_1.default.string().required(),
+    email: joi_1.default.string().required(),
+    serviceNumber: joi_1.default.string().required(),
+    rank: joi_1.default.string().required(),
+});
+const validateUpdateAdminRequest = (req, res, next) => {
+    const { error } = updateAdminSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateUpdateAdminRequest = validateUpdateAdminRequest;
 //# sourceMappingURL=admin.js.map

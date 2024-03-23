@@ -195,3 +195,52 @@ export const validateSingleSchoolRequest = (req, res, next) => {
     next();
   }
 };
+const createAdminSchema = Joi.object({
+  token: Joi.string().required(),
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
+  email: Joi.string().required(),
+  serviceNumber: Joi.string().required(),
+  rank: Joi.string().required(),
+});
+
+export const validateCreateAdminRequest = (req, res, next) => {
+  const { error } = createAdminSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
+const updateAdminSchema = Joi.object({
+  adminID: Joi.string().required(),
+  token: Joi.string().required(),
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
+  email: Joi.string().required(),
+  serviceNumber: Joi.string().required(),
+  rank: Joi.string().required(),
+});
+
+export const validateUpdateAdminRequest = (req, res, next) => {
+  const { error } = updateAdminSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};

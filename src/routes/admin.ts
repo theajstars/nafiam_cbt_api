@@ -13,10 +13,12 @@ import {
 } from "../Lib/Misc";
 import { Student } from "../models/Student";
 import { Course } from "../models/Course";
-import { generateRandomString } from "../Lib/Methods";
+import { genPassword, generateRandomString } from "../Lib/Methods";
 import {
+  validateCreateAdminRequest,
   validateOnboardStudent,
   validateSingleLecturerRequest,
+  validateUpdateAdminRequest,
   validateUpdateStudent,
 } from "../validation/admin";
 import { validateTokenSchema } from "../validation/course";
@@ -89,6 +91,102 @@ export default function (app: Express) {
       res.json(UnauthorizedResponseObject);
     }
   });
+  app.post(
+    `${basePath}/create`,
+    validateCreateAdminRequest,
+    async (req, res) => {
+      const { token, firstName, lastName, email, serviceNumber, rank } =
+        req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        //Check if Admin already exists
+        const adminExists = await Admin.findOne({
+          $or: [{ email }, { serviceNumber }],
+        });
+        if (adminExists && adminExists.id) {
+          res.json({
+            status: true,
+            message: "Email or Service number for admin already exists!",
+            statusCode: 409,
+          });
+        } else {
+          const password = await genPassword(lastName.toUpperCase());
+          const admin = await new Admin({
+            id: generateRandomString(32),
+            firstName,
+            lastName,
+            email,
+            serviceNumber,
+            rank,
+            password,
+            isChangedPassword: false,
+          }).save();
+          res.json({
+            status: true,
+            statusCode: 201,
+            data: admin,
+            message: "Admin created!",
+          });
+        }
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/update`,
+    validateUpdateAdminRequest,
+    async (req, res) => {
+      const {
+        adminID,
+        token,
+        firstName,
+        lastName,
+        email,
+        serviceNumber,
+        rank,
+      } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        //Check if other admin has email or service number
+        const adminExistsWithPersonalInformation = await Admin.findOne({
+          $or: [{ email }, { serviceNumber }],
+        });
+        if (
+          adminExistsWithPersonalInformation &&
+          adminExistsWithPersonalInformation.id &&
+          adminExistsWithPersonalInformation.id === adminID
+        ) {
+          //Admin with information is admin to be modified
+          const admin = await Admin.findOneAndUpdate(
+            { id: adminID },
+            {
+              token,
+              firstName,
+              lastName,
+              email,
+              serviceNumber,
+              rank,
+            }
+          );
+          res.json({
+            status: true,
+            statusCode: 200,
+            data: admin,
+            message: "Admin profile updated!",
+          });
+        } else {
+          res.json({
+            status: true,
+            statusCode: 409,
+            message: "Duplicate record found!",
+          });
+        }
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
   app.post(`${basePath}/verify_token`, async (req, res) => {
     const { token } = req.body;
     const { user, id } = verifyToken(token);

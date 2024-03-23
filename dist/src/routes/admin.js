@@ -84,6 +84,84 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    app.post(`${basePath}/create`, admin_1.validateCreateAdminRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, firstName, lastName, email, serviceNumber, rank } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            //Check if Admin already exists
+            const adminExists = yield Admin_1.Admin.findOne({
+                $or: [{ email }, { serviceNumber }],
+            });
+            if (adminExists && adminExists.id) {
+                res.json({
+                    status: true,
+                    message: "Email or Service number for admin already exists!",
+                    statusCode: 409,
+                });
+            }
+            else {
+                const password = yield (0, Methods_1.genPassword)(lastName.toUpperCase());
+                const admin = yield new Admin_1.Admin({
+                    id: (0, Methods_1.generateRandomString)(32),
+                    firstName,
+                    lastName,
+                    email,
+                    serviceNumber,
+                    rank,
+                    password,
+                    isChangedPassword: false,
+                }).save();
+                res.json({
+                    status: true,
+                    statusCode: 201,
+                    data: admin,
+                    message: "Admin created!",
+                });
+            }
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/update`, admin_1.validateUpdateAdminRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { adminID, token, firstName, lastName, email, serviceNumber, rank, } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            //Check if other admin has email or service number
+            const adminExistsWithPersonalInformation = yield Admin_1.Admin.findOne({
+                $or: [{ email }, { serviceNumber }],
+            });
+            if (adminExistsWithPersonalInformation &&
+                adminExistsWithPersonalInformation.id &&
+                adminExistsWithPersonalInformation.id === adminID) {
+                //Admin with information is admin to be modified
+                const admin = yield Admin_1.Admin.findOneAndUpdate({ id: adminID }, {
+                    token,
+                    firstName,
+                    lastName,
+                    email,
+                    serviceNumber,
+                    rank,
+                });
+                res.json({
+                    status: true,
+                    statusCode: 200,
+                    data: admin,
+                    message: "Admin profile updated!",
+                });
+            }
+            else {
+                res.json({
+                    status: true,
+                    statusCode: 409,
+                    message: "Duplicate record found!",
+                });
+            }
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     app.post(`${basePath}/verify_token`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { user, id } = (0, JWT_1.verifyToken)(token);
