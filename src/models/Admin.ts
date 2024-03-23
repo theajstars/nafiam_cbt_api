@@ -5,6 +5,8 @@ export interface AdminProps {
   firstName: string;
   lastName: string;
   email: string;
+  serviceNumber: string;
+  rank: string;
   password: string;
   isChangedPassword: boolean;
 }
@@ -14,6 +16,8 @@ const adminSchema = new Schema<AdminProps, Model<AdminProps>>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },
+  serviceNumber: { type: String, required: true },
+  rank: { type: String, required: true },
   password: { type: String, required: true },
   isChangedPassword: { type: Boolean, required: true },
 });

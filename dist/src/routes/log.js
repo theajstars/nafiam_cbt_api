@@ -27,6 +27,20 @@ function default_1(app) {
             action,
             timestamp,
         });
+        const logs = yield Log_1.Log.find({
+            personnelID,
+            action,
+            // timestamp,
+        }, {}, { skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit, limit });
+        res.json({
+            status: true,
+            statusCode: 200,
+            data: logs,
+            page,
+            limit,
+            rows: logs.length,
+            totalCount,
+        });
     }));
 }
 exports.default = default_1;

@@ -73,6 +73,22 @@ export default function (app: Express) {
       res.json(UnauthorizedResponseObject);
     }
   });
+  app.post(`${basePath}s/all`, validateTokenSchema, async (req, res) => {
+    const { token } = req.body;
+    const { id, user } = verifyToken(token);
+    if (id && user && user === "admin") {
+      const admins = await Admin.find({}).select(
+        "id firstName lastName email rank serviceNumber"
+      );
+      res.json({
+        status: true,
+        statusCode: 200,
+        data: admins,
+      });
+    } else {
+      res.json(UnauthorizedResponseObject);
+    }
+  });
   app.post(`${basePath}/verify_token`, async (req, res) => {
     const { token } = req.body;
     const { user, id } = verifyToken(token);

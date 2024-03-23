@@ -69,6 +69,21 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    app.post(`${basePath}s/all`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const admins = yield Admin_1.Admin.find({}).select("id firstName lastName email rank serviceNumber");
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: admins,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     app.post(`${basePath}/verify_token`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { user, id } = (0, JWT_1.verifyToken)(token);
