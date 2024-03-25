@@ -18,6 +18,7 @@ const Lecturer_1 = require("../models/Lecturer");
 const course_1 = require("../validation/course");
 const Misc_1 = require("../Lib/Misc");
 const Student_1 = require("../models/Student");
+const lecturer_1 = require("../validation/lecturer");
 const basePath = "/lecturer";
 function default_1(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -43,11 +44,27 @@ function default_1(app) {
             });
         }
     }));
+    app.post(`${basePath}/profile/get`, lecturer_1.validateDefaultLecturerRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, lecturerID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            const lecturer = yield Lecturer_1.Lecturer.findOne({ id: lecturerID !== null && lecturerID !== void 0 ? lecturerID : id });
+            res.json({
+                status: true,
+                statusCode: 200,
+                message: "Lecturer found!",
+                data: lecturer,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     app.post(`${basePath}s/all`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user !== "student") {
-            const lecturers = yield Lecturer_1.Lecturer.find({}).select("email firstName lastName id rank gender role serviceNumber");
+            const lecturers = yield Lecturer_1.Lecturer.find({}).select("email firstName lastName id rank gender role serviceNumber  dateCreated isChangedPassword");
             res.json({
                 status: true,
                 statusCode: 200,

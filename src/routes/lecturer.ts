@@ -8,6 +8,7 @@ import { Lecturer } from "../models/Lecturer";
 import { validateTokenSchema } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { Student } from "../models/Student";
+import { validateDefaultLecturerRequest } from "../validation/lecturer";
 const basePath = "/lecturer";
 export default function (app: Express) {
   app.post(`${basePath}/login`, async (req, res) => {
@@ -36,12 +37,31 @@ export default function (app: Express) {
       });
     }
   });
+  app.post(
+    `${basePath}/profile/get`,
+    validateDefaultLecturerRequest,
+    async (req, res) => {
+      const { token, lecturerID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user) {
+        const lecturer = await Lecturer.findOne({ id: lecturerID ?? id });
+        res.json({
+          status: true,
+          statusCode: 200,
+          message: "Lecturer found!",
+          data: lecturer,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
   app.post(`${basePath}s/all`, validateTokenSchema, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user && user !== "student") {
       const lecturers = await Lecturer.find({}).select(
-        "email firstName lastName id rank gender role serviceNumber"
+        "email firstName lastName id rank gender role serviceNumber  dateCreated isChangedPassword"
       );
       res.json({
         status: true,
