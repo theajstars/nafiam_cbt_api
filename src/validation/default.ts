@@ -46,3 +46,48 @@ export const validateUpdatePasswordRequest = (req, res, next) => {
     next();
   }
 };
+const updateProfileSchema = Joi.object({
+  token: Joi.string().required(),
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
+  email: Joi.string().required(),
+});
+
+export const validateDefaultProfileUpdateRequest = (req, res, next) => {
+  const { error } = updateProfileSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
+const findUserSchema = Joi.object({
+  token: Joi.string().required(),
+  userCase: Joi.string().required(),
+  searchString: Joi.string().optional().allow(""),
+  rank: Joi.string().optional().allow(""),
+  gender: Joi.string().optional().allow(""),
+});
+
+export const validateDefaultFindUserRequest = (req, res, next) => {
+  const { error } = findUserSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};

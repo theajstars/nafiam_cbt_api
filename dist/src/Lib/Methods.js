@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.genPassword = exports.generateRandomString = void 0;
+exports.removeEmptyFields = exports.returnUnlessUndefined = exports.genPassword = exports.generateRandomString = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const generateRandomString = (length, charset = "ALL") => {
     let result = "";
@@ -37,4 +37,17 @@ const genPassword = (password) => __awaiter(void 0, void 0, void 0, function* ()
     return hash;
 });
 exports.genPassword = genPassword;
+const returnUnlessUndefined = (param) => {
+    return param && param.length > 0 ? param : undefined;
+};
+exports.returnUnlessUndefined = returnUnlessUndefined;
+const removeEmptyFields = (obj) => {
+    for (let key in obj) {
+        if (obj[key] === "" || obj[key] === undefined) {
+            delete obj[key];
+        }
+    }
+    return obj;
+};
+exports.removeEmptyFields = removeEmptyFields;
 //# sourceMappingURL=Methods.js.map

@@ -10,9 +10,17 @@ import {
   UnauthorizedResponseObject,
   returnSuccessResponseObject,
 } from "../Lib/Misc";
-import { genPassword, generateRandomString } from "../Lib/Methods";
+import {
+  genPassword,
+  generateRandomString,
+  removeEmptyFields,
+  returnUnlessUndefined,
+} from "../Lib/Methods";
 import { validateTokenSchema } from "../validation/course";
-import { validateUpdatePasswordRequest } from "../validation/default";
+import {
+  validateDefaultFindUserRequest,
+  validateUpdatePasswordRequest,
+} from "../validation/default";
 import { Student } from "../models/Student";
 import { Admin } from "../models/Admin";
 import { Log } from "../models/Log";
@@ -91,9 +99,7 @@ export default function (app: Express) {
                 res.json({
                   status: true,
                   statusCode: 200,
-                  data: {},
-                  message:
-                    "Your STUDENT password has been successfully updated!",
+                  message: "Your password has been successfully updated!",
                 });
               } else {
                 res.json({
@@ -117,7 +123,6 @@ export default function (app: Express) {
                 res.json({
                   status: true,
                   statusCode: 200,
-                  data: {},
                   message: "Your password has been successfully updated!",
                 });
               } else {
@@ -142,7 +147,6 @@ export default function (app: Express) {
                 res.json({
                   status: true,
                   statusCode: 200,
-                  data: {},
                   message: "Your password has been successfully updated!",
                 });
               } else {
@@ -166,6 +170,82 @@ export default function (app: Express) {
           }).save();
         } else {
           res.json(UnauthorizedResponseObject);
+        }
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+
+  app.post(
+    `${basePath}/find`,
+    validateDefaultFindUserRequest,
+    async (req, res) => {
+      const { token, searchString, userCase, rank, gender } = req.body;
+
+      const { id, user } = verifyToken(token);
+      if (id && user) {
+        const filter = {
+          $or: [
+            {
+              email: { $regex: ".*" + searchString + ".*", $options: "i" },
+            },
+            {
+              serviceNumber: {
+                $regex: ".*" + searchString + ".*",
+                $options: "i",
+              },
+            },
+            {
+              firstName: {
+                $regex: ".*" + searchString + ".*",
+                $options: "i",
+              },
+            },
+            {
+              lastName: {
+                $regex: ".*" + searchString + ".*",
+                $options: "i",
+              },
+            },
+          ],
+          gender,
+          rank,
+        };
+        switch (userCase) {
+          case "student":
+            const students = await Student.find({
+              ...removeEmptyFields(filter),
+            }).select("-password");
+            res.json({
+              status: true,
+              statusCode: 200,
+              message: "Students found!",
+              data: students,
+            });
+            break;
+          case "lecturer":
+            const lecturers = await Lecturer.find({
+              ...removeEmptyFields(filter),
+            }).select("-password");
+            res.json({
+              status: true,
+              statusCode: 200,
+              message: "Lecturers found!",
+              data: lecturers,
+            });
+            break;
+          case "admin":
+            const admins = await Admin.find({
+              ...removeEmptyFields(filter),
+            }).select("-password");
+            res.json({
+              status: true,
+              statusCode: 200,
+              message: "Admins found!",
+              data: admins,
+            });
+            break;
         }
       } else {
         res.json(UnauthorizedResponseObject);

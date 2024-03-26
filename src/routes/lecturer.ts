@@ -9,6 +9,7 @@ import { validateTokenSchema } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { Student } from "../models/Student";
 import { validateDefaultLecturerRequest } from "../validation/lecturer";
+import { validateDefaultProfileUpdateRequest } from "../validation/default";
 const basePath = "/lecturer";
 export default function (app: Express) {
   app.post(`${basePath}/login`, async (req, res) => {
@@ -56,6 +57,27 @@ export default function (app: Express) {
       }
     }
   );
+  app.post(
+    `${basePath}/profile/update`,
+    validateDefaultProfileUpdateRequest,
+    async (req, res) => {
+      const { token, firstName, lastName, email } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "lecturer") {
+        const lecturer = await Lecturer.findOneAndUpdate(
+          { id },
+          { firstName, lastName, email }
+        );
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: lecturer,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
   app.post(`${basePath}s/all`, validateTokenSchema, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
@@ -82,7 +104,7 @@ export default function (app: Express) {
       const { user, id } = verifyToken(token);
       if (id && user && user === "lecturer") {
         const students = await Student.find({}).select(
-          "id firstName lastName mail password serviceNumber rank gender role"
+          "id firstName lastName email password serviceNumber rank gender role"
         );
         res.json(<DefaultResponse>{
           data: students,

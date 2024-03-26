@@ -80,8 +80,7 @@ function default_2(app) {
                             res.json({
                                 status: true,
                                 statusCode: 200,
-                                data: {},
-                                message: "Your STUDENT password has been successfully updated!",
+                                message: "Your password has been successfully updated!",
                             });
                         }
                         else {
@@ -95,7 +94,6 @@ function default_2(app) {
                             res.json({
                                 status: true,
                                 statusCode: 200,
-                                data: {},
                                 message: "Your password has been successfully updated!",
                             });
                         }
@@ -110,7 +108,6 @@ function default_2(app) {
                             res.json({
                                 status: true,
                                 statusCode: 200,
-                                data: {},
                                 message: "Your password has been successfully updated!",
                             });
                         }
@@ -133,6 +130,71 @@ function default_2(app) {
             }
             else {
                 res.json(Misc_1.UnauthorizedResponseObject);
+            }
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/find`, default_1.validateDefaultFindUserRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, searchString, userCase, rank, gender } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            const filter = {
+                $or: [
+                    {
+                        email: { $regex: ".*" + searchString + ".*", $options: "i" },
+                    },
+                    {
+                        serviceNumber: {
+                            $regex: ".*" + searchString + ".*",
+                            $options: "i",
+                        },
+                    },
+                    {
+                        firstName: {
+                            $regex: ".*" + searchString + ".*",
+                            $options: "i",
+                        },
+                    },
+                    {
+                        lastName: {
+                            $regex: ".*" + searchString + ".*",
+                            $options: "i",
+                        },
+                    },
+                ],
+                gender,
+                rank,
+            };
+            switch (userCase) {
+                case "student":
+                    const students = yield Student_1.Student.find(Object.assign({}, (0, Methods_1.removeEmptyFields)(filter))).select("-password");
+                    res.json({
+                        status: true,
+                        statusCode: 200,
+                        message: "Students found!",
+                        data: students,
+                    });
+                    break;
+                case "lecturer":
+                    const lecturers = yield Lecturer_1.Lecturer.find(Object.assign({}, (0, Methods_1.removeEmptyFields)(filter))).select("-password");
+                    res.json({
+                        status: true,
+                        statusCode: 200,
+                        message: "Lecturers found!",
+                        data: lecturers,
+                    });
+                    break;
+                case "admin":
+                    const admins = yield Admin_1.Admin.find(Object.assign({}, (0, Methods_1.removeEmptyFields)(filter))).select("-password");
+                    res.json({
+                        status: true,
+                        statusCode: 200,
+                        message: "Admins found!",
+                        data: admins,
+                    });
+                    break;
             }
         }
         else {

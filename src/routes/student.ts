@@ -1,13 +1,17 @@
 import { Express } from "express";
 import bcrypt from "bcryptjs";
-import { validateLoginRequest } from "../validation/default";
+import {
+  validateDefaultFindUserRequest,
+  validateDefaultProfileUpdateRequest,
+  validateLoginRequest,
+} from "../validation/default";
 import { validateTokenSchema } from "../validation/course";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { Student } from "../models/Student";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { Log } from "../models/Log";
 import { genPassword, generateRandomString } from "../Lib/Methods";
-import { validateUpdateStudentProfileRequest } from "../validation/student";
+
 import { Lecturer } from "../models/Lecturer";
 import { Admin } from "../models/Admin";
 
@@ -66,7 +70,7 @@ export default function (app: Express) {
   });
   app.post(
     `${basePath}/profile/update`,
-    validateUpdateStudentProfileRequest,
+    validateDefaultProfileUpdateRequest,
     async (req, res) => {
       const { token, firstName, lastName, email } = req.body;
       const { id, user } = verifyToken(token);

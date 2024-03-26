@@ -25,3 +25,15 @@ export const genPassword = async (password: string) => {
   console.log("Thine Hash", hash);
   return hash;
 };
+
+export const returnUnlessUndefined = (param: string) => {
+  return param && param.length > 0 ? param : undefined;
+};
+export const removeEmptyFields = (obj: any) => {
+  for (let key in obj) {
+    if (obj[key] === "" || obj[key] === undefined) {
+      delete obj[key];
+    }
+  }
+  return obj;
+};
