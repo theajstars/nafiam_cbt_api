@@ -51,6 +51,8 @@ const updateProfileSchema = Joi.object({
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
   email: Joi.string().required(),
+  serviceNumber: Joi.string().optional(),
+  rank: Joi.string().optional(),
 });
 
 export const validateDefaultProfileUpdateRequest = (req, res, next) => {

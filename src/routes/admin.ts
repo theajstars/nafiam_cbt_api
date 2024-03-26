@@ -22,7 +22,10 @@ import {
   validateUpdateStudent,
 } from "../validation/admin";
 import { validateTokenSchema } from "../validation/course";
-import { validateLoginRequest } from "../validation/default";
+import {
+  validateDefaultProfileUpdateRequest,
+  validateLoginRequest,
+} from "../validation/default";
 import { Log } from "../models/Log";
 import {
   validateCreateLecturer,
@@ -34,12 +37,12 @@ const basePath = "/admin";
 export default function (app: Express) {
   app.post(`${basePath}/login`, validateLoginRequest, async (req, res) => {
     const { id, password, navigatorObject } = req.body;
-    const admin = await Admin.findOne({ email: id });
+    const admin = await Admin.findOne({ serviceNumber: id });
     if (admin) {
       const isPasswordCorrect = await bcrypt.compare(password, admin.password);
-      const log = await new Log({
-        personnelID: admin.id,
+      await new Log({
         id: generateRandomString(32),
+        personnelID: admin.id,
         userType: "admin",
         action: "login",
         navigatorObject: navigatorObject,
@@ -49,12 +52,12 @@ export default function (app: Express) {
       res.json({
         status: true,
         statusCode: isPasswordCorrect ? 200 : 401,
-        admin: isPasswordCorrect ? admin : null,
         token: isPasswordCorrect ? await createToken(admin.id, "admin") : null,
       });
     } else {
       res.json({
         status: true,
+        message: "Password and ID combination not found!",
         statusCode: 401,
       });
     }
@@ -64,7 +67,7 @@ export default function (app: Express) {
     const { id, user } = verifyToken(token);
     if (id && user && user === "admin") {
       const admin = await Admin.findOne({ id }).select(
-        "id firstName lastName email"
+        "id firstName lastName email superUser rank serviceNumber dateCreated isChangedPassword"
       );
       res.json({
         status: true,
@@ -75,12 +78,40 @@ export default function (app: Express) {
       res.json(UnauthorizedResponseObject);
     }
   });
+  app.post(
+    `${basePath}/profile/update`,
+    validateDefaultProfileUpdateRequest,
+    async (req, res) => {
+      const { token, firstName, lastName, email, serviceNumber, rank } =
+        req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const admin = await Admin.findOneAndUpdate(
+          { id },
+          {
+            firstName,
+            lastName,
+            email,
+            serviceNumber: serviceNumber ?? undefined,
+            rank: rank ?? undefined,
+          }
+        );
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: admin,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
   app.post(`${basePath}s/all`, validateTokenSchema, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user && user === "admin") {
       const admins = await Admin.find({}).select(
-        "id firstName lastName email rank serviceNumber"
+        "id firstName lastName email rank serviceNumber isChangedPassword superUser dateCreated"
       );
       res.json({
         status: true,
@@ -116,9 +147,11 @@ export default function (app: Express) {
             firstName,
             lastName,
             email,
-            serviceNumber,
+            serviceNumber: serviceNumber?.toUpperCase(),
             rank,
             password,
+            dateCreated: Date.now(),
+            superUser: false,
             isChangedPassword: false,
           }).save();
           res.json({

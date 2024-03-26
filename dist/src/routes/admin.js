@@ -28,12 +28,12 @@ const basePath = "/admin";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password, navigatorObject } = req.body;
-        const admin = yield Admin_1.Admin.findOne({ email: id });
+        const admin = yield Admin_1.Admin.findOne({ serviceNumber: id });
         if (admin) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, admin.password);
-            const log = yield new Log_1.Log({
-                personnelID: admin.id,
+            yield new Log_1.Log({
                 id: (0, Methods_1.generateRandomString)(32),
+                personnelID: admin.id,
                 userType: "admin",
                 action: "login",
                 navigatorObject: navigatorObject,
@@ -43,13 +43,13 @@ function default_2(app) {
             res.json({
                 status: true,
                 statusCode: isPasswordCorrect ? 200 : 401,
-                admin: isPasswordCorrect ? admin : null,
                 token: isPasswordCorrect ? yield (0, JWT_1.createToken)(admin.id, "admin") : null,
             });
         }
         else {
             res.json({
                 status: true,
+                message: "Password and ID combination not found!",
                 statusCode: 401,
             });
         }
@@ -58,7 +58,28 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const admin = yield Admin_1.Admin.findOne({ id }).select("id firstName lastName email");
+            const admin = yield Admin_1.Admin.findOne({ id }).select("id firstName lastName email superUser rank serviceNumber dateCreated isChangedPassword");
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: admin,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/profile/update`, default_1.validateDefaultProfileUpdateRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, firstName, lastName, email, serviceNumber, rank } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const admin = yield Admin_1.Admin.findOneAndUpdate({ id }, {
+                firstName,
+                lastName,
+                email,
+                serviceNumber: serviceNumber !== null && serviceNumber !== void 0 ? serviceNumber : undefined,
+                rank: rank !== null && rank !== void 0 ? rank : undefined,
+            });
             res.json({
                 status: true,
                 statusCode: 200,
@@ -73,7 +94,7 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const admins = yield Admin_1.Admin.find({}).select("id firstName lastName email rank serviceNumber");
+            const admins = yield Admin_1.Admin.find({}).select("id firstName lastName email rank serviceNumber isChangedPassword superUser dateCreated");
             res.json({
                 status: true,
                 statusCode: 200,
@@ -106,9 +127,11 @@ function default_2(app) {
                     firstName,
                     lastName,
                     email,
-                    serviceNumber,
+                    serviceNumber: serviceNumber === null || serviceNumber === void 0 ? void 0 : serviceNumber.toUpperCase(),
                     rank,
                     password,
+                    dateCreated: Date.now(),
+                    superUser: false,
                     isChangedPassword: false,
                 }).save();
                 res.json({

@@ -56,6 +56,8 @@ const updateProfileSchema = joi_1.default.object({
     firstName: joi_1.default.string().required(),
     lastName: joi_1.default.string().required(),
     email: joi_1.default.string().required(),
+    serviceNumber: joi_1.default.string().optional(),
+    rank: joi_1.default.string().optional(),
 });
 const validateDefaultProfileUpdateRequest = (req, res, next) => {
     const { error } = updateProfileSchema.validate(req.body);
