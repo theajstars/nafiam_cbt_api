@@ -29,9 +29,9 @@ app.use(
 app.use(bodyParser({ extended: true }));
 
 const PORT = 8080;
-const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
-// const dbConnectString =
-//   "mongodb+srv://theajstars:XS4582oDGlvmhAub@data.hy4gux2.mongodb.net/?retryWrites=true&w=majority&appName=data/nafiamDB";
+// const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
+const dbConnectString =
+  "mongodb+srv://theajstars:XS4582oDGlvmhAub@data.hy4gux2.mongodb.net/?retryWrites=true&w=majority&appName=data/nafiamDB";
 
 connect(dbConnectString)
   .then(() => {
