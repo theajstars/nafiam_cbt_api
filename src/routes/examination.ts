@@ -334,6 +334,32 @@ export default function (app: Express) {
     }
   );
   app.post(
+    `${basePath}/change-password`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const password = generateRandomString(6, "ALPHABET").toUpperCase();
+        await Examination.findOneAndUpdate(
+          {
+            id: examinationID,
+          },
+          { started: true, password }
+        );
+
+        res.json({
+          statusCode: 200,
+          status: true,
+          message: "Examination password has been changed!",
+          data: { password },
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
     `${basePath}/start`,
     validateDefaultExaminationRequest,
     async (req, res) => {

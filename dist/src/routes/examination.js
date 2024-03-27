@@ -236,6 +236,25 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    app.post(`${basePath}/change-password`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const password = (0, Methods_1.generateRandomString)(6, "ALPHABET").toUpperCase();
+            yield Examination_1.Examination.findOneAndUpdate({
+                id: examinationID,
+            }, { started: true, password });
+            res.json({
+                statusCode: 200,
+                status: true,
+                message: "Examination password has been changed!",
+                data: { password },
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     app.post(`${basePath}/start`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID, isAdmin } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
