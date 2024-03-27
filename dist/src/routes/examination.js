@@ -278,6 +278,23 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    app.post(`${basePath}/redo`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const examination = yield Examination_1.Examination.findOneAndUpdate({
+                id: examinationID,
+            }, { completed: false, started: false });
+            res.json({
+                statusCode: 200,
+                status: true,
+                message: "Examination can be taken again",
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     app.post(`${basePath}/validate-password`, examination_1.validateExaminationPasswordRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID, password } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);

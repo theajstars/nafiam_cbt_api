@@ -389,6 +389,30 @@ export default function (app: Express) {
     }
   );
   app.post(
+    `${basePath}/redo`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const examination = await Examination.findOneAndUpdate(
+          {
+            id: examinationID,
+          },
+          { completed: false, started: false }
+        );
+
+        res.json({
+          statusCode: 200,
+          status: true,
+          message: "Examination can be taken again",
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
     `${basePath}/validate-password`,
     validateExaminationPasswordRequest,
     async (req, res) => {
