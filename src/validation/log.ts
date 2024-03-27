@@ -3,10 +3,12 @@ import { CourseProps } from "../models/Course";
 import { MaterialProps } from "../models/Material";
 
 const getAllLogsSchema = Joi.object({
+  token: Joi.string().required(),
   timestamp: Joi.number().optional(),
   personnelID: Joi.string().optional(),
-  page: Joi.string().optional(),
-  limit: Joi.string().optional(),
+  userType: Joi.string().optional(),
+  page: Joi.number().optional(),
+  limit: Joi.number().optional(),
   type: Joi.string().optional(),
 });
 

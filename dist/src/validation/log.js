@@ -6,10 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateGetAllLogsRequest = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const getAllLogsSchema = joi_1.default.object({
+    token: joi_1.default.string().required(),
     timestamp: joi_1.default.number().optional(),
     personnelID: joi_1.default.string().optional(),
-    page: joi_1.default.string().optional(),
-    limit: joi_1.default.string().optional(),
+    userType: joi_1.default.string().optional(),
+    page: joi_1.default.number().optional(),
+    limit: joi_1.default.number().optional(),
     type: joi_1.default.string().optional(),
 });
 const validateGetAllLogsRequest = (req, res, next) => {
