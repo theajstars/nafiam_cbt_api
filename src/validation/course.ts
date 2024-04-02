@@ -1,6 +1,5 @@
 import Joi from "@hapi/joi";
 import { CourseProps } from "../models/Course";
-import { MaterialProps } from "../models/Material";
 
 const tokenSchema = Joi.object<{ token: string }>({
   token: Joi.string().required(),
@@ -116,9 +115,7 @@ export const validateUpdateCourse = (req, res, next) => {
   }
 };
 
-const createCourseMaterialSchema = Joi.object<
-  MaterialProps & { token: string }
->({
+const createCourseMaterialSchema = Joi.object({
   courseID: Joi.string().required(),
   token: Joi.string().required(),
   title: Joi.string().required(),
@@ -143,9 +140,7 @@ export const validateCreateCourseMaterial = (req, res, next) => {
     next();
   }
 };
-const getAllCourseMaterialsSchema = Joi.object<
-  MaterialProps & { token: string }
->({
+const getAllCourseMaterialsSchema = Joi.object({
   courseID: Joi.string().required(),
   token: Joi.string().required(),
 });

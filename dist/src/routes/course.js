@@ -14,7 +14,6 @@ const Methods_1 = require("../Lib/Methods");
 const Misc_1 = require("../Lib/Misc");
 const Course_1 = require("../models/Course");
 const course_1 = require("../validation/course");
-const Material_1 = require("../models/Material");
 const basePath = "/course";
 function default_1(app) {
     app.post(`${basePath}s/all`, course_1.validateGetAllCourses, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -102,61 +101,6 @@ function default_1(app) {
                 message: "Course details updated successfully!",
                 data: course,
             });
-        }
-    }));
-    app.post(`${basePath}/material/create`, course_1.validateCreateCourseMaterial, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { courseID, token, title, description, type, category, file } = req.body;
-        const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (user === "admin" || user === "lecturer") {
-            const courseMaterial = yield new Material_1.Material({
-                id: (0, Methods_1.generateRandomString)(16),
-                courseID,
-                title,
-                description,
-                type,
-                category,
-                file,
-            }).save();
-            res.json({
-                status: true,
-                statusCode: 201,
-                message: "Course Material uploaded successfully!",
-                data: courseMaterial,
-            });
-        }
-        else {
-            res.json(Misc_1.UnauthorizedResponseObject);
-        }
-    }));
-    app.delete(`${basePath}/material/delete`, course_1.validateDeleteCourseMaterialSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { materialID, token } = req.body;
-        const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (user === "admin" || user === "lecturer") {
-            yield Material_1.Material.deleteOne({ id: materialID });
-            res.json({
-                status: true,
-                statusCode: 204,
-                message: "Course Material deleted successfully!",
-            });
-        }
-        else {
-            res.json(Misc_1.UnauthorizedResponseObject);
-        }
-    }));
-    app.post(`${basePath}/materials/get`, course_1.validateGetAllCourseMaterials, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { courseID, token } = req.body;
-        const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (user === "admin" || user === "lecturer") {
-            const materials = yield Material_1.Material.find({ courseID });
-            res.json({
-                status: true,
-                statusCode: 200,
-                message: "Found materials!",
-                data: materials,
-            });
-        }
-        else {
-            res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
     app.post(`${basePath}/enroll`, course_1.validateCourseEnrollmentRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {

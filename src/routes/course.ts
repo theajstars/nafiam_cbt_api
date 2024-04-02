@@ -15,7 +15,6 @@ import {
   validateTokenSchema,
   validateUpdateCourse,
 } from "../validation/course";
-import { Material } from "../models/Material";
 
 const basePath = "/course";
 
@@ -127,78 +126,6 @@ export default function (app: Express) {
     }
   });
 
-  app.post(
-    `${basePath}/material/create`,
-    validateCreateCourseMaterial,
-    async (req, res) => {
-      const { courseID, token, title, description, type, category, file } =
-        req.body;
-
-      const { id, user } = verifyToken(token);
-
-      if (user === "admin" || user === "lecturer") {
-        const courseMaterial = await new Material({
-          id: generateRandomString(16),
-          courseID,
-          title,
-          description,
-          type,
-          category,
-          file,
-        }).save();
-        res.json(<DefaultResponse>{
-          status: true,
-          statusCode: 201,
-          message: "Course Material uploaded successfully!",
-          data: courseMaterial,
-        });
-      } else {
-        res.json(UnauthorizedResponseObject);
-      }
-    }
-  );
-  app.delete(
-    `${basePath}/material/delete`,
-    validateDeleteCourseMaterialSchema,
-    async (req, res) => {
-      const { materialID, token } = req.body;
-
-      const { id, user } = verifyToken(token);
-
-      if (user === "admin" || user === "lecturer") {
-        await Material.deleteOne({ id: materialID });
-        res.json(<DefaultResponse>{
-          status: true,
-          statusCode: 204,
-          message: "Course Material deleted successfully!",
-        });
-      } else {
-        res.json(UnauthorizedResponseObject);
-      }
-    }
-  );
-
-  app.post(
-    `${basePath}/materials/get`,
-    validateGetAllCourseMaterials,
-    async (req, res) => {
-      const { courseID, token } = req.body;
-
-      const { id, user } = verifyToken(token);
-
-      if (user === "admin" || user === "lecturer") {
-        const materials = await Material.find({ courseID });
-        res.json(<DefaultResponse>{
-          status: true,
-          statusCode: 200,
-          message: "Found materials!",
-          data: materials,
-        });
-      } else {
-        res.json(UnauthorizedResponseObject);
-      }
-    }
-  );
   app.post(
     `${basePath}/enroll`,
     validateCourseEnrollmentRequest,
