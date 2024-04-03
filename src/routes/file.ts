@@ -26,46 +26,34 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 export default function (app: Express) {
-  // app.post(`${basePath}/upload`, upload.single("file"), async (req, res) => {
-  //   const { token } = req.body;
-
-  //   const file = await new File({
-  //     id: generateRandomString(32),
-  //     path: req.file.path,
-  //     name: req.file.filename,
-  //     timestamp: Date.now(),
-  //   }).save();
-  //   res.json({
-  //     token,
-  //     data: {
-  //       file,
-  //       sack: url.fileURLToPath(url.pathToFileURL(req.file.path)),
-  //     },
-  //   });
-  // });
   app.post(`${basePath}/upload`, upload.single("file"), async (req, res) => {
-    cloudinary.uploader.upload(req.file.path, async (err, result) => {
-      if (err) {
-        res.json(<DefaultResponse>{
-          statusCode: 401,
-          status: true,
-          message: "An error occurred while uploading files",
-        });
-      } else {
-        const file = await new File({
-          id: generateRandomString(32),
-          path: result.url,
-          timestamp: Date.now(),
-          name: result.original_filename,
-        }).save();
-        res.json({
-          statusCode: 201,
-          status: true,
-          message: "File Uploaded!",
-          file,
-        });
+    cloudinary.uploader.upload(
+      req.file.path,
+      { resource_type: "raw" },
+      async (err, result) => {
+        if (err) {
+          res.json(<DefaultResponse>{
+            statusCode: 401,
+            status: true,
+            message: "An error occurred while uploading files",
+            err,
+          });
+        } else {
+          const file = await new File({
+            id: generateRandomString(32),
+            path: result.url,
+            timestamp: Date.now(),
+            name: result.original_filename,
+          }).save();
+          res.json({
+            statusCode: 201,
+            status: true,
+            message: "File Uploaded!",
+            file,
+          });
+        }
       }
-    });
+    );
   });
   app.get(`${basePath}s/:file`, async (req, res) => {
     console.log(req.params.file);

@@ -34,29 +34,14 @@ const storage = multer_1.default.diskStorage({
 });
 const upload = (0, multer_1.default)({ storage });
 function default_1(app) {
-    // app.post(`${basePath}/upload`, upload.single("file"), async (req, res) => {
-    //   const { token } = req.body;
-    //   const file = await new File({
-    //     id: generateRandomString(32),
-    //     path: req.file.path,
-    //     name: req.file.filename,
-    //     timestamp: Date.now(),
-    //   }).save();
-    //   res.json({
-    //     token,
-    //     data: {
-    //       file,
-    //       sack: url.fileURLToPath(url.pathToFileURL(req.file.path)),
-    //     },
-    //   });
-    // });
     app.post(`${basePath}/upload`, upload.single("file"), (req, res) => __awaiter(this, void 0, void 0, function* () {
-        cloudinary.uploader.upload(req.file.path, (err, result) => __awaiter(this, void 0, void 0, function* () {
+        cloudinary.uploader.upload(req.file.path, { resource_type: "raw" }, (err, result) => __awaiter(this, void 0, void 0, function* () {
             if (err) {
                 res.json({
                     statusCode: 401,
                     status: true,
                     message: "An error occurred while uploading files",
+                    err,
                 });
             }
             else {
