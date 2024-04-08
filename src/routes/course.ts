@@ -7,12 +7,8 @@ import { Course } from "../models/Course";
 import {
   validateCourseEnrollmentRequest,
   validateCreateCourse,
-  validateCreateCourseMaterial,
-  validateDeleteCourseMaterialSchema,
-  validateGetAllCourseMaterials,
   validateGetAllCourses,
   validateGetSingleCourseSchema,
-  validateTokenSchema,
   validateUpdateCourse,
 } from "../validation/course";
 

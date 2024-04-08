@@ -1,6 +1,4 @@
 import Joi from "@hapi/joi";
-import { CourseProps } from "../models/Course";
-import { MaterialProps } from "../models/Lecture";
 
 const onboardstudentSchema = Joi.object({
   token: Joi.string().required(),
