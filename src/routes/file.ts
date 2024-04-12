@@ -59,56 +59,7 @@ export default function (app: Express) {
       );
     }
   );
-  app.post(
-    `${basePath}/upload-many`,
-    upload.array("file"),
-    async (req, res) => {
-      const uploads = (file, folder) => {
-        return new Promise((resolve) => {
-          cloudinary.uploader.upload(
-            file,
-            (result) => {
-              resolve({
-                url: result.url,
-                id: result.public_id,
-              });
-            },
-            {
-              resource_type: "raw",
-            }
-          );
-        });
-      };
-      const uploader = async (path) => await cloudinary.uploader;
-      cloudinary.uploader.upload(
-        req.file.path,
-        { resource_type: "raw" },
-        async (err, result) => {
-          if (err) {
-            res.json(<DefaultResponse>{
-              statusCode: 401,
-              status: true,
-              message: "An error occurred while uploading files",
-              err,
-            });
-          } else {
-            const file = await new File({
-              id: generateRandomString(32),
-              path: result.url,
-              timestamp: Date.now(),
-              name: result.original_filename,
-            }).save();
-            res.json({
-              statusCode: 201,
-              status: true,
-              message: "File Uploaded!",
-              file,
-            });
-          }
-        }
-      );
-    }
-  );
+
   app.get(`${basePath}s/:file`, async (req, res) => {
     console.log(req.params.file);
   });

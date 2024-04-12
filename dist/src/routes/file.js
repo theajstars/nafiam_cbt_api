@@ -60,45 +60,6 @@ function default_1(app) {
             }
         }));
     }));
-    app.post(`${basePath}/upload-many`, upload.array("file"), (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const uploads = (file, folder) => {
-            return new Promise((resolve) => {
-                cloudinary.uploader.upload(file, (result) => {
-                    resolve({
-                        url: result.url,
-                        id: result.public_id,
-                    });
-                }, {
-                    resource_type: "raw",
-                });
-            });
-        };
-        const uploader = (path) => __awaiter(this, void 0, void 0, function* () { return yield cloudinary.uploader; });
-        cloudinary.uploader.upload(req.file.path, { resource_type: "raw" }, (err, result) => __awaiter(this, void 0, void 0, function* () {
-            if (err) {
-                res.json({
-                    statusCode: 401,
-                    status: true,
-                    message: "An error occurred while uploading files",
-                    err,
-                });
-            }
-            else {
-                const file = yield new File_1.File({
-                    id: (0, Methods_1.generateRandomString)(32),
-                    path: result.url,
-                    timestamp: Date.now(),
-                    name: result.original_filename,
-                }).save();
-                res.json({
-                    statusCode: 201,
-                    status: true,
-                    message: "File Uploaded!",
-                    file,
-                });
-            }
-        }));
-    }));
     app.get(`${basePath}s/:file`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         console.log(req.params.file);
     }));
