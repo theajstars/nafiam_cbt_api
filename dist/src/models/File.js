@@ -6,7 +6,7 @@ const fileSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
     path: { type: String, required: true },
     name: { type: String, required: true },
-    timestamp: { type: String, required: true },
+    timestamp: { type: Number, required: true },
 });
 const File = (0, mongoose_1.model)("File", fileSchema);
 exports.File = File;

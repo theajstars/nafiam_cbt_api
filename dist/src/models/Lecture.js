@@ -7,7 +7,7 @@ const LectureSchema = new mongoose_1.Schema({
     courseID: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
-    files: { type: Array, required: true },
+    files: [{ id: String, path: String, name: String, timestamp: Number }],
 });
 const Lecture = (0, mongoose_1.model)("Lecture", LectureSchema);
 exports.Lecture = Lecture;

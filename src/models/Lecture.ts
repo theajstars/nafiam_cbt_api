@@ -1,11 +1,12 @@
-import { Schema, Model, model } from "mongoose";
+import { Schema, Model, model, Types } from "mongoose";
+import { FileProps } from "./File";
 
 export interface LectureProps {
   id: string;
   courseID: string;
   title: string;
   description: string;
-  files: any;
+  files: Types.DocumentArray<FileProps>;
 }
 
 const LectureSchema = new Schema<LectureProps, Model<LectureProps>>({
@@ -13,7 +14,7 @@ const LectureSchema = new Schema<LectureProps, Model<LectureProps>>({
   courseID: { type: String, required: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
-  files: { type: Array, required: true },
+  files: [{ id: String, path: String, name: String, timestamp: Number }],
 });
 
 const Lecture = model<LectureProps>("Lecture", LectureSchema);

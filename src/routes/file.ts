@@ -17,14 +17,15 @@ cloudinary.config({
   api_secret: "clC9-fOu0VrHXtKNEfYDggqSeUY",
 });
 const storage = multer.diskStorage({
-  destination: (req, file, callback) => {
-    callback(null, "./src/files");
+  destination: function (req, file, cb) {
+    cb(null, "./src/files");
   },
-  filename: (req, file, callback) => {
-    callback(null, `${file.originalname}`);
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
   },
 });
-const upload = multer({ storage });
+
+const upload = multer({ storage: storage });
 export default function (app: Express) {
   app.post(
     `${basePath}/upload-one`,
@@ -63,37 +64,46 @@ export default function (app: Express) {
     `${basePath}/upload-many`,
     upload.array("files", 10),
     async (req, res) => {
-      cloudinary.uploader.upload(
-        req.file.path,
-        { resource_type: "raw" },
-        async (err, result) => {
-          if (err) {
-            res.json(<DefaultResponse>{
-              statusCode: 401,
-              status: true,
-              message: "An error occurred while uploading files",
-              err,
-            });
-          } else {
-            const file = await new File({
-              id: generateRandomString(32),
-              path: result.url,
-              timestamp: Date.now(),
-              name: result.original_filename,
-            }).save();
-            res.json({
-              statusCode: 201,
-              status: true,
-              message: "File Uploaded!",
-              file,
-            });
-          }
-        }
-      );
-      console.log(req.files);
-      res.json({
-        balls: "sacks",
-      });
+      const numberOfFiles = req.files.length as unknown as number;
+      var files = [];
+      for (var i = 0; i < numberOfFiles; i++) {
+        const file = req.files[i];
+        const upload = await cloudinary.uploader.upload(file.path, {
+          resource_type: "raw",
+        });
+        files = [
+          ...files,
+          {
+            url: upload.url,
+            fileName: upload.original_filename,
+          },
+        ];
+      }
+      if (files.length === numberOfFiles) {
+        console.log(files);
+        const filesToUpload = files.map((f) => {
+          return {
+            id: generateRandomString(32),
+            path: f.url,
+            timestamp: Date.now(),
+            name: f.fileName,
+          };
+        });
+        const fs = await File.insertMany(filesToUpload);
+        res.json({
+          statusCode: 201,
+          status: true,
+          message: "File Uploaded!",
+          files: fs,
+        });
+      } else {
+        res.json(<DefaultResponse>{
+          statusCode: 401,
+          status: true,
+          message: "An error occurred while uploading files",
+          // err,
+        });
+      }
     }
   );
 }
