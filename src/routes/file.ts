@@ -59,7 +59,10 @@ export default function (app: Express) {
       );
     }
   );
+<<<<<<< HEAD
 
+=======
+>>>>>>> 72d4432e4e8c91af123394a50e3a558fde21d43d
   app.get(`${basePath}s/:file`, async (req, res) => {
     console.log(req.params.file);
   });
