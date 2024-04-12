@@ -25,6 +25,7 @@ function default_1(app) {
                 title,
                 description,
                 courseID,
+                dateCreated: Date.now(),
                 files,
             }).save();
             res.json({
@@ -42,12 +43,12 @@ function default_1(app) {
         const { token, courseID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
-            const lecture = yield Lecture_1.Lecture.find({ courseID });
+            const lectures = yield Lecture_1.Lecture.find({ courseID });
             res.json({
-                statusCode: 201,
+                statusCode: 200,
                 message: "Lectures found!",
                 status: true,
-                data: lecture,
+                data: lectures,
             });
         }
         else {

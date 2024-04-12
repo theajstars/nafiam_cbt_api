@@ -28,46 +28,13 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 export default function (app: Express) {
   app.post(
-    `${basePath}/upload-one`,
-    upload.single("file"),
-    async (req, res) => {
-      cloudinary.uploader.upload(
-        req.file.path,
-        { resource_type: "raw" },
-        async (err, result) => {
-          if (err) {
-            res.json(<DefaultResponse>{
-              statusCode: 401,
-              status: true,
-              message: "An error occurred while uploading files",
-              err,
-            });
-          } else {
-            const file = await new File({
-              id: generateRandomString(32),
-              path: result.url,
-              timestamp: Date.now(),
-              name: result.original_filename,
-            }).save();
-            res.json({
-              statusCode: 201,
-              status: true,
-              message: "File Uploaded!",
-              file,
-            });
-          }
-        }
-      );
-    }
-  );
-  app.post(
-    `${basePath}/upload-many`,
+    `${basePath}/upload`,
     upload.array("files", 10),
     async (req, res) => {
-      const numberOfFiles = req.files.length as unknown as number;
+      const numberOfFiles = req?.files?.length as unknown as number;
       var files = [];
       for (var i = 0; i < numberOfFiles; i++) {
-        const file = req.files[i];
+        const file = req?.files[i];
         const upload = await cloudinary.uploader.upload(file.path, {
           resource_type: "raw",
         });
@@ -76,6 +43,7 @@ export default function (app: Express) {
           {
             url: upload.url,
             fileName: upload.original_filename,
+            cloudinaryID: upload.public_id,
           },
         ];
       }
@@ -86,6 +54,7 @@ export default function (app: Express) {
             id: generateRandomString(32),
             path: f.url,
             timestamp: Date.now(),
+            cloudinaryID: f.fileName,
             name: f.fileName,
           };
         });
@@ -94,7 +63,7 @@ export default function (app: Express) {
           statusCode: 201,
           status: true,
           message: "File Uploaded!",
-          files: fs,
+          data: fs,
         });
       } else {
         res.json(<DefaultResponse>{

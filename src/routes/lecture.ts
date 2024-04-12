@@ -27,6 +27,7 @@ export default function (app: Express) {
           title,
           description,
           courseID,
+          dateCreated: Date.now(),
           files,
         }).save();
         res.json({
@@ -47,12 +48,12 @@ export default function (app: Express) {
       const { token, courseID } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user) {
-        const lecture = await Lecture.find({ courseID });
+        const lectures = await Lecture.find({ courseID });
         res.json({
-          statusCode: 201,
+          statusCode: 200,
           message: "Lectures found!",
           status: true,
-          data: lecture,
+          data: lectures,
         });
       } else {
         res.json(UnauthorizedResponseObject);

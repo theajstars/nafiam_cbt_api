@@ -4,6 +4,7 @@ export interface FileProps {
   id: string;
   path: string;
   name: string;
+  cloudinaryID: string;
   timestamp: number;
 }
 
@@ -11,6 +12,7 @@ const fileSchema = new Schema<FileProps, Model<FileProps>>({
   id: { type: String, required: true },
   path: { type: String, required: true },
   name: { type: String, required: true },
+  cloudinaryID: { type: String, required: true },
   timestamp: { type: Number, required: true },
 });
 
