@@ -19,6 +19,7 @@ import misc from "./src/routes/misc";
 import school from "./src/routes/school";
 import result from "./src/routes/result";
 import log from "./src/routes/log";
+import lecture from "./src/routes/lecture";
 
 const app = express();
 app.use(
@@ -46,6 +47,7 @@ connect(dbConnectString)
     school(app);
     result(app);
     log(app);
+    lecture(app);
     // new Admin({
     //   id: generateRandomString(32),
     //   firstName: "Zeus",

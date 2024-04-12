@@ -19,6 +19,7 @@ const misc_1 = __importDefault(require("./src/routes/misc"));
 const school_1 = __importDefault(require("./src/routes/school"));
 const result_1 = __importDefault(require("./src/routes/result"));
 const log_1 = __importDefault(require("./src/routes/log"));
+const lecture_1 = __importDefault(require("./src/routes/lecture"));
 const app = (0, express_1.default)();
 exports.app = app;
 app.use((0, cors_1.default)({
@@ -42,6 +43,7 @@ const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
     (0, school_1.default)(app);
     (0, result_1.default)(app);
     (0, log_1.default)(app);
+    (0, lecture_1.default)(app);
     // new Admin({
     //   id: generateRandomString(32),
     //   firstName: "Zeus",

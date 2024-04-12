@@ -23,13 +23,29 @@ function default_1(app) {
             const lecture = yield new Lecture_1.Lecture({
                 id: (0, Methods_1.generateRandomString)(32),
                 title,
-                courseID,
                 description,
+                courseID,
                 files,
             }).save();
             res.json({
                 statusCode: 201,
                 message: "Lecture has been added!",
+                status: true,
+                data: lecture,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}s/get`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, courseID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            const lecture = yield Lecture_1.Lecture.find({ courseID });
+            res.json({
+                statusCode: 201,
+                message: "Lectures found!",
                 status: true,
                 data: lecture,
             });
