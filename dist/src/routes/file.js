@@ -60,6 +60,36 @@ function default_1(app) {
             }
         }));
     }));
+    app.post(`${basePath}/upload-many`, upload.array("files", 10), (req, res) => __awaiter(this, void 0, void 0, function* () {
+        cloudinary.uploader.upload(req.file.path, { resource_type: "raw" }, (err, result) => __awaiter(this, void 0, void 0, function* () {
+            if (err) {
+                res.json({
+                    statusCode: 401,
+                    status: true,
+                    message: "An error occurred while uploading files",
+                    err,
+                });
+            }
+            else {
+                const file = yield new File_1.File({
+                    id: (0, Methods_1.generateRandomString)(32),
+                    path: result.url,
+                    timestamp: Date.now(),
+                    name: result.original_filename,
+                }).save();
+                res.json({
+                    statusCode: 201,
+                    status: true,
+                    message: "File Uploaded!",
+                    file,
+                });
+            }
+        }));
+        console.log(req.files);
+        res.json({
+            balls: "sacks",
+        });
+    }));
 }
 exports.default = default_1;
 //# sourceMappingURL=file.js.map
