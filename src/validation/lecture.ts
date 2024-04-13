@@ -2,7 +2,8 @@ import Joi from "@hapi/joi";
 
 const defaultLectureRequestSchema = Joi.object({
   token: Joi.string().required(),
-  courseID: Joi.string().required(),
+  courseID: Joi.string().optional(),
+  lectureID: Joi.string().optional(),
 });
 
 export const validateDefaultLectureRequest = (req, res, next) => {

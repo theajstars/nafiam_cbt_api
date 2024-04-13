@@ -7,7 +7,8 @@ exports.validateCreatePracticeQuestionsRequest = exports.validateCreateLectureRe
 const joi_1 = __importDefault(require("@hapi/joi"));
 const defaultLectureRequestSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
-    courseID: joi_1.default.string().required(),
+    courseID: joi_1.default.string().optional(),
+    lectureID: joi_1.default.string().optional(),
 });
 const validateDefaultLectureRequest = (req, res, next) => {
     const { error } = defaultLectureRequestSchema.validate(req.body);

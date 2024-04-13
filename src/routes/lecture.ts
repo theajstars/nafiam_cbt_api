@@ -69,18 +69,37 @@ export default function (app: Express) {
       const { token, lectureID, questions } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "lecturer") {
-        const practice = new Practice({
+        const practice = await new Practice({
           id: generateRandomString(32),
           lectureID,
           questions,
           dateCreated: Date.now(),
           active: false,
-        });
+        }).save();
         res.json({
           statusCode: 201,
           message: "New practice has been created!",
           status: true,
           data: practice,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/practices/get`,
+    validateDefaultLectureRequest,
+    async (req, res) => {
+      const { token, lectureID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user) {
+        const practices = await Practice.find({ lectureID });
+        res.json({
+          statusCode: 200,
+          message: "All Practices found!",
+          status: true,
+          data: practices,
         });
       } else {
         res.json(UnauthorizedResponseObject);

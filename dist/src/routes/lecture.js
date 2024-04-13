@@ -60,18 +60,34 @@ function default_1(app) {
         const { token, lectureID, questions } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "lecturer") {
-            const practice = new Practice_1.Practice({
+            const practice = yield new Practice_1.Practice({
                 id: (0, Methods_1.generateRandomString)(32),
                 lectureID,
                 questions,
                 dateCreated: Date.now(),
                 active: false,
-            });
+            }).save();
             res.json({
                 statusCode: 201,
                 message: "New practice has been created!",
                 status: true,
                 data: practice,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/practices/get`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, lectureID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            const practices = yield Practice_1.Practice.find({ lectureID });
+            res.json({
+                statusCode: 200,
+                message: "All Practices found!",
+                status: true,
+                data: practices,
             });
         }
         else {
