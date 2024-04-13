@@ -43,3 +43,24 @@ export const validateCreateLectureRequest = (req, res, next) => {
     next();
   }
 };
+const createPracticeQuestionsSchema = Joi.object({
+  token: Joi.string().required(),
+  lectureID: Joi.string().required(),
+  questions: Joi.array().required(),
+});
+
+export const validateCreatePracticeQuestionsRequest = (req, res, next) => {
+  const { error } = createPracticeQuestionsSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};

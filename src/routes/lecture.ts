@@ -9,10 +9,12 @@ import { validateTokenSchema } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import {
   validateCreateLectureRequest,
+  validateCreatePracticeQuestionsRequest,
   validateDefaultLectureRequest,
 } from "../validation/lecture";
 import { Lecture } from "../models/Lecture";
 import { generateRandomString } from "../Lib/Methods";
+import { Practice } from "../models/Practice";
 const basePath = "/lecture";
 export default function (app: Express) {
   app.post(
@@ -54,6 +56,31 @@ export default function (app: Express) {
           message: "Lectures found!",
           status: true,
           data: lectures,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/practice/create`,
+    validateCreatePracticeQuestionsRequest,
+    async (req, res) => {
+      const { token, lectureID, questions } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "lecturer") {
+        const practice = new Practice({
+          id: generateRandomString(32),
+          lectureID,
+          questions,
+          dateCreated: Date.now(),
+          active: false,
+        });
+        res.json({
+          statusCode: 201,
+          message: "New practice has been created!",
+          status: true,
+          data: practice,
         });
       } else {
         res.json(UnauthorizedResponseObject);

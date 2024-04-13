@@ -14,6 +14,7 @@ const Misc_1 = require("../Lib/Misc");
 const lecture_1 = require("../validation/lecture");
 const Lecture_1 = require("../models/Lecture");
 const Methods_1 = require("../Lib/Methods");
+const Practice_1 = require("../models/Practice");
 const basePath = "/lecture";
 function default_1(app) {
     app.post(`${basePath}/create`, lecture_1.validateCreateLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -49,6 +50,28 @@ function default_1(app) {
                 message: "Lectures found!",
                 status: true,
                 data: lectures,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/practice/create`, lecture_1.validateCreatePracticeQuestionsRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, lectureID, questions } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "lecturer") {
+            const practice = new Practice_1.Practice({
+                id: (0, Methods_1.generateRandomString)(32),
+                lectureID,
+                questions,
+                dateCreated: Date.now(),
+                active: false,
+            });
+            res.json({
+                statusCode: 201,
+                message: "New practice has been created!",
+                status: true,
+                data: practice,
             });
         }
         else {
