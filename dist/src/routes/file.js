@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const multer_1 = __importDefault(require("multer"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
+const fs_1 = __importDefault(require("fs"));
 const File_1 = require("../models/File");
 const Methods_1 = require("../Lib/Methods");
 const basePath = "/file";
@@ -64,6 +65,8 @@ function default_1(app) {
                 };
             });
             const fs = yield File_1.File.insertMany(filesToUpload);
+            (0, Methods_1.deleteFolderRecursive)("./src/files");
+            fs_1.default.mkdirSync("./src/files");
             res.json({
                 statusCode: 201,
                 status: true,

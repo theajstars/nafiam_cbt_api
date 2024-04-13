@@ -1,9 +1,10 @@
 import { Express, Request } from "express";
 import multer from "multer";
 import Cloudinary from "cloudinary";
-import url from "url";
+import path from "path";
+import fileSystem from "fs";
 import { File } from "../models/File";
-import { generateRandomString } from "../Lib/Methods";
+import { deleteFolderRecursive, generateRandomString } from "../Lib/Methods";
 import { DefaultResponse } from "../Lib/Responses";
 
 const basePath = "/file";
@@ -59,6 +60,9 @@ export default function (app: Express) {
           };
         });
         const fs = await File.insertMany(filesToUpload);
+        deleteFolderRecursive("./src/files");
+        fileSystem.mkdirSync("./src/files");
+
         res.json({
           statusCode: 201,
           status: true,

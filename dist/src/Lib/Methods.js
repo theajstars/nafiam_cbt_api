@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeEmptyFields = exports.returnUnlessUndefined = exports.genPassword = exports.generateRandomString = void 0;
+exports.deleteFolderRecursive = exports.removeEmptyFields = exports.returnUnlessUndefined = exports.genPassword = exports.generateRandomString = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const fs_1 = __importDefault(require("fs"));
 const generateRandomString = (length, charset = "ALL") => {
     let result = "";
     const characters = charset === "ALL"
@@ -50,4 +51,21 @@ const removeEmptyFields = (obj) => {
     return obj;
 };
 exports.removeEmptyFields = removeEmptyFields;
+const deleteFolderRecursive = (path) => {
+    if (fs_1.default.existsSync(path)) {
+        fs_1.default.readdirSync(path).forEach(function (file, index) {
+            var curPath = path + "/" + file;
+            if (fs_1.default.lstatSync(curPath).isDirectory()) {
+                // recurse
+                (0, exports.deleteFolderRecursive)(curPath);
+            }
+            else {
+                // delete file
+                fs_1.default.unlinkSync(curPath);
+            }
+        });
+        fs_1.default.rmdirSync(path);
+    }
+};
+exports.deleteFolderRecursive = deleteFolderRecursive;
 //# sourceMappingURL=Methods.js.map
