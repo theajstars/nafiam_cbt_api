@@ -27,8 +27,10 @@ export default function (app: Express) {
       res.json({
         status: true,
         statusCode: isPasswordCorrect ? 200 : 401,
-        message: "Logged In!",
-        token: await createToken(lecturer.id, "lecturer"),
+        message: isPasswordCorrect ? "Logged In!" : "Incorrect Password",
+        token: isPasswordCorrect
+          ? await createToken(lecturer.id, "lecturer")
+          : null,
       });
     } else {
       res.json({

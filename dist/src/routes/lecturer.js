@@ -33,8 +33,10 @@ function default_2(app) {
             res.json({
                 status: true,
                 statusCode: isPasswordCorrect ? 200 : 401,
-                message: "Logged In!",
-                token: yield (0, JWT_1.createToken)(lecturer.id, "lecturer"),
+                message: isPasswordCorrect ? "Logged In!" : "Incorrect Password",
+                token: isPasswordCorrect
+                    ? yield (0, JWT_1.createToken)(lecturer.id, "lecturer")
+                    : null,
             });
         }
         else {
