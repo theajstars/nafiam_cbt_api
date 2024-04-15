@@ -44,7 +44,7 @@ export default function (app: Express) {
     }
   );
   app.post(
-    `${basePath}s/get`,
+    `${basePath}s/all`,
     validateDefaultLectureRequest,
     async (req, res) => {
       const { token, courseID } = req.body;
@@ -56,6 +56,44 @@ export default function (app: Express) {
           message: "Lectures found!",
           status: true,
           data: lectures,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/get/:lectureID`,
+    validateDefaultLectureRequest,
+    async (req, res) => {
+      const { token } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user) {
+        const lecture = await Lecture.findOne({ id: req.params.lectureID });
+        res.json({
+          statusCode: 200,
+          message: "Lecture found!",
+          status: true,
+          data: lecture,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.delete(
+    `${basePath}/delete`,
+    validateDefaultLectureRequest,
+    async (req, res) => {
+      const { token, lectureID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "lecturer") {
+        const lecture = await Lecture.findOneAndDelete({ id: lectureID });
+        res.json({
+          statusCode: 204,
+          message: "Lecture has been deleted!",
+          status: true,
+          data: lecture,
         });
       } else {
         res.json(UnauthorizedResponseObject);
@@ -87,6 +125,7 @@ export default function (app: Express) {
       }
     }
   );
+
   app.post(
     `${basePath}/practices/get`,
     validateDefaultLectureRequest,

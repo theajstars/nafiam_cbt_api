@@ -40,7 +40,7 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}s/get`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}s/all`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, courseID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
@@ -50,6 +50,38 @@ function default_1(app) {
                 message: "Lectures found!",
                 status: true,
                 data: lectures,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/get/:lectureID`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            const lecture = yield Lecture_1.Lecture.findOne({ id: req.params.lectureID });
+            res.json({
+                statusCode: 200,
+                message: "Lecture found!",
+                status: true,
+                data: lecture,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.delete(`${basePath}/delete`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, lectureID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "lecturer") {
+            const lecture = yield Lecture_1.Lecture.findOneAndDelete({ id: lectureID });
+            res.json({
+                statusCode: 204,
+                message: "Lecture has been deleted!",
+                status: true,
+                data: lecture,
             });
         }
         else {
