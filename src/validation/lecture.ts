@@ -44,6 +44,29 @@ export const validateCreateLectureRequest = (req, res, next) => {
     next();
   }
 };
+const lectureUpdateSchema = Joi.object({
+  token: Joi.string().required(),
+  lectureID: Joi.string().optional(),
+  title: Joi.string().required(),
+  description: Joi.string().required(),
+  files: Joi.array().required(),
+});
+
+export const validateUpdateLectureRequest = (req, res, next) => {
+  const { error } = lectureUpdateSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
 const createPracticeQuestionsSchema = Joi.object({
   token: Joi.string().required(),
   lectureID: Joi.string().required(),

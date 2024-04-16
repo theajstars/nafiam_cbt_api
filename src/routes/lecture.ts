@@ -11,12 +11,14 @@ import {
   validateCreateLectureRequest,
   validateCreatePracticeQuestionsRequest,
   validateDefaultLectureRequest,
+  validateUpdateLectureRequest,
 } from "../validation/lecture";
 import { Lecture } from "../models/Lecture";
 import { generateRandomString } from "../Lib/Methods";
 import { Practice } from "../models/Practice";
 const basePath = "/lecture";
 export default function (app: Express) {
+  // Create a new Lecture
   app.post(
     `${basePath}/create`,
     validateCreateLectureRequest,
@@ -43,6 +45,7 @@ export default function (app: Express) {
       }
     }
   );
+  // Get all lectures for a course
   app.post(
     `${basePath}s/all`,
     validateDefaultLectureRequest,
@@ -62,6 +65,7 @@ export default function (app: Express) {
       }
     }
   );
+  // Get details for a single lecture
   app.post(
     `${basePath}/get/:lectureID`,
     validateDefaultLectureRequest,
@@ -73,6 +77,31 @@ export default function (app: Express) {
         res.json({
           statusCode: 200,
           message: "Lecture found!",
+          status: true,
+          data: lecture,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  // Update details of a single lecture
+  app.post(
+    `${basePath}/update/:lectureID`,
+    validateUpdateLectureRequest,
+    async (req, res) => {
+      const { lectureID, title, description, files, token } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "lecturer") {
+        const lecture = await Lecture.findOneAndUpdate(
+          {
+            id: req.params.lectureID ?? lectureID,
+          },
+          { title, description, files }
+        );
+        res.json({
+          statusCode: 200,
+          message: "Lecture has been updated!",
           status: true,
           data: lecture,
         });

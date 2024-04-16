@@ -17,6 +17,7 @@ const Methods_1 = require("../Lib/Methods");
 const Practice_1 = require("../models/Practice");
 const basePath = "/lecture";
 function default_1(app) {
+    // Create a new Lecture
     app.post(`${basePath}/create`, lecture_1.validateCreateLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { title, courseID, description, files, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
@@ -40,6 +41,7 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    // Get all lectures for a course
     app.post(`${basePath}s/all`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, courseID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
@@ -56,6 +58,7 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    // Get details for a single lecture
     app.post(`${basePath}/get/:lectureID`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
@@ -64,6 +67,26 @@ function default_1(app) {
             res.json({
                 statusCode: 200,
                 message: "Lecture found!",
+                status: true,
+                data: lecture,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    // Update details of a single lecture
+    app.post(`${basePath}/update/:lectureID`, lecture_1.validateUpdateLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        const { lectureID, title, description, files, token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "lecturer") {
+            const lecture = yield Lecture_1.Lecture.findOneAndUpdate({
+                id: (_a = req.params.lectureID) !== null && _a !== void 0 ? _a : lectureID,
+            }, { title, description, files });
+            res.json({
+                statusCode: 200,
+                message: "Lecture has been updated!",
                 status: true,
                 data: lecture,
             });
