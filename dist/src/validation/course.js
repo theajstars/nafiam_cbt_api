@@ -3,12 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateCourseEnrollmentRequest = exports.validateDeleteCourseMaterialSchema = exports.validateGetAllCourseMaterials = exports.validateCreateCourseMaterial = exports.validateUpdateCourse = exports.validateGetSingleCourseSchema = exports.validateGetAllCourses = exports.validateCreateCourse = exports.validateTokenSchema = void 0;
+exports.validateCourseEnrollmentRequest = exports.validateDeleteCourseMaterialSchema = exports.validateGetAllCourseMaterials = exports.validateCreateCourseMaterial = exports.validateUpdateCourse = exports.validateGetSingleCourseSchema = exports.validateGetAllCourses = exports.validateCreateCourse = exports.validateTokenRequest = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const tokenSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
 });
-const validateTokenSchema = (req, res, next) => {
+const validateTokenRequest = (req, res, next) => {
     const { error } = tokenSchema.validate(req.body);
     if (error) {
         const errorResponse = error.details.map((e) => {
@@ -24,7 +24,7 @@ const validateTokenSchema = (req, res, next) => {
         next();
     }
 };
-exports.validateTokenSchema = validateTokenSchema;
+exports.validateTokenRequest = validateTokenRequest;
 const createSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     code: joi_1.default.string().required(),

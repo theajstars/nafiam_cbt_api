@@ -14,7 +14,6 @@ export interface PracticeProps {
   lectureID: string;
   questions: Types.DocumentArray<QuestionProps>;
   dateCreated: number;
-  active: boolean;
 }
 
 const PracticeSchema = new Schema<PracticeProps, Model<PracticeProps>>({
@@ -22,7 +21,6 @@ const PracticeSchema = new Schema<PracticeProps, Model<PracticeProps>>({
   lectureID: { type: String, required: true },
   questions: [{ options: [{ id: String, value: String }], answer: String }],
   dateCreated: { type: Number, required: true },
-  active: { type: Boolean, required: true },
 });
 
 const Practice = model<PracticeProps>("Practice", PracticeSchema);

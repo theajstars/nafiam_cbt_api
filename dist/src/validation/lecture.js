@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateCreatePracticeQuestionsRequest = exports.validateUpdateLectureRequest = exports.validateCreateLectureRequest = exports.validateDefaultLectureRequest = void 0;
+exports.validateToggleLectureStatusRequest = exports.validateCreatePracticeQuestionsRequest = exports.validateUpdateLectureRequest = exports.validateCreateLectureRequest = exports.validateDefaultLectureRequest = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const defaultLectureRequestSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -97,4 +97,25 @@ const validateCreatePracticeQuestionsRequest = (req, res, next) => {
     }
 };
 exports.validateCreatePracticeQuestionsRequest = validateCreatePracticeQuestionsRequest;
+const toggleLectureStatusSchema = joi_1.default.object({
+    token: joi_1.default.string().required(),
+    status: joi_1.default.boolean().required(),
+});
+const validateToggleLectureStatusRequest = (req, res, next) => {
+    const { error } = toggleLectureStatusSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateToggleLectureStatusRequest = validateToggleLectureStatusRequest;
 //# sourceMappingURL=lecture.js.map

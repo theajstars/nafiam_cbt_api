@@ -29,6 +29,7 @@ function default_1(app) {
                 courseID,
                 dateCreated: Date.now(),
                 files,
+                isActive: false,
             }).save();
             res.json({
                 statusCode: 201,
@@ -67,6 +68,25 @@ function default_1(app) {
             res.json({
                 statusCode: 200,
                 message: "Lecture found!",
+                status: true,
+                data: lecture,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    // Update active status for a single lecture
+    app.post(`${basePath}/status/:lectureID`, lecture_1.validateToggleLectureStatusRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, status } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            const lecture = yield Lecture_1.Lecture.findOneAndUpdate({ id: req.params.lectureID }, { isActive: status });
+            res.json({
+                statusCode: 200,
+                message: status
+                    ? "Lecture has been activated!"
+                    : "Lecture has been deactivated",
                 status: true,
                 data: lecture,
             });
@@ -120,7 +140,6 @@ function default_1(app) {
                 lectureID,
                 questions,
                 dateCreated: Date.now(),
-                active: false,
             }).save();
             res.json({
                 statusCode: 201,

@@ -66,7 +66,7 @@ function default_1(app) {
         }
     }));
     // Get All Results all at once
-    app.post(`${basePath}s/all`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}s/all`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user !== "student") {
@@ -80,7 +80,7 @@ function default_1(app) {
         }
     }));
     // Get All Examination Attendances
-    app.post(`${basePath}s/attendances/all`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}s/attendances/all`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user !== "student") {

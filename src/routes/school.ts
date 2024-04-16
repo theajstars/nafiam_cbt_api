@@ -2,7 +2,7 @@ import { Express, Request } from "express";
 import bcrypt from "bcryptjs";
 import { Admin } from "../models/Admin";
 import { createToken, verifyToken } from "../Lib/JWT";
-import { validateTokenSchema } from "../validation/course";
+import { validateTokenRequest } from "../validation/course";
 import { School } from "../models/Schools";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { generateRandomString } from "../Lib/Methods";
@@ -17,7 +17,7 @@ import { Course } from "../models/Course";
 const basePath = "/school";
 
 export default function (app: Express) {
-  app.post(`${basePath}s/all`, validateTokenSchema, async (req, res) => {
+  app.post(`${basePath}s/all`, validateTokenRequest, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user) {

@@ -21,7 +21,7 @@ import {
   validateUpdateAdminRequest,
   validateUpdateStudent,
 } from "../validation/admin";
-import { validateTokenSchema } from "../validation/course";
+import { validateTokenRequest } from "../validation/course";
 import {
   validateDefaultProfileUpdateRequest,
   validateLoginRequest,
@@ -62,22 +62,26 @@ export default function (app: Express) {
       });
     }
   });
-  app.post(`${basePath}/profile/get`, validateTokenSchema, async (req, res) => {
-    const { token } = req.body;
-    const { id, user } = verifyToken(token);
-    if (id && user && user === "admin") {
-      const admin = await Admin.findOne({ id }).select(
-        "id firstName lastName email superUser rank serviceNumber dateCreated isChangedPassword"
-      );
-      res.json({
-        status: true,
-        statusCode: 200,
-        data: admin,
-      });
-    } else {
-      res.json(UnauthorizedResponseObject);
+  app.post(
+    `${basePath}/profile/get`,
+    validateTokenRequest,
+    async (req, res) => {
+      const { token } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const admin = await Admin.findOne({ id }).select(
+          "id firstName lastName email superUser rank serviceNumber dateCreated isChangedPassword"
+        );
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: admin,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
     }
-  });
+  );
   app.post(
     `${basePath}/profile/update`,
     validateDefaultProfileUpdateRequest,
@@ -106,7 +110,7 @@ export default function (app: Express) {
       }
     }
   );
-  app.post(`${basePath}s/all`, validateTokenSchema, async (req, res) => {
+  app.post(`${basePath}s/all`, validateTokenRequest, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user && user === "admin") {
@@ -352,7 +356,7 @@ export default function (app: Express) {
     }
   );
 
-  app.post("/admin/students/get", validateTokenSchema, async (req, res) => {
+  app.post("/admin/students/get", validateTokenRequest, async (req, res) => {
     const { token } = req.body;
     const { user, id } = verifyToken(token);
     if (!id || !user || user !== "admin") {
@@ -385,7 +389,7 @@ export default function (app: Express) {
   });
   app.delete(
     "/admin/student/:studentID",
-    validateTokenSchema,
+    validateTokenRequest,
     async (req, res) => {
       const { token } = req.body;
       const { studentID } = req.params;
@@ -554,7 +558,7 @@ export default function (app: Express) {
   );
   app.post(
     `${basePath}/lecturers/all/get`,
-    validateTokenSchema,
+    validateTokenRequest,
     async (req, res) => {
       const { token } = req.body;
       const { id, user } = verifyToken(token);

@@ -7,7 +7,6 @@ const PracticeSchema = new mongoose_1.Schema({
     lectureID: { type: String, required: true },
     questions: [{ options: [{ id: String, value: String }], answer: String }],
     dateCreated: { type: Number, required: true },
-    active: { type: Boolean, required: true },
 });
 const Practice = (0, mongoose_1.model)("Practice", PracticeSchema);
 exports.Practice = Practice;

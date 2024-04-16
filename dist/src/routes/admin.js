@@ -54,7 +54,7 @@ function default_2(app) {
             });
         }
     }));
-    app.post(`${basePath}/profile/get`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/profile/get`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
@@ -90,7 +90,7 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}s/all`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}s/all`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
@@ -289,7 +289,7 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post("/admin/students/get", course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post("/admin/students/get", course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { user, id } = (0, JWT_1.verifyToken)(token);
         if (!id || !user || user !== "admin") {
@@ -321,7 +321,7 @@ function default_2(app) {
             });
         }
     }));
-    app.delete("/admin/student/:studentID", course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.delete("/admin/student/:studentID", course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { studentID } = req.params;
         const { user, id } = (0, JWT_1.verifyToken)(token);
@@ -453,7 +453,7 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}/lecturers/all/get`, course_1.validateTokenSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/lecturers/all/get`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {

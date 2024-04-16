@@ -5,7 +5,7 @@ import {
   validateDefaultProfileUpdateRequest,
   validateLoginRequest,
 } from "../validation/default";
-import { validateTokenSchema } from "../validation/course";
+import { validateTokenRequest } from "../validation/course";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { Student } from "../models/Student";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
@@ -52,22 +52,26 @@ export default function (app: Express) {
       });
     }
   });
-  app.post(`${basePath}/profile/get`, validateTokenSchema, async (req, res) => {
-    const { token } = req.body;
-    const { id, user } = verifyToken(token);
-    if (id && user && user === "student") {
-      const student = await Student.findOne({ id }).select(
-        "id firstName lastName email rank serviceNumber gender role isChangedPassword"
-      );
-      res.json({
-        status: true,
-        statusCode: 200,
-        data: student,
-      });
-    } else {
-      res.json(UnauthorizedResponseObject);
+  app.post(
+    `${basePath}/profile/get`,
+    validateTokenRequest,
+    async (req, res) => {
+      const { token } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "student") {
+        const student = await Student.findOne({ id }).select(
+          "id firstName lastName email rank serviceNumber gender role isChangedPassword"
+        );
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: student,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
     }
-  });
+  );
   app.post(
     `${basePath}/profile/update`,
     validateDefaultProfileUpdateRequest,

@@ -16,7 +16,7 @@ import {
   removeEmptyFields,
   returnUnlessUndefined,
 } from "../Lib/Methods";
-import { validateTokenSchema } from "../validation/course";
+import { validateTokenRequest } from "../validation/course";
 import {
   validateDefaultFindUserRequest,
   validateUpdatePasswordRequest,
@@ -33,7 +33,7 @@ export default function (app: Express) {
       message: "Server is live!!",
     });
   });
-  app.post(`${basePath}/ranks/get`, validateTokenSchema, async (req, res) => {
+  app.post(`${basePath}/ranks/get`, validateTokenRequest, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user) {

@@ -15,7 +15,7 @@ import {
   generateRandomString,
   removeEmptyFields,
 } from "../Lib/Methods";
-import { validateTokenSchema } from "../validation/course";
+import { validateTokenRequest } from "../validation/course";
 import { validateUpdatePasswordRequest } from "../validation/default";
 import { Student } from "../models/Student";
 import { Admin } from "../models/Admin";

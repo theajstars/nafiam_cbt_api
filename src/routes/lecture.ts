@@ -5,12 +5,13 @@ import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 
 import { Lecturer } from "../models/Lecturer";
-import { validateTokenSchema } from "../validation/course";
+import { validateTokenRequest } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import {
   validateCreateLectureRequest,
   validateCreatePracticeQuestionsRequest,
   validateDefaultLectureRequest,
+  validateToggleLectureStatusRequest,
   validateUpdateLectureRequest,
 } from "../validation/lecture";
 import { Lecture } from "../models/Lecture";
@@ -33,6 +34,7 @@ export default function (app: Express) {
           courseID,
           dateCreated: Date.now(),
           files,
+          isActive: false,
         }).save();
         res.json({
           statusCode: 201,
@@ -77,6 +79,31 @@ export default function (app: Express) {
         res.json({
           statusCode: 200,
           message: "Lecture found!",
+          status: true,
+          data: lecture,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  // Update active status for a single lecture
+  app.post(
+    `${basePath}/status/:lectureID`,
+    validateToggleLectureStatusRequest,
+    async (req, res) => {
+      const { token, status } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user) {
+        const lecture = await Lecture.findOneAndUpdate(
+          { id: req.params.lectureID },
+          { isActive: status }
+        );
+        res.json({
+          statusCode: 200,
+          message: status
+            ? "Lecture has been activated!"
+            : "Lecture has been deactivated",
           status: true,
           data: lecture,
         });
@@ -141,7 +168,6 @@ export default function (app: Express) {
           lectureID,
           questions,
           dateCreated: Date.now(),
-          active: false,
         }).save();
         res.json({
           statusCode: 201,

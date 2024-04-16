@@ -6,6 +6,7 @@ export interface LectureProps {
   courseID: string;
   title: string;
   description: string;
+  isActive: boolean;
   dateCreated: number;
   files: Types.DocumentArray<FileProps>;
 }
@@ -14,6 +15,7 @@ const LectureSchema = new Schema<LectureProps, Model<LectureProps>>({
   id: { type: String, required: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
+  isActive: { type: Boolean, required: true },
   dateCreated: { type: Number, required: true },
   courseID: { type: String, required: true },
   files: [{ id: String, path: String, name: String, timestamp: Number }],

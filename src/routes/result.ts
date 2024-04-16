@@ -5,7 +5,7 @@ import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 
 import { Lecturer } from "../models/Lecturer";
-import { validateTokenSchema } from "../validation/course";
+import { validateTokenRequest } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { Student } from "../models/Student";
 import { Result } from "../models/Results";
@@ -79,7 +79,7 @@ export default function (app: Express) {
     }
   );
   // Get All Results all at once
-  app.post(`${basePath}s/all`, validateTokenSchema, async (req, res) => {
+  app.post(`${basePath}s/all`, validateTokenRequest, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user && user !== "student") {
@@ -96,7 +96,7 @@ export default function (app: Express) {
   // Get All Examination Attendances
   app.post(
     `${basePath}s/attendances/all`,
-    validateTokenSchema,
+    validateTokenRequest,
     async (req, res) => {
       const { token } = req.body;
       const { id, user } = verifyToken(token);

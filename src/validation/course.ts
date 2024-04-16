@@ -5,7 +5,7 @@ const tokenSchema = Joi.object<{ token: string }>({
   token: Joi.string().required(),
 });
 
-export const validateTokenSchema = (req, res, next) => {
+export const validateTokenRequest = (req, res, next) => {
   const { error } = tokenSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {

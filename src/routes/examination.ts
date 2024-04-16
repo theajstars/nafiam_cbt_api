@@ -11,7 +11,7 @@ import {
   returnSuccessResponseObject,
 } from "../Lib/Misc";
 import { generateRandomString } from "../Lib/Methods";
-import { validateTokenSchema } from "../validation/course";
+import { validateTokenRequest } from "../validation/course";
 import {
   validateApproveExaminationRequest,
   validateCreateExaminationSchema,
