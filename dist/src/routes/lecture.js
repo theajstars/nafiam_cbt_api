@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const JWT_1 = require("../Lib/JWT");
+const course_1 = require("../validation/course");
 const Misc_1 = require("../Lib/Misc");
 const lecture_1 = require("../validation/lecture");
 const Lecture_1 = require("../models/Lecture");
@@ -152,14 +153,16 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}/practices/get`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, lectureID } = req.body;
+    app.post(`${basePath}/practice/get/:lectureID`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
-            const practices = yield Practice_1.Practice.find({ lectureID });
+            const practices = yield Practice_1.Practice.findOne({
+                lectureID: req.params.lectureID,
+            });
             res.json({
                 statusCode: 200,
-                message: "All Practices found!",
+                message: "Practice found!",
                 status: true,
                 data: practices,
             });

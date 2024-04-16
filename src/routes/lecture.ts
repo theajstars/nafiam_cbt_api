@@ -182,16 +182,18 @@ export default function (app: Express) {
   );
 
   app.post(
-    `${basePath}/practices/get`,
-    validateDefaultLectureRequest,
+    `${basePath}/practice/get/:lectureID`,
+    validateTokenRequest,
     async (req, res) => {
-      const { token, lectureID } = req.body;
+      const { token } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user) {
-        const practices = await Practice.find({ lectureID });
+        const practices = await Practice.findOne({
+          lectureID: req.params.lectureID,
+        });
         res.json({
           statusCode: 200,
-          message: "All Practices found!",
+          message: "Practice found!",
           status: true,
           data: practices,
         });
