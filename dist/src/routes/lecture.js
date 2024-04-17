@@ -20,6 +20,7 @@ const basePath = "/lecture";
 function default_1(app) {
     // Create a new Lecture
     app.post(`${basePath}/create`, lecture_1.validateCreateLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
         const { title, courseID, description, files, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "lecturer") {
@@ -32,11 +33,20 @@ function default_1(app) {
                 files,
                 isActive: false,
             }).save();
+            const practice = yield new Practice_1.Practice({
+                id: (0, Methods_1.generateRandomString)(32),
+                lecture: {
+                    id: (_a = lecture === null || lecture === void 0 ? void 0 : lecture.id) !== null && _a !== void 0 ? _a : "",
+                    title: (_b = lecture === null || lecture === void 0 ? void 0 : lecture.title) !== null && _b !== void 0 ? _b : "",
+                },
+                questions: [],
+                dateCreated: Date.now(),
+            }).save();
             res.json({
                 statusCode: 201,
                 message: "Lecture has been added!",
                 status: true,
-                data: lecture,
+                data: { lecture, practice },
             });
         }
         else {
@@ -98,18 +108,21 @@ function default_1(app) {
     }));
     // Update details of a single lecture
     app.post(`${basePath}/update/:lectureID`, lecture_1.validateUpdateLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        var _a;
+        var _c;
         const { lectureID, title, description, files, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "lecturer") {
             const lecture = yield Lecture_1.Lecture.findOneAndUpdate({
-                id: (_a = req.params.lectureID) !== null && _a !== void 0 ? _a : lectureID,
+                id: (_c = req.params.lectureID) !== null && _c !== void 0 ? _c : lectureID,
             }, { title, description, files });
+            const practice = yield Practice_1.Practice.findOneAndUpdate({
+                "lecture.id": lectureID,
+            }, { lecture: { title: title, id: lectureID } });
             res.json({
                 statusCode: 200,
                 message: "Lecture has been updated!",
                 status: true,
-                data: lecture,
+                data: { lecture, practice },
             });
         }
         else {
@@ -121,30 +134,30 @@ function default_1(app) {
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "lecturer") {
             const lecture = yield Lecture_1.Lecture.findOneAndDelete({ id: lectureID });
+            const practice = yield Practice_1.Practice.findOneAndDelete({
+                "lecture.id": lectureID,
+            });
             res.json({
                 statusCode: 204,
                 message: "Lecture has been deleted!",
                 status: true,
-                data: lecture,
+                data: { lecture, practice },
             });
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}/practice/create`, lecture_1.validateCreatePracticeQuestionsRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/practice/update`, lecture_1.validateUpdatePracticeQuestionsRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, lectureID, questions } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "lecturer") {
-            const practice = yield new Practice_1.Practice({
-                id: (0, Methods_1.generateRandomString)(32),
-                lectureID,
-                questions,
-                dateCreated: Date.now(),
-            }).save();
+            const practice = yield Practice_1.Practice.findOneAndUpdate({
+                "lecture.id": lectureID,
+            }, { questions });
             res.json({
-                statusCode: 201,
-                message: "New practice has been created!",
+                statusCode: 200,
+                message: "Practice has been updated!",
                 status: true,
                 data: practice,
             });
@@ -157,14 +170,14 @@ function default_1(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
-            const practices = yield Practice_1.Practice.findOne({
-                lectureID: req.params.lectureID,
+            const practice = yield Practice_1.Practice.findOne({
+                "lecture.id": req.params.lectureID,
             });
             res.json({
                 statusCode: 200,
                 message: "Practice found!",
                 status: true,
-                data: practices,
+                data: practice,
             });
         }
         else {

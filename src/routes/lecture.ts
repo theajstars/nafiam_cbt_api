@@ -9,7 +9,7 @@ import { validateTokenRequest } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import {
   validateCreateLectureRequest,
-  validateCreatePracticeQuestionsRequest,
+  validateUpdatePracticeQuestionsRequest,
   validateDefaultLectureRequest,
   validateToggleLectureStatusRequest,
   validateUpdateLectureRequest,
@@ -36,11 +36,20 @@ export default function (app: Express) {
           files,
           isActive: false,
         }).save();
+        const practice = await new Practice({
+          id: generateRandomString(32),
+          lecture: {
+            id: lecture?.id ?? "",
+            title: lecture?.title ?? "",
+          },
+          questions: [],
+          dateCreated: Date.now(),
+        }).save();
         res.json({
           statusCode: 201,
           message: "Lecture has been added!",
           status: true,
-          data: lecture,
+          data: { lecture, practice },
         });
       } else {
         res.json(UnauthorizedResponseObject);
@@ -126,11 +135,17 @@ export default function (app: Express) {
           },
           { title, description, files }
         );
+        const practice = await Practice.findOneAndUpdate(
+          {
+            "lecture.id": lectureID,
+          },
+          { lecture: { title: title, id: lectureID } }
+        );
         res.json({
           statusCode: 200,
           message: "Lecture has been updated!",
           status: true,
-          data: lecture,
+          data: { lecture, practice },
         });
       } else {
         res.json(UnauthorizedResponseObject);
@@ -145,11 +160,14 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
       if (id && user && user === "lecturer") {
         const lecture = await Lecture.findOneAndDelete({ id: lectureID });
+        const practice = await Practice.findOneAndDelete({
+          "lecture.id": lectureID,
+        });
         res.json({
           statusCode: 204,
           message: "Lecture has been deleted!",
           status: true,
-          data: lecture,
+          data: { lecture, practice },
         });
       } else {
         res.json(UnauthorizedResponseObject);
@@ -157,21 +175,21 @@ export default function (app: Express) {
     }
   );
   app.post(
-    `${basePath}/practice/create`,
-    validateCreatePracticeQuestionsRequest,
+    `${basePath}/practice/update`,
+    validateUpdatePracticeQuestionsRequest,
     async (req, res) => {
       const { token, lectureID, questions } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "lecturer") {
-        const practice = await new Practice({
-          id: generateRandomString(32),
-          lectureID,
-          questions,
-          dateCreated: Date.now(),
-        }).save();
+        const practice = await Practice.findOneAndUpdate(
+          {
+            "lecture.id": lectureID,
+          },
+          { questions }
+        );
         res.json({
-          statusCode: 201,
-          message: "New practice has been created!",
+          statusCode: 200,
+          message: "Practice has been updated!",
           status: true,
           data: practice,
         });
@@ -188,14 +206,14 @@ export default function (app: Express) {
       const { token } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user) {
-        const practices = await Practice.findOne({
-          lectureID: req.params.lectureID,
+        const practice = await Practice.findOne({
+          "lecture.id": req.params.lectureID,
         });
         res.json({
           statusCode: 200,
           message: "Practice found!",
           status: true,
-          data: practices,
+          data: practice,
         });
       } else {
         res.json(UnauthorizedResponseObject);

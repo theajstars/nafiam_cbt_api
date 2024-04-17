@@ -73,7 +73,7 @@ const createPracticeQuestionsSchema = Joi.object({
   questions: Joi.array().required(),
 });
 
-export const validateCreatePracticeQuestionsRequest = (req, res, next) => {
+export const validateUpdatePracticeQuestionsRequest = (req, res, next) => {
   const { error } = createPracticeQuestionsSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateToggleLectureStatusRequest = exports.validateCreatePracticeQuestionsRequest = exports.validateUpdateLectureRequest = exports.validateCreateLectureRequest = exports.validateDefaultLectureRequest = void 0;
+exports.validateToggleLectureStatusRequest = exports.validateUpdatePracticeQuestionsRequest = exports.validateUpdateLectureRequest = exports.validateCreateLectureRequest = exports.validateDefaultLectureRequest = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const defaultLectureRequestSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -80,7 +80,7 @@ const createPracticeQuestionsSchema = joi_1.default.object({
     lectureID: joi_1.default.string().required(),
     questions: joi_1.default.array().required(),
 });
-const validateCreatePracticeQuestionsRequest = (req, res, next) => {
+const validateUpdatePracticeQuestionsRequest = (req, res, next) => {
     const { error } = createPracticeQuestionsSchema.validate(req.body);
     if (error) {
         const errorResponse = error.details.map((e) => {
@@ -96,7 +96,7 @@ const validateCreatePracticeQuestionsRequest = (req, res, next) => {
         next();
     }
 };
-exports.validateCreatePracticeQuestionsRequest = validateCreatePracticeQuestionsRequest;
+exports.validateUpdatePracticeQuestionsRequest = validateUpdatePracticeQuestionsRequest;
 const toggleLectureStatusSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     status: joi_1.default.boolean().required(),
