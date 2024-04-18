@@ -91,7 +91,7 @@ function default_1(app) {
     app.post(`${basePath}/status/:lectureID`, lecture_1.validateToggleLectureStatusRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, status } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user) {
+        if (id && user && user === "lecturer") {
             const lecture = yield Lecture_1.Lecture.findOneAndUpdate({ id: req.params.lectureID }, { isActive: status });
             res.json({
                 statusCode: 200,
@@ -129,6 +129,7 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    //Delete a single lecture, this will also delete the lecture's practice questions
     app.delete(`${basePath}/delete`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, lectureID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
@@ -148,6 +149,7 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    // Update the questions of the lecture
     app.post(`${basePath}/practice/update`, lecture_1.validateUpdatePracticeQuestionsRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, lectureID, questions } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
@@ -166,6 +168,7 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    // Get the practice of a lecture
     app.post(`${basePath}/practice/get/:lectureID`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);

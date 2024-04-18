@@ -103,7 +103,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, status } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user) {
+      if (id && user && user === "lecturer") {
         const lecture = await Lecture.findOneAndUpdate(
           { id: req.params.lectureID },
           { isActive: status }
@@ -152,6 +152,8 @@ export default function (app: Express) {
       }
     }
   );
+
+  //Delete a single lecture, this will also delete the lecture's practice questions
   app.delete(
     `${basePath}/delete`,
     validateDefaultLectureRequest,
@@ -174,6 +176,8 @@ export default function (app: Express) {
       }
     }
   );
+
+  // Update the questions of the lecture
   app.post(
     `${basePath}/practice/update`,
     validateUpdatePracticeQuestionsRequest,
@@ -199,6 +203,7 @@ export default function (app: Express) {
     }
   );
 
+  // Get the practice of a lecture
   app.post(
     `${basePath}/practice/get/:lectureID`,
     validateTokenRequest,
