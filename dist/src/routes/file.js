@@ -17,6 +17,9 @@ const cloudinary_1 = __importDefault(require("cloudinary"));
 const fs_1 = __importDefault(require("fs"));
 const File_1 = require("../models/File");
 const Methods_1 = require("../Lib/Methods");
+const course_1 = require("../validation/course");
+const JWT_1 = require("../Lib/JWT");
+const Misc_1 = require("../Lib/Misc");
 const basePath = "/file";
 const CLOUDINARY_URL = "cloudinary://897745466481853:clC9-fOu0VrHXtKNEfYDggqSeUY@theajstars";
 const cloudinary = cloudinary_1.default.v2;
@@ -43,13 +46,16 @@ function default_1(app) {
             const file = req === null || req === void 0 ? void 0 : req.files[i];
             const upload = yield cloudinary.uploader.upload(file.path, {
                 resource_type: "raw",
+                use_filename: true,
             });
+            console.log(upload);
             files = [
                 ...files,
                 {
                     url: upload.url,
                     fileName: upload.original_filename,
                     cloudinaryID: upload.public_id,
+                    // extension: upload.
                 },
             ];
         }
@@ -60,7 +66,7 @@ function default_1(app) {
                     id: (0, Methods_1.generateRandomString)(32),
                     path: f.url,
                     timestamp: Date.now(),
-                    cloudinaryID: f.fileName,
+                    cloudinaryID: f.cloudinaryID,
                     name: f.fileName,
                 };
             });
@@ -81,6 +87,22 @@ function default_1(app) {
                 message: "An error occurred while uploading files",
                 // err,
             });
+        }
+    }));
+    app.post(`${basePath}s/all`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            const files = yield File_1.File.find();
+            res.json({
+                statusCode: 204,
+                message: "Retrieved all files!",
+                status: true,
+                data: { files },
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
 }
