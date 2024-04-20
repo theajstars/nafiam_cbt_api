@@ -78,7 +78,8 @@ export default function (app: Express) {
           statusCode: 201,
           status: true,
           message: "File Uploaded!",
-          data: fs,
+          // data: fs,
+          data: filesToUpload,
         });
       } else {
         res.json(<DefaultResponse>{

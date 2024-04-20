@@ -18,7 +18,15 @@ const LectureSchema = new Schema<LectureProps, Model<LectureProps>>({
   isActive: { type: Boolean, required: true },
   dateCreated: { type: Number, required: true },
   courseID: { type: String, required: true },
-  files: [{ id: String, path: String, name: String, timestamp: Number }],
+  files: [
+    {
+      id: String,
+      path: String,
+      cloudinaryID: String,
+      name: String,
+      timestamp: Number,
+    },
+  ],
 });
 
 const Lecture = model<LectureProps>("Lecture", LectureSchema);

@@ -9,7 +9,15 @@ const LectureSchema = new mongoose_1.Schema({
     isActive: { type: Boolean, required: true },
     dateCreated: { type: Number, required: true },
     courseID: { type: String, required: true },
-    files: [{ id: String, path: String, name: String, timestamp: Number }],
+    files: [
+        {
+            id: String,
+            path: String,
+            cloudinaryID: String,
+            name: String,
+            timestamp: Number,
+        },
+    ],
 });
 const Lecture = (0, mongoose_1.model)("Lecture", LectureSchema);
 exports.Lecture = Lecture;
