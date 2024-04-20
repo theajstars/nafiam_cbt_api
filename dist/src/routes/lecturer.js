@@ -62,7 +62,7 @@ function default_2(app) {
     app.post(`${basePath}/profile/get`, lecturer_1.validateDefaultLecturerRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, lecturerID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user) {
+        if (id && user && user === "lecturer") {
             const lecturer = yield Lecturer_1.Lecturer.findOne({ id: lecturerID !== null && lecturerID !== void 0 ? lecturerID : id });
             res.json({
                 status: true,

@@ -58,7 +58,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, lecturerID } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user) {
+      if (id && user && user === "lecturer") {
         const lecturer = await Lecturer.findOne({ id: lecturerID ?? id });
         res.json({
           status: true,

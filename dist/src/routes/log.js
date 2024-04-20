@@ -29,11 +29,7 @@ function default_1(app) {
                 skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
                 limit,
             });
-            const totalCount = yield Log_1.Log.countDocuments({
-                personnelID,
-                action,
-                timestamp,
-            });
+            const totalCount = yield Log_1.Log.countDocuments({});
             res.json({
                 status: true,
                 statusCode: 200,
@@ -41,7 +37,7 @@ function default_1(app) {
                 page,
                 limit,
                 rows: logs.length,
-                totalCount,
+                total: totalCount,
             });
         }
         else {

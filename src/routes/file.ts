@@ -22,6 +22,11 @@ cloudinary.config({
 });
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
+    var dir = "./src/files";
+
+    if (!fileSystem.existsSync(dir)) {
+      fileSystem.mkdirSync(dir);
+    }
     cb(null, "./src/files");
   },
   filename: function (req, file, cb) {

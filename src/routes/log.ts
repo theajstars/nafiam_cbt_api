@@ -43,11 +43,7 @@ export default function (app: Express) {
         }
       );
 
-      const totalCount = await Log.countDocuments({
-        personnelID,
-        action,
-        timestamp,
-      });
+      const totalCount = await Log.countDocuments({});
 
       res.json({
         status: true,
@@ -56,7 +52,7 @@ export default function (app: Express) {
         page,
         limit,
         rows: logs.length,
-        totalCount,
+        total: totalCount,
       });
     } else {
       res.json(UnauthorizedResponseObject);
