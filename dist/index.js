@@ -56,5 +56,6 @@ const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
 })
     .catch((err) => {
     console.error("Failed to connect to DB", err);
+    app.listen(PORT, () => console.log(`Server running without DB on port: ${PORT}`));
 });
 //# sourceMappingURL=index.js.map
