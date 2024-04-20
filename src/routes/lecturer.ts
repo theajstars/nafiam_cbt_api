@@ -10,6 +10,8 @@ import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { Student } from "../models/Student";
 import { validateDefaultLecturerRequest } from "../validation/lecturer";
 import { validateDefaultProfileUpdateRequest } from "../validation/default";
+import { generateRandomString } from "../Lib/Methods";
+import { Log } from "../models/Log";
 const basePath = "/lecturer";
 export default function (app: Express) {
   app.post(`${basePath}/login`, async (req, res) => {
@@ -24,6 +26,15 @@ export default function (app: Express) {
         lecturer.password
       );
 
+      const log = await new Log({
+        personnelID: lecturer.id,
+        id: generateRandomString(32),
+        userType: "lecturer",
+        action: "login",
+        comments: isPasswordCorrect ? "Login successful!" : "Invalid Password",
+        timestamp: Date.now(),
+        status: isPasswordCorrect ? "success" : "error",
+      }).save();
       res.json({
         status: true,
         statusCode: isPasswordCorrect ? 200 : 401,
@@ -31,6 +42,7 @@ export default function (app: Express) {
         token: isPasswordCorrect
           ? await createToken(lecturer.id, "lecturer")
           : null,
+        log,
       });
     } else {
       res.json({

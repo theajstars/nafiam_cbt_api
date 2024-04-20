@@ -20,6 +20,8 @@ const Misc_1 = require("../Lib/Misc");
 const Student_1 = require("../models/Student");
 const lecturer_1 = require("../validation/lecturer");
 const default_1 = require("../validation/default");
+const Methods_1 = require("../Lib/Methods");
+const Log_1 = require("../models/Log");
 const basePath = "/lecturer";
 function default_2(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -30,6 +32,15 @@ function default_2(app) {
         });
         if (lecturer) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, lecturer.password);
+            const log = yield new Log_1.Log({
+                personnelID: lecturer.id,
+                id: (0, Methods_1.generateRandomString)(32),
+                userType: "lecturer",
+                action: "login",
+                comments: isPasswordCorrect ? "Login successful!" : "Invalid Password",
+                timestamp: Date.now(),
+                status: isPasswordCorrect ? "success" : "error",
+            }).save();
             res.json({
                 status: true,
                 statusCode: isPasswordCorrect ? 200 : 401,
@@ -37,6 +48,7 @@ function default_2(app) {
                 token: isPasswordCorrect
                     ? yield (0, JWT_1.createToken)(lecturer.id, "lecturer")
                     : null,
+                log,
             });
         }
         else {

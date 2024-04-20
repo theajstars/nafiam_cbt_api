@@ -48,15 +48,24 @@ connect(dbConnectString)
     result(app);
     log(app);
     lecture(app);
-    // new Admin({
-    //   id: generateRandomString(32),
-    //   firstName: "Zeus",
-    //   lastName: "Olympus",
-    //   email: "me@theajstars.com",
-    //   password: hash,
-    // }).save();
+    async function createAdmin() {
+      const hash = await genPassword("securePassword2024");
+      new Admin({
+        id: generateRandomString(32),
+        firstName: "Zeus",
+        lastName: "Olympus",
+        email: "me@theajstars.com",
+        serviceNumber: "NAF01/12345",
+        rank: "Air Chief Marshal",
+        dateCreated: Date.now(),
+        password: hash,
+        isChangedPassword: true,
+        superUser: true,
+      }).save();
+    }
 
-    genPassword("AJIBOYE");
+    // genPassword("AJIBOYE");
+    // createAdmin();
     // Course.updateMany({}, { lecturerID: "1709114865502" }).exec();
   })
   .catch((err) => {

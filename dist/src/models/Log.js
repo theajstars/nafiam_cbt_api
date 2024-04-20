@@ -8,8 +8,9 @@ const logSchema = new mongoose_1.Schema({
     userType: { type: String, required: true },
     action: { type: String, required: true },
     timestamp: { type: Number, required: true },
-    navigatorObject: { type: Object, required: true },
+    navigatorObject: { type: Object, required: false },
     comments: { type: String, required: false },
+    status: { type: String, required: false },
 });
 const Log = (0, mongoose_1.model)("Log", logSchema);
 exports.Log = Log;

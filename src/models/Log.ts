@@ -8,6 +8,7 @@ export interface LogProps {
   timestamp: number;
   navigatorObject: any;
   comments?: string;
+  status: "success" | "pending" | "error";
 }
 
 const logSchema = new Schema<LogProps, Model<LogProps>>({
@@ -16,8 +17,9 @@ const logSchema = new Schema<LogProps, Model<LogProps>>({
   userType: { type: String, required: true },
   action: { type: String, required: true },
   timestamp: { type: Number, required: true },
-  navigatorObject: { type: Object, required: true },
+  navigatorObject: { type: Object, required: false },
   comments: { type: String, required: false },
+  status: { type: String, required: false },
 });
 
 const Log = model<LogProps>("Log", logSchema);

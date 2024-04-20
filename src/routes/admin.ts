@@ -48,6 +48,7 @@ export default function (app: Express) {
         navigatorObject: navigatorObject,
         comments: isPasswordCorrect ? "Login successful!" : "Invalid Password",
         timestamp: Date.now(),
+        status: isPasswordCorrect ? "success" : "error",
       }).save();
       res.json({
         status: true,

@@ -157,7 +157,7 @@ export default function (app: Express) {
               }
               break;
           }
-          const log = await new Log({
+          await new Log({
             id: generateRandomString(32),
             personnelID: id,
             timestamp: Date.now(),
@@ -167,6 +167,7 @@ export default function (app: Express) {
               : "Password was not changed",
             userType: user,
             action: "change_password",
+            status: isPasswordCorrect ? "success" : "error",
           }).save();
         } else {
           res.json(UnauthorizedResponseObject);

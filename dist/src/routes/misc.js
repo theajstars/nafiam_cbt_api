@@ -116,7 +116,7 @@ function default_2(app) {
                         }
                         break;
                 }
-                const log = yield new Log_1.Log({
+                yield new Log_1.Log({
                     id: (0, Methods_1.generateRandomString)(32),
                     personnelID: id,
                     timestamp: Date.now(),
@@ -126,6 +126,7 @@ function default_2(app) {
                         : "Password was not changed",
                     userType: user,
                     action: "change_password",
+                    status: isPasswordCorrect ? "success" : "error",
                 }).save();
             }
             else {
