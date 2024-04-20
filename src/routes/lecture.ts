@@ -211,14 +211,20 @@ export default function (app: Express) {
       const { token } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user) {
+        const lecture = await Lecture.findOne({
+          id: req.params.lectureID,
+          isActive: true,
+        });
         const practice = await Practice.findOne({
           "lecture.id": req.params.lectureID,
         });
         res.json({
-          statusCode: 200,
-          message: "Practice found!",
+          statusCode: lecture ? 200 : 401,
+          message: lecture
+            ? "Practice found!"
+            : "Unauthorized or Practice does not exist!",
           status: true,
-          data: practice,
+          data: lecture ? practice : null,
         });
       } else {
         res.json(UnauthorizedResponseObject);

@@ -30,6 +30,7 @@ const school_1 = __importDefault(require("./src/routes/school"));
 const result_1 = __importDefault(require("./src/routes/result"));
 const log_1 = __importDefault(require("./src/routes/log"));
 const lecture_1 = __importDefault(require("./src/routes/lecture"));
+const practice_1 = __importDefault(require("./src/routes/practice"));
 const app = (0, express_1.default)();
 exports.app = app;
 app.use((0, cors_1.default)({
@@ -54,6 +55,7 @@ const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
     (0, result_1.default)(app);
     (0, log_1.default)(app);
     (0, lecture_1.default)(app);
+    (0, practice_1.default)(app);
     function createAdmin() {
         return __awaiter(this, void 0, void 0, function* () {
             const hash = yield (0, Methods_1.genPassword)("securePassword2024");

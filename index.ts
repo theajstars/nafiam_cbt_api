@@ -20,6 +20,7 @@ import school from "./src/routes/school";
 import result from "./src/routes/result";
 import log from "./src/routes/log";
 import lecture from "./src/routes/lecture";
+import practice from "./src/routes/practice";
 
 const app = express();
 app.use(
@@ -48,6 +49,7 @@ connect(dbConnectString)
     result(app);
     log(app);
     lecture(app);
+    practice(app);
     async function createAdmin() {
       const hash = await genPassword("securePassword2024");
       new Admin({

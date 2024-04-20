@@ -173,20 +173,14 @@ function default_1(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
-            const lecture = yield Lecture_1.Lecture.findOne({
-                id: req.params.lectureID,
-                isActive: true,
-            });
             const practice = yield Practice_1.Practice.findOne({
                 "lecture.id": req.params.lectureID,
             });
             res.json({
-                statusCode: lecture ? 200 : 401,
-                message: lecture
-                    ? "Practice found!"
-                    : "Unauthorized or Practice does not exist!",
+                statusCode: 200,
+                message: "Practice found!",
                 status: true,
-                data: lecture ? practice : null,
+                data: practice,
             });
         }
         else {
@@ -195,4 +189,4 @@ function default_1(app) {
     }));
 }
 exports.default = default_1;
-//# sourceMappingURL=lecture.js.map
+//# sourceMappingURL=lecture%20copy.js.map
