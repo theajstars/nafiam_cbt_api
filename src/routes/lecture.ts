@@ -203,9 +203,9 @@ export default function (app: Express) {
     }
   );
 
-  // Get the practice of a lecture
+  // Get the practice of a lecture by a student
   app.post(
-    `${basePath}/practice/get/:lectureID`,
+    `${basePath}/practice/student/get/:lectureID`,
     validateTokenRequest,
     async (req, res) => {
       const { token } = req.body;

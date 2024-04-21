@@ -168,8 +168,8 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    // Get the practice of a lecture
-    app.post(`${basePath}/practice/get/:lectureID`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    // Get the practice of a lecture by a student
+    app.post(`${basePath}/practice/student/get/:lectureID`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
