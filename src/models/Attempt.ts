@@ -6,6 +6,7 @@ export interface AttemptProps {
   practiceID: string;
   studentID: string;
   score: number;
+  percent: number;
 
   timestamp: number;
 }
@@ -15,6 +16,7 @@ const AttemptSchema = new Schema<AttemptProps, Model<AttemptProps>>({
   practiceID: { type: String, required: true },
   studentID: { type: String, required: true },
   score: { type: Number, required: true },
+  percent: { type: Number, required: true },
 
   timestamp: { type: Number, required: true },
 });

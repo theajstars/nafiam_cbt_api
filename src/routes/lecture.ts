@@ -17,6 +17,9 @@ import {
 import { Lecture } from "../models/Lecture";
 import { generateRandomString } from "../Lib/Methods";
 import { Practice } from "../models/Practice";
+import { validateStudentSubmissionRequest } from "../validation/examination";
+import { Attempt } from "../models/Attempt";
+import { Student } from "../models/Student";
 const basePath = "/lecture";
 export default function (app: Express) {
   // Create a new Lecture
@@ -45,6 +48,11 @@ export default function (app: Express) {
           questions: [],
           dateCreated: Date.now(),
         }).save();
+        // Update lecture to include practice
+        await Lecture.findOneAndUpdate(
+          { id: lecture?.id },
+          { practiceID: practice.id }
+        );
         res.json({
           statusCode: 201,
           message: "Lecture has been added!",
@@ -196,35 +204,6 @@ export default function (app: Express) {
           message: "Practice has been updated!",
           status: true,
           data: practice,
-        });
-      } else {
-        res.json(UnauthorizedResponseObject);
-      }
-    }
-  );
-
-  // Get the practice of a lecture by a student
-  app.post(
-    `${basePath}/practice/student/get/:lectureID`,
-    validateTokenRequest,
-    async (req, res) => {
-      const { token } = req.body;
-      const { id, user } = verifyToken(token);
-      if (id && user) {
-        const lecture = await Lecture.findOne({
-          id: req.params.lectureID,
-          isActive: true,
-        });
-        const practice = await Practice.findOne({
-          "lecture.id": req.params.lectureID,
-        });
-        res.json({
-          statusCode: lecture ? 200 : 401,
-          message: lecture
-            ? "Practice found!"
-            : "Unauthorized or Practice does not exist!",
-          status: true,
-          data: lecture ? practice : null,
         });
       } else {
         res.json(UnauthorizedResponseObject);

@@ -7,6 +7,7 @@ const AttemptSchema = new mongoose_1.Schema({
     practiceID: { type: String, required: true },
     studentID: { type: String, required: true },
     score: { type: Number, required: true },
+    percent: { type: Number, required: true },
     timestamp: { type: Number, required: true },
 });
 const Attempt = (0, mongoose_1.model)("Attempt", AttemptSchema);

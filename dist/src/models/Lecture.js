@@ -6,6 +6,7 @@ const LectureSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
+    practiceID: { type: String, required: true },
     isActive: { type: Boolean, required: true },
     dateCreated: { type: Number, required: true },
     courseID: { type: String, required: true },

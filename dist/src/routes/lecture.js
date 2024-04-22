@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const JWT_1 = require("../Lib/JWT");
-const course_1 = require("../validation/course");
 const Misc_1 = require("../Lib/Misc");
 const lecture_1 = require("../validation/lecture");
 const Lecture_1 = require("../models/Lecture");
@@ -42,6 +41,8 @@ function default_1(app) {
                 questions: [],
                 dateCreated: Date.now(),
             }).save();
+            // Update lecture to include practice
+            yield Lecture_1.Lecture.findOneAndUpdate({ id: lecture === null || lecture === void 0 ? void 0 : lecture.id }, { practiceID: practice.id });
             res.json({
                 statusCode: 201,
                 message: "Lecture has been added!",
@@ -162,31 +163,6 @@ function default_1(app) {
                 message: "Practice has been updated!",
                 status: true,
                 data: practice,
-            });
-        }
-        else {
-            res.json(Misc_1.UnauthorizedResponseObject);
-        }
-    }));
-    // Get the practice of a lecture by a student
-    app.post(`${basePath}/practice/student/get/:lectureID`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token } = req.body;
-        const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user) {
-            const lecture = yield Lecture_1.Lecture.findOne({
-                id: req.params.lectureID,
-                isActive: true,
-            });
-            const practice = yield Practice_1.Practice.findOne({
-                "lecture.id": req.params.lectureID,
-            });
-            res.json({
-                statusCode: lecture ? 200 : 401,
-                message: lecture
-                    ? "Practice found!"
-                    : "Unauthorized or Practice does not exist!",
-                status: true,
-                data: lecture ? practice : null,
             });
         }
         else {
