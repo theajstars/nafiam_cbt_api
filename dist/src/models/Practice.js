@@ -16,6 +16,7 @@ const PracticeSchema = new mongoose_1.Schema({
             answer: String,
         },
     ],
+    index: { type: Number, required: true },
     dateCreated: { type: Number, required: true },
 });
 const Practice = (0, mongoose_1.model)("Practice", PracticeSchema);

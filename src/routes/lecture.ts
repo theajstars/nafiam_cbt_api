@@ -30,6 +30,9 @@ export default function (app: Express) {
       const { title, courseID, description, files, token } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "lecturer") {
+        //Get Existing lectures for the course
+        const lectures = await Lecture.find({ courseID });
+        const index = lectures.length + 1;
         const lecture = await new Lecture({
           id: generateRandomString(32),
           title,
@@ -45,6 +48,7 @@ export default function (app: Express) {
             id: lecture?.id ?? "",
             title: lecture?.title ?? "",
           },
+          index,
           questions: [],
           dateCreated: Date.now(),
         }).save();

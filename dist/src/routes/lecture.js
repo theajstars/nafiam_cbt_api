@@ -23,6 +23,9 @@ function default_1(app) {
         const { title, courseID, description, files, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "lecturer") {
+            //Get Existing lectures for the course
+            const lectures = yield Lecture_1.Lecture.find({ courseID });
+            const index = lectures.length + 1;
             const lecture = yield new Lecture_1.Lecture({
                 id: (0, Methods_1.generateRandomString)(32),
                 title,
@@ -38,6 +41,7 @@ function default_1(app) {
                     id: (_a = lecture === null || lecture === void 0 ? void 0 : lecture.id) !== null && _a !== void 0 ? _a : "",
                     title: (_b = lecture === null || lecture === void 0 ? void 0 : lecture.title) !== null && _b !== void 0 ? _b : "",
                 },
+                index,
                 questions: [],
                 dateCreated: Date.now(),
             }).save();

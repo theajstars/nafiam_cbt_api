@@ -50,6 +50,29 @@ export default function (app: Express) {
       }
     }
   );
+  // Get the practice of a lecture by a lecturer or admin
+  app.post(
+    `${basePath}/get/:practiceID`,
+    validateTokenRequest,
+    async (req, res) => {
+      const { token } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user !== "student") {
+        const practice = await Practice.findOne({
+          id: req.params.practiceID,
+        });
+
+        res.json({
+          statusCode: 200,
+          message: "Practice found!",
+          status: true,
+          data: practice,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
   // Get the practice of a lecture by a student
   app.post(
     `${basePath}/student/get/:practiceID`,
@@ -65,6 +88,11 @@ export default function (app: Express) {
           id: practice?.lecture?.id ?? "",
           isActive: true,
         });
+        const hasStudentCompletedPreceedingLecturePractices = async () => {
+          const practices = await Practice.find({
+            "lecture.id": practice.lecture.id,
+          });
+        };
         res.json({
           statusCode: lecture ? 200 : 401,
           message: lecture

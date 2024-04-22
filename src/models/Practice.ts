@@ -20,6 +20,7 @@ export interface PracticeProps {
   id: string;
   lecture: PracticeLecture;
   questions: Types.DocumentArray<QuestionProps>;
+  index: number;
   dateCreated: number;
 }
 
@@ -37,6 +38,7 @@ const PracticeSchema = new Schema<PracticeProps, Model<PracticeProps>>({
       answer: String,
     },
   ],
+  index: { type: Number, required: true },
   dateCreated: { type: Number, required: true },
 });
 

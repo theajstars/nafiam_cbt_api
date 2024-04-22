@@ -44,6 +44,25 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    // Get the practice of a lecture by a lecturer or admin
+    app.post(`${basePath}/get/:practiceID`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user !== "student") {
+            const practice = yield Practice_1.Practice.findOne({
+                id: req.params.practiceID,
+            });
+            res.json({
+                statusCode: 200,
+                message: "Practice found!",
+                status: true,
+                data: practice,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     // Get the practice of a lecture by a student
     app.post(`${basePath}/student/get/:practiceID`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         var _a, _b;
@@ -56,6 +75,11 @@ function default_1(app) {
             const lecture = yield Lecture_1.Lecture.findOne({
                 id: (_b = (_a = practice === null || practice === void 0 ? void 0 : practice.lecture) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : "",
                 isActive: true,
+            });
+            const hasStudentCompletedPreceedingLecturePractices = () => __awaiter(this, void 0, void 0, function* () {
+                const practices = yield Practice_1.Practice.find({
+                    "lecture.id": practice.lecture.id,
+                });
             });
             res.json({
                 statusCode: lecture ? 200 : 401,
