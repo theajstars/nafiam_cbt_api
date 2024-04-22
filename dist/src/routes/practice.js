@@ -26,8 +26,13 @@ function default_1(app) {
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
             const attempts = yield Attempt_1.Attempt.find({
-                studentID: studentID !== null && studentID !== void 0 ? studentID : id,
+                studentID: studentID,
                 practiceID,
+            });
+            console.log({
+                studentID,
+                practiceID,
+                attempts,
             });
             res.json({
                 statusCode: 200,

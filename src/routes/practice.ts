@@ -32,8 +32,13 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
       if (id && user) {
         const attempts = await Attempt.find({
-          studentID: studentID ?? id,
+          studentID: studentID,
           practiceID,
+        });
+        console.log({
+          studentID,
+          practiceID,
+          attempts,
         });
         res.json({
           statusCode: 200,
