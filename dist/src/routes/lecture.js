@@ -41,6 +41,7 @@ function default_1(app) {
                     id: (_a = lecture === null || lecture === void 0 ? void 0 : lecture.id) !== null && _a !== void 0 ? _a : "",
                     title: (_b = lecture === null || lecture === void 0 ? void 0 : lecture.title) !== null && _b !== void 0 ? _b : "",
                 },
+                courseID,
                 index,
                 questions: [],
                 dateCreated: Date.now(),

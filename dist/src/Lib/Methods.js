@@ -34,7 +34,6 @@ const genPassword = (password) => __awaiter(void 0, void 0, void 0, function* ()
     const saltRounds = 10;
     const salt = yield bcryptjs_1.default.genSalt(saltRounds);
     const hash = yield bcryptjs_1.default.hash(password, salt);
-    console.log("Thine Hash", hash);
     return hash;
 });
 exports.genPassword = genPassword;

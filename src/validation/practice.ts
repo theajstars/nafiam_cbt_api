@@ -5,6 +5,7 @@ const defaultPracticeSchema = Joi.object({
   lectureID: Joi.string().optional(),
   practiceID: Joi.string().optional(),
   studentID: Joi.string().optional(),
+  courseID: Joi.string().optional(),
 });
 
 export const validateDefaultPracticeRequest = (req, res, next) => {

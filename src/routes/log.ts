@@ -32,7 +32,6 @@ export default function (app: Express) {
         action,
         userType,
       };
-      console.log(removeEmptyFields(filter));
 
       const logs = await Log.find(
         { ...removeEmptyFields(filter) },

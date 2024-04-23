@@ -35,11 +35,7 @@ export default function (app: Express) {
           studentID: studentID,
           practiceID,
         });
-        console.log({
-          studentID,
-          practiceID,
-          attempts,
-        });
+
         res.json({
           statusCode: 200,
           status: true,
@@ -76,9 +72,9 @@ export default function (app: Express) {
   // Get the practice of a lecture by a student
   app.post(
     `${basePath}/student/get/:practiceID`,
-    validateTokenRequest,
+    validateDefaultPracticeRequest,
     async (req, res) => {
-      const { token } = req.body;
+      const { token, courseID } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user) {
         const practice = await Practice.findOne({
@@ -88,18 +84,78 @@ export default function (app: Express) {
           id: practice?.lecture?.id ?? "",
           isActive: true,
         });
+        const attempts = await Attempt.find({ studentID: id });
         const hasStudentCompletedPreceedingLecturePractices = async () => {
           const practices = await Practice.find({
-            "lecture.id": practice.lecture.id,
+            courseID,
           });
+          // Check if student has passed each practice
+          const checkArray = practices.map((p) => {
+            if (p.index < practice.index) {
+              const studentAttempts = attempts.filter(
+                (a) => a.practiceID === p.id
+              );
+              if (studentAttempts.length === 0) {
+                // 'relevant' refers to if a practice must be passed beforehand
+                return {
+                  relevant: true,
+                  passed: false,
+                };
+              } else {
+                // Return true if attempt exists with more than 50%
+                const findPass = studentAttempts.find((s) => s.percent >= 50);
+                if (findPass && findPass.percent >= 50) {
+                  return {
+                    relevant: true,
+                    passed: true,
+                  };
+                } else {
+                  return { relevant: true, passed: true };
+                }
+              }
+            } else {
+              return {
+                relevant: false,
+                passed: false,
+              };
+            }
+          });
+          console.log(checkArray);
+          const canUserProceed = () => {
+            return checkArray.length === 0
+              ? false
+              : checkArray.filter(
+                  (c) => c.relevant === true && c.passed === false
+                ).length !== 0
+              ? false
+              : true;
+          };
+          return canUserProceed();
         };
+        const resolvedQuestions = practice.questions.map((q) => {
+          return {
+            id: q.id,
+            title: q.title,
+            options: q.options,
+            answer: "unset",
+          };
+        });
+        const resolvedPractice = {
+          id: practice.id,
+          lecture: { title: practice.lecture.title, id: practice.lecture.id },
+          questions: resolvedQuestions,
+          index: practice.index,
+          dateCreated: practice.dateCreated,
+        };
+
         res.json({
           statusCode: lecture ? 200 : 401,
           message: lecture
             ? "Practice found!"
             : "Unauthorized or Practice does not exist!",
           status: true,
-          data: lecture ? practice : null,
+          data: lecture ? resolvedPractice : null,
+          mess: await hasStudentCompletedPreceedingLecturePractices(),
         });
       } else {
         res.json(UnauthorizedResponseObject);

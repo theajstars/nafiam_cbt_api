@@ -26,7 +26,6 @@ const basePath = "/lecturer";
 function default_2(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password } = req.body;
-        console.log({ id, password });
         const lecturer = yield Lecturer_1.Lecturer.findOne({
             serviceNumber: id.toUpperCase(),
         });

@@ -52,7 +52,6 @@ function default_1(app) {
                 resource_type: "raw",
                 use_filename: true,
             });
-            console.log(upload);
             files = [
                 ...files,
                 {
@@ -64,7 +63,6 @@ function default_1(app) {
             ];
         }
         if (files.length === numberOfFiles) {
-            console.log(files);
             const filesToUpload = files.map((f) => {
                 return {
                     id: (0, Methods_1.generateRandomString)(32),

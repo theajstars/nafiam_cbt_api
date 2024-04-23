@@ -48,7 +48,7 @@ export default function (app: Express) {
           resource_type: "raw",
           use_filename: true,
         });
-        console.log(upload);
+
         files = [
           ...files,
           {
@@ -60,7 +60,6 @@ export default function (app: Express) {
         ];
       }
       if (files.length === numberOfFiles) {
-        console.log(files);
         const filesToUpload = files.map((f) => {
           return {
             id: generateRandomString(32),

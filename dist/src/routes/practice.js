@@ -29,11 +29,6 @@ function default_1(app) {
                 studentID: studentID,
                 practiceID,
             });
-            console.log({
-                studentID,
-                practiceID,
-                attempts,
-            });
             res.json({
                 statusCode: 200,
                 status: true,
@@ -64,9 +59,9 @@ function default_1(app) {
         }
     }));
     // Get the practice of a lecture by a student
-    app.post(`${basePath}/student/get/:practiceID`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/student/get/:practiceID`, practice_1.validateDefaultPracticeRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         var _a, _b;
-        const { token } = req.body;
+        const { token, courseID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
             const practice = yield Practice_1.Practice.findOne({
@@ -76,18 +71,76 @@ function default_1(app) {
                 id: (_b = (_a = practice === null || practice === void 0 ? void 0 : practice.lecture) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : "",
                 isActive: true,
             });
+            const attempts = yield Attempt_1.Attempt.find({ studentID: id });
             const hasStudentCompletedPreceedingLecturePractices = () => __awaiter(this, void 0, void 0, function* () {
                 const practices = yield Practice_1.Practice.find({
-                    "lecture.id": practice.lecture.id,
+                    courseID,
                 });
+                // Check if student has passed each practice
+                const checkArray = practices.map((p) => {
+                    if (p.index < practice.index) {
+                        const studentAttempts = attempts.filter((a) => a.practiceID === p.id);
+                        if (studentAttempts.length === 0) {
+                            // 'relevant' refers to if a practice must be passed beforehand
+                            return {
+                                relevant: true,
+                                passed: false,
+                            };
+                        }
+                        else {
+                            // Return true if attempt exists with more than 50%
+                            const findPass = studentAttempts.find((s) => s.percent >= 50);
+                            if (findPass && findPass.percent >= 50) {
+                                return {
+                                    relevant: true,
+                                    passed: true,
+                                };
+                            }
+                            else {
+                                return { relevant: true, passed: true };
+                            }
+                        }
+                    }
+                    else {
+                        return {
+                            relevant: false,
+                            passed: false,
+                        };
+                    }
+                });
+                console.log(checkArray);
+                const canUserProceed = () => {
+                    return checkArray.length === 0
+                        ? false
+                        : checkArray.filter((c) => c.relevant === true && c.passed === false).length !== 0
+                            ? false
+                            : true;
+                };
+                return canUserProceed();
             });
+            const resolvedQuestions = practice.questions.map((q) => {
+                return {
+                    id: q.id,
+                    title: q.title,
+                    options: q.options,
+                    answer: "unset",
+                };
+            });
+            const resolvedPractice = {
+                id: practice.id,
+                lecture: { title: practice.lecture.title, id: practice.lecture.id },
+                questions: resolvedQuestions,
+                index: practice.index,
+                dateCreated: practice.dateCreated,
+            };
             res.json({
                 statusCode: lecture ? 200 : 401,
                 message: lecture
                     ? "Practice found!"
                     : "Unauthorized or Practice does not exist!",
                 status: true,
-                data: lecture ? practice : null,
+                data: lecture ? resolvedPractice : null,
+                mess: yield hasStudentCompletedPreceedingLecturePractices(),
             });
         }
         else {

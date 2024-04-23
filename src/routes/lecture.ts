@@ -48,6 +48,7 @@ export default function (app: Express) {
             id: lecture?.id ?? "",
             title: lecture?.title ?? "",
           },
+          courseID,
           index,
           questions: [],
           dateCreated: Date.now(),

@@ -23,7 +23,7 @@ export const genPassword = async (password: string) => {
 
   const salt = await bcrypt.genSalt(saltRounds);
   const hash = await bcrypt.hash(password, salt);
-  console.log("Thine Hash", hash);
+
   return hash;
 };
 

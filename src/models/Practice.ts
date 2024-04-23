@@ -18,6 +18,7 @@ interface PracticeLecture {
 }
 export interface PracticeProps {
   id: string;
+  courseID: string;
   lecture: PracticeLecture;
   questions: Types.DocumentArray<QuestionProps>;
   index: number;
@@ -26,6 +27,7 @@ export interface PracticeProps {
 
 const PracticeSchema = new Schema<PracticeProps, Model<PracticeProps>>({
   id: { type: String, required: true },
+  courseID: { type: String, required: true },
   lecture: {
     title: { type: String, required: true },
     id: { type: String, required: true },

@@ -73,7 +73,6 @@ function default_1(app) {
             const examination = user === "admin"
                 ? yield Examination_1.Examination.findOne({ id: examinationID })
                 : yield Examination_1.Examination.findOne({ id: examinationID, lecturerID: id });
-            console.log(examination, user, id);
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination found!", examination === null ? 404 : 200, examination));
         }
         else {
@@ -446,7 +445,6 @@ function default_1(app) {
                     message: "Examination successfully graded!",
                     data: result,
                 });
-                console.log("Marks Obtainable", marksObtainable);
             }
             else {
                 res.json({

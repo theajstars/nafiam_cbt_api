@@ -24,7 +24,6 @@ function default_1(app) {
                 action,
                 userType,
             };
-            console.log((0, Methods_1.removeEmptyFields)(filter));
             const logs = yield Log_1.Log.find(Object.assign({}, (0, Methods_1.removeEmptyFields)(filter)), {}, {
                 skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
                 limit,

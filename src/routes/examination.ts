@@ -100,7 +100,6 @@ export default function (app: Express) {
             ? await Examination.findOne({ id: examinationID })
             : await Examination.findOne({ id: examinationID, lecturerID: id });
 
-        console.log(examination, user, id);
         res.json(
           returnSuccessResponseObject(
             examination === null ? "Not Found!" : "Examination found!",
@@ -609,7 +608,6 @@ export default function (app: Express) {
             message: "Examination successfully graded!",
             data: result,
           });
-          console.log("Marks Obtainable", marksObtainable);
         } else {
           res.json({
             statusCode: 401,

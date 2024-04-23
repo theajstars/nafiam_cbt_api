@@ -4,6 +4,7 @@ exports.Practice = void 0;
 const mongoose_1 = require("mongoose");
 const PracticeSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
+    courseID: { type: String, required: true },
     lecture: {
         title: { type: String, required: true },
         id: { type: String, required: true },
