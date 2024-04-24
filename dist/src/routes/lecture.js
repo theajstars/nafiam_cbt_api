@@ -15,6 +15,7 @@ const lecture_1 = require("../validation/lecture");
 const Lecture_1 = require("../models/Lecture");
 const Methods_1 = require("../Lib/Methods");
 const Practice_1 = require("../models/Practice");
+const Whitelist_1 = require("../models/Whitelist");
 const basePath = "/lecture";
 function default_1(app) {
     // Create a new Lecture
@@ -26,6 +27,7 @@ function default_1(app) {
             //Get Existing lectures for the course
             const lectures = yield Lecture_1.Lecture.find({ courseID });
             const index = lectures.length + 1;
+            // Create Lecture, Whitelist and Practice
             const lecture = yield new Lecture_1.Lecture({
                 id: (0, Methods_1.generateRandomString)(32),
                 title,
@@ -46,13 +48,19 @@ function default_1(app) {
                 questions: [],
                 dateCreated: Date.now(),
             }).save();
-            // Update lecture to include practice
+            const whitelist = yield new Whitelist_1.Whitelist({
+                id: (0, Methods_1.generateRandomString)(32),
+                practiceID: practice.id,
+                students: [],
+                lastUpdated: Date.now(),
+            }).save();
+            // Update lecture to include practiceID
             yield Lecture_1.Lecture.findOneAndUpdate({ id: lecture === null || lecture === void 0 ? void 0 : lecture.id }, { practiceID: practice.id });
             res.json({
                 statusCode: 201,
                 message: "Lecture has been added!",
                 status: true,
-                data: { lecture, practice },
+                data: { lecture, practice, whitelist },
             });
         }
         else {

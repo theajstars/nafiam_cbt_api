@@ -5,7 +5,7 @@ export interface WhitelistProps {
   id: string;
   practiceID: string;
   examinationID: string;
-  students: Types.DocumentArray<string>;
+  students: any;
 
   lastUpdated: number;
 }

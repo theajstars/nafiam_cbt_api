@@ -20,6 +20,7 @@ import { Practice } from "../models/Practice";
 import { validateStudentSubmissionRequest } from "../validation/examination";
 import { Attempt } from "../models/Attempt";
 import { Student } from "../models/Student";
+import { Whitelist } from "../models/Whitelist";
 const basePath = "/lecture";
 export default function (app: Express) {
   // Create a new Lecture
@@ -33,6 +34,8 @@ export default function (app: Express) {
         //Get Existing lectures for the course
         const lectures = await Lecture.find({ courseID });
         const index = lectures.length + 1;
+
+        // Create Lecture, Whitelist and Practice
         const lecture = await new Lecture({
           id: generateRandomString(32),
           title,
@@ -53,7 +56,13 @@ export default function (app: Express) {
           questions: [],
           dateCreated: Date.now(),
         }).save();
-        // Update lecture to include practice
+        const whitelist = await new Whitelist({
+          id: generateRandomString(32),
+          practiceID: practice.id,
+          students: [],
+          lastUpdated: Date.now(),
+        }).save();
+        // Update lecture to include practiceID
         await Lecture.findOneAndUpdate(
           { id: lecture?.id },
           { practiceID: practice.id }
@@ -62,7 +71,7 @@ export default function (app: Express) {
           statusCode: 201,
           message: "Lecture has been added!",
           status: true,
-          data: { lecture, practice },
+          data: { lecture, practice, whitelist },
         });
       } else {
         res.json(UnauthorizedResponseObject);

@@ -18,6 +18,7 @@ const Practice_1 = require("../models/Practice");
 const practice_1 = require("../validation/practice");
 const Attempt_1 = require("../models/Attempt");
 const examination_1 = require("../validation/examination");
+const Whitelist_1 = require("../models/Whitelist");
 const basePath = "/practice";
 function default_1(app) {
     // Get student attempts on a lecture practice
@@ -52,6 +53,65 @@ function default_1(app) {
                 message: "Practice found!",
                 status: true,
                 data: practice,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    //Get Practice Whitelist
+    app.post(`${basePath}/whitelist/get`, practice_1.validateDefaultPracticeRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, practiceID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            const whitelist = yield Whitelist_1.Whitelist.findOne({ practiceID });
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: whitelist !== null && whitelist !== void 0 ? whitelist : undefined,
+                message: whitelist
+                    ? "Whitelist found"
+                    : "Lecturer has not created whitelist for this practice",
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    // Add student to whitelist
+    app.post(`${basePath}/whitelist/add`, practice_1.validateDefaultPracticeRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, practiceID, studentID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "lecturer") {
+            // Find Whitelist
+            const whitelist = yield Whitelist_1.Whitelist.findOne({ practiceID });
+            if (!whitelist.students.includes(studentID)) {
+                const updatedWhitelist = yield Whitelist_1.Whitelist.findOneAndUpdate({ practiceID }, { students: [...whitelist.students, studentID] });
+                res.json({
+                    status: true,
+                    statusCode: 201,
+                    message: "Added to whitelist",
+                    data: updatedWhitelist,
+                });
+            }
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    // Remove student from whitelist
+    app.post(`${basePath}/whitelist/remove`, practice_1.validateDefaultPracticeRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, practiceID, studentID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "lecturer") {
+            // Find Whitelist
+            const whitelist = yield Whitelist_1.Whitelist.findOne({ practiceID });
+            const updatedWhitelist = yield Whitelist_1.Whitelist.findOneAndUpdate({ practiceID }, { students: whitelist.students.fitler((s) => s !== studentID) });
+            res.json({
+                status: true,
+                statusCode: 201,
+                message: "Removed from whitelist",
+                data: updatedWhitelist,
             });
         }
         else {

@@ -21,6 +21,7 @@ import { validateDefaultPracticeRequest } from "../validation/practice";
 import { Attempt } from "../models/Attempt";
 import { validateStudentSubmissionRequest } from "../validation/examination";
 import { Student } from "../models/Student";
+import { Whitelist } from "../models/Whitelist";
 const basePath = "/practice";
 export default function (app: Express) {
   // Get student attempts on a lecture practice
@@ -63,6 +64,83 @@ export default function (app: Express) {
           message: "Practice found!",
           status: true,
           data: practice,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  //Get Practice Whitelist
+  app.post(
+    `${basePath}/whitelist/get`,
+    validateDefaultPracticeRequest,
+    async (req, res) => {
+      const { token, practiceID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user) {
+        const whitelist = await Whitelist.findOne({ practiceID });
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: whitelist ?? undefined,
+          message: whitelist
+            ? "Whitelist found"
+            : "Lecturer has not created whitelist for this practice",
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+
+  // Add student to whitelist
+  app.post(
+    `${basePath}/whitelist/add`,
+    validateDefaultPracticeRequest,
+    async (req, res) => {
+      const { token, practiceID, studentID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "lecturer") {
+        // Find Whitelist
+        const whitelist = await Whitelist.findOne({ practiceID });
+
+        if (!whitelist.students.includes(studentID)) {
+          const updatedWhitelist = await Whitelist.findOneAndUpdate(
+            { practiceID },
+            { students: [...whitelist.students, studentID] }
+          );
+          res.json({
+            status: true,
+            statusCode: 201,
+            message: "Added to whitelist",
+            data: updatedWhitelist,
+          });
+        }
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  // Remove student from whitelist
+  app.post(
+    `${basePath}/whitelist/remove`,
+    validateDefaultPracticeRequest,
+    async (req, res) => {
+      const { token, practiceID, studentID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "lecturer") {
+        // Find Whitelist
+        const whitelist = await Whitelist.findOne({ practiceID });
+
+        const updatedWhitelist = await Whitelist.findOneAndUpdate(
+          { practiceID },
+          { students: whitelist.students.fitler((s) => s !== studentID) }
+        );
+        res.json({
+          status: true,
+          statusCode: 201,
+          message: "Removed from whitelist",
+          data: updatedWhitelist,
         });
       } else {
         res.json(UnauthorizedResponseObject);
