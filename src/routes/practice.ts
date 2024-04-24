@@ -77,8 +77,9 @@ export default function (app: Express) {
       const { token, courseID } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user) {
+        const practiceID = req.params.practiceID;
         const practice = await Practice.findOne({
-          id: req.params.practiceID,
+          id: practiceID,
         });
         const lecture = await Lecture.findOne({
           id: practice?.lecture?.id ?? "",
@@ -89,52 +90,25 @@ export default function (app: Express) {
           const practices = await Practice.find({
             courseID,
           });
-          // Check if student has passed each practice
-          const checkArray = practices.map((p) => {
-            if (p.index < practice.index) {
-              const studentAttempts = attempts.filter(
-                (a) => a.practiceID === p.id
-              );
-              console.log("Attempts", studentAttempts);
-              if (studentAttempts.length === 0) {
-                // Student has never attempted practice before
-                // 'relevant' refers to if a practice must be passed beforehand
-                return {
-                  relevant: true,
-                  passed: false,
-                };
+          const currentPractice = practices.find((p) => p.id === practiceID);
+          if (currentPractice && currentPractice.index === 1) {
+            //This is the first practice
+            return true;
+          } else {
+            const passed = practices.map((p) => {
+              if (p.index < practice.index) {
+                // Check for attempts for each practice with more than 50 Percent
+                const pass = attempts.filter(
+                  (a) => a.practiceID === p.id && a.percent >= 50
+                );
+                return pass.length > 0;
               } else {
-                // Return true if attempt exists with more than 50%
-                const findPass = studentAttempts.find((s) => s.percent >= 50);
-                if (findPass && findPass.percent >= 50) {
-                  return {
-                    relevant: true,
-                    passed: true,
-                  };
-                } else {
-                  return { relevant: true, passed: false };
-                }
+                return true;
               }
-            } else {
-              return {
-                relevant: false,
-                passed: false,
-              };
-            }
-          });
-          console.log(checkArray);
-          const canUserProceed = () => {
-            if (practice.index === 1) {
-              // This is the first practice so student cannot have taken previous
-              return true;
-            } else {
-              const arrayContainsFailed = checkArray.filter(
-                (c) => c.relevant === true && c.passed === false
-              );
-              return arrayContainsFailed.length > 0 ? false : true;
-            }
-          };
-          return canUserProceed();
+            });
+            console.log(passed);
+          }
+          // Check if student has passed each practice
         };
         const resolvedQuestions = practice.questions.map((q) => {
           return {
