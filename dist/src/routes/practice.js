@@ -80,7 +80,9 @@ function default_1(app) {
                 const checkArray = practices.map((p) => {
                     if (p.index < practice.index) {
                         const studentAttempts = attempts.filter((a) => a.practiceID === p.id);
+                        console.log("Attempts", studentAttempts);
                         if (studentAttempts.length === 0) {
+                            // Student has never attempted practice before
                             // 'relevant' refers to if a practice must be passed beforehand
                             return {
                                 relevant: true,
@@ -97,7 +99,7 @@ function default_1(app) {
                                 };
                             }
                             else {
-                                return { relevant: true, passed: true };
+                                return { relevant: true, passed: false };
                             }
                         }
                     }
@@ -110,11 +112,14 @@ function default_1(app) {
                 });
                 console.log(checkArray);
                 const canUserProceed = () => {
-                    return checkArray.length === 0
-                        ? false
-                        : checkArray.filter((c) => c.relevant === true && c.passed === false).length !== 0
-                            ? false
-                            : true;
+                    if (practice.index === 1) {
+                        // This is the first practice so student cannot have taken previous
+                        return true;
+                    }
+                    else {
+                        const arrayContainsFailed = checkArray.filter((c) => c.relevant === true && c.passed === false);
+                        return arrayContainsFailed.length > 0 ? false : true;
+                    }
                 };
                 return canUserProceed();
             });
@@ -132,6 +137,7 @@ function default_1(app) {
                 questions: resolvedQuestions,
                 index: practice.index,
                 dateCreated: practice.dateCreated,
+                isEligible: yield hasStudentCompletedPreceedingLecturePractices(),
             };
             res.json({
                 statusCode: lecture ? 200 : 401,
@@ -140,7 +146,6 @@ function default_1(app) {
                     : "Unauthorized or Practice does not exist!",
                 status: true,
                 data: lecture ? resolvedPractice : null,
-                mess: yield hasStudentCompletedPreceedingLecturePractices(),
             });
         }
         else {

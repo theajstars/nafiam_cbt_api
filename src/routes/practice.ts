@@ -95,7 +95,9 @@ export default function (app: Express) {
               const studentAttempts = attempts.filter(
                 (a) => a.practiceID === p.id
               );
+              console.log("Attempts", studentAttempts);
               if (studentAttempts.length === 0) {
+                // Student has never attempted practice before
                 // 'relevant' refers to if a practice must be passed beforehand
                 return {
                   relevant: true,
@@ -110,7 +112,7 @@ export default function (app: Express) {
                     passed: true,
                   };
                 } else {
-                  return { relevant: true, passed: true };
+                  return { relevant: true, passed: false };
                 }
               }
             } else {
@@ -122,13 +124,15 @@ export default function (app: Express) {
           });
           console.log(checkArray);
           const canUserProceed = () => {
-            return checkArray.length === 0
-              ? false
-              : checkArray.filter(
-                  (c) => c.relevant === true && c.passed === false
-                ).length !== 0
-              ? false
-              : true;
+            if (practice.index === 1) {
+              // This is the first practice so student cannot have taken previous
+              return true;
+            } else {
+              const arrayContainsFailed = checkArray.filter(
+                (c) => c.relevant === true && c.passed === false
+              );
+              return arrayContainsFailed.length > 0 ? false : true;
+            }
           };
           return canUserProceed();
         };
@@ -146,6 +150,7 @@ export default function (app: Express) {
           questions: resolvedQuestions,
           index: practice.index,
           dateCreated: practice.dateCreated,
+          isEligible: await hasStudentCompletedPreceedingLecturePractices(),
         };
 
         res.json({
@@ -155,7 +160,6 @@ export default function (app: Express) {
             : "Unauthorized or Practice does not exist!",
           status: true,
           data: lecture ? resolvedPractice : null,
-          mess: await hasStudentCompletedPreceedingLecturePractices(),
         });
       } else {
         res.json(UnauthorizedResponseObject);
