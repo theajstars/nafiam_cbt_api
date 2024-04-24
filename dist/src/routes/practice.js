@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const JWT_1 = require("../Lib/JWT");
 const course_1 = require("../validation/course");
 const Misc_1 = require("../Lib/Misc");
+const lecture_1 = require("../validation/lecture");
 const Lecture_1 = require("../models/Lecture");
 const Methods_1 = require("../Lib/Methods");
 const Practice_1 = require("../models/Practice");
@@ -21,6 +22,43 @@ const examination_1 = require("../validation/examination");
 const Whitelist_1 = require("../models/Whitelist");
 const basePath = "/practice";
 function default_1(app) {
+    // Update the questions of the lecture
+    app.post(`${basePath}/update`, lecture_1.validateUpdatePracticeQuestionsRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, lectureID, questions } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "lecturer") {
+            const practice = yield Practice_1.Practice.findOneAndUpdate({
+                "lecture.id": lectureID,
+            }, { questions });
+            res.json({
+                statusCode: 200,
+                message: "Practice has been updated!",
+                status: true,
+                data: practice,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    // Get all attempts by students from lecturer
+    app.post(`${basePath}/attempts`, practice_1.validateDefaultPracticeRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, practiceID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "lecturer") {
+            const attempts = yield Attempt_1.Attempt.find({
+                practiceID,
+            });
+            res.json({
+                statusCode: 200,
+                status: true,
+                data: attempts,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     // Get student attempts on a lecture practice
     app.post(`${basePath}/student/attempts`, practice_1.validateDefaultPracticeRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, studentID, practiceID } = req.body;

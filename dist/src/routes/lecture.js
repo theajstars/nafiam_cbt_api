@@ -163,25 +163,6 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    // Update the questions of the lecture
-    app.post(`${basePath}/practice/update`, lecture_1.validateUpdatePracticeQuestionsRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, lectureID, questions } = req.body;
-        const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
-            const practice = yield Practice_1.Practice.findOneAndUpdate({
-                "lecture.id": lectureID,
-            }, { questions });
-            res.json({
-                statusCode: 200,
-                message: "Practice has been updated!",
-                status: true,
-                data: practice,
-            });
-        }
-        else {
-            res.json(Misc_1.UnauthorizedResponseObject);
-        }
-    }));
 }
 exports.default = default_1;
 //# sourceMappingURL=lecture.js.map

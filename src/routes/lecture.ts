@@ -198,30 +198,4 @@ export default function (app: Express) {
       }
     }
   );
-
-  // Update the questions of the lecture
-  app.post(
-    `${basePath}/practice/update`,
-    validateUpdatePracticeQuestionsRequest,
-    async (req, res) => {
-      const { token, lectureID, questions } = req.body;
-      const { id, user } = verifyToken(token);
-      if (id && user && user === "lecturer") {
-        const practice = await Practice.findOneAndUpdate(
-          {
-            "lecture.id": lectureID,
-          },
-          { questions }
-        );
-        res.json({
-          statusCode: 200,
-          message: "Practice has been updated!",
-          status: true,
-          data: practice,
-        });
-      } else {
-        res.json(UnauthorizedResponseObject);
-      }
-    }
-  );
 }

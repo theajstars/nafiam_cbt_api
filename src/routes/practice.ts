@@ -24,6 +24,53 @@ import { Student } from "../models/Student";
 import { Whitelist } from "../models/Whitelist";
 const basePath = "/practice";
 export default function (app: Express) {
+  // Update the questions of the lecture
+  app.post(
+    `${basePath}/update`,
+    validateUpdatePracticeQuestionsRequest,
+    async (req, res) => {
+      const { token, lectureID, questions } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "lecturer") {
+        const practice = await Practice.findOneAndUpdate(
+          {
+            "lecture.id": lectureID,
+          },
+          { questions }
+        );
+        res.json({
+          statusCode: 200,
+          message: "Practice has been updated!",
+          status: true,
+          data: practice,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  // Get all attempts by students from lecturer
+  app.post(
+    `${basePath}/attempts`,
+    validateDefaultPracticeRequest,
+    async (req, res) => {
+      const { token, practiceID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "lecturer") {
+        const attempts = await Attempt.find({
+          practiceID,
+        });
+
+        res.json({
+          statusCode: 200,
+          status: true,
+          data: attempts,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
   // Get student attempts on a lecture practice
   app.post(
     `${basePath}/student/attempts`,
