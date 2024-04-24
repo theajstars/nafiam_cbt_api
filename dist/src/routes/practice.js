@@ -93,7 +93,7 @@ function default_1(app) {
                             return true;
                         }
                     });
-                    console.log(passed);
+                    return !passed.includes(false);
                 }
                 // Check if student has passed each practice
             });
@@ -108,7 +108,9 @@ function default_1(app) {
             const resolvedPractice = {
                 id: practice.id,
                 lecture: { title: practice.lecture.title, id: practice.lecture.id },
-                questions: resolvedQuestions,
+                questions: (yield hasStudentCompletedPreceedingLecturePractices())
+                    ? resolvedQuestions
+                    : [],
                 index: practice.index,
                 dateCreated: practice.dateCreated,
                 isEligible: yield hasStudentCompletedPreceedingLecturePractices(),

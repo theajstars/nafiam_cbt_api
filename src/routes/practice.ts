@@ -106,7 +106,7 @@ export default function (app: Express) {
                 return true;
               }
             });
-            console.log(passed);
+            return !passed.includes(false);
           }
           // Check if student has passed each practice
         };
@@ -121,7 +121,9 @@ export default function (app: Express) {
         const resolvedPractice = {
           id: practice.id,
           lecture: { title: practice.lecture.title, id: practice.lecture.id },
-          questions: resolvedQuestions,
+          questions: (await hasStudentCompletedPreceedingLecturePractices())
+            ? resolvedQuestions
+            : [],
           index: practice.index,
           dateCreated: practice.dateCreated,
           isEligible: await hasStudentCompletedPreceedingLecturePractices(),
