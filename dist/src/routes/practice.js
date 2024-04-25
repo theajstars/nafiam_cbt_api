@@ -127,9 +127,17 @@ function default_1(app) {
                 const updatedWhitelist = yield Whitelist_1.Whitelist.findOneAndUpdate({ practiceID }, { students: [...whitelist.students, studentID] });
                 res.json({
                     status: true,
-                    statusCode: 201,
+                    statusCode: 200,
                     message: "Added to whitelist",
                     data: updatedWhitelist,
+                });
+            }
+            else {
+                res.json({
+                    status: true,
+                    statusCode: 200,
+                    message: "Student already in whitelist",
+                    data: whitelist,
                 });
             }
         }

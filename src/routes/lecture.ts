@@ -21,6 +21,7 @@ import { validateStudentSubmissionRequest } from "../validation/examination";
 import { Attempt } from "../models/Attempt";
 import { Student } from "../models/Student";
 import { Whitelist } from "../models/Whitelist";
+import { ordainedNumberOfPracticeQuestions } from "../Lib/Data";
 const basePath = "/lecture";
 export default function (app: Express) {
   // Create a new Lecture
@@ -126,18 +127,33 @@ export default function (app: Express) {
       const { token, status } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "lecturer") {
-        const lecture = await Lecture.findOneAndUpdate(
-          { id: req.params.lectureID },
-          { isActive: status }
-        );
-        res.json({
-          statusCode: 200,
-          message: status
-            ? "Lecture has been activated!"
-            : "Lecture has been deactivated",
-          status: true,
-          data: lecture,
+        // Check if Lecture Practice is completed
+        const practice = await Practice.findOne({
+          "lecture.id": req.params.lectureID,
         });
+        if (
+          practice &&
+          practice.questions.length === ordainedNumberOfPracticeQuestions
+        ) {
+          const lecture = await Lecture.findOneAndUpdate(
+            { id: req.params.lectureID },
+            { isActive: status }
+          );
+          res.json({
+            statusCode: 200,
+            message: status
+              ? "Lecture has been activated!"
+              : "Lecture has been deactivated",
+            status: true,
+            data: lecture,
+          });
+        } else {
+          res.json({
+            status: true,
+            statusCode: 405,
+            message: "You must complete the practice first!",
+          });
+        }
       } else {
         res.json(UnauthorizedResponseObject);
       }

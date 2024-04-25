@@ -22,6 +22,7 @@ const default_1 = require("../validation/default");
 const Student_1 = require("../models/Student");
 const Admin_1 = require("../models/Admin");
 const Log_1 = require("../models/Log");
+const Data_1 = require("../Lib/Data");
 const basePath = "/misc";
 function default_2(app) {
     app.get("/", (req, res) => {
@@ -35,31 +36,11 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
-            const nigerianAirForceRanks = [
-                "Marshal of the Nigerian Air Force",
-                "Air Chief Marshal",
-                "Air Marshal",
-                "Air Vice Marshal",
-                "Air Commodore",
-                "Group Captain",
-                "Wing Commander",
-                "Squadron Leader",
-                "Flight Lieutenant",
-                "Flying Officer",
-                "Pilot Officer",
-                "Air Warrant Officer",
-                "Master Warrant Officer",
-                "Warrant Officer",
-                "Flight Sergeant",
-                "Sergeant",
-                "Corporal",
-                "Lance Corporal",
-            ];
             res.json({
                 status: true,
                 statusCode: 200,
                 message: "List of ranks",
-                data: nigerianAirForceRanks,
+                data: Data_1.nigerianAirForceRanks,
             });
         }
         else {

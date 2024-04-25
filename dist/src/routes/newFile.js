@@ -16,11 +16,10 @@ const Lecture_1 = require("../models/Lecture");
 const Methods_1 = require("../Lib/Methods");
 const Practice_1 = require("../models/Practice");
 const Whitelist_1 = require("../models/Whitelist");
-const Data_1 = require("../Lib/Data");
-const basePath = "/lecture";
+const lecture_2 = require("./lecture");
 function default_1(app) {
     // Create a new Lecture
-    app.post(`${basePath}/create`, lecture_1.validateCreateLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${lecture_2.basePath}/create`, lecture_1.validateCreateLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         var _a, _b;
         const { title, courseID, description, files, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
@@ -69,7 +68,7 @@ function default_1(app) {
         }
     }));
     // Get all lectures for a course
-    app.post(`${basePath}s/all`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${lecture_2.basePath}s/all`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, courseID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
@@ -86,7 +85,7 @@ function default_1(app) {
         }
     }));
     // Get details for a single lecture
-    app.post(`${basePath}/get/:lectureID`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${lecture_2.basePath}/get/:lectureID`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
@@ -103,40 +102,27 @@ function default_1(app) {
         }
     }));
     // Update active status for a single lecture
-    app.post(`${basePath}/status/:lectureID`, lecture_1.validateToggleLectureStatusRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${lecture_2.basePath}/status/:lectureID`, lecture_1.validateToggleLectureStatusRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, status } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "lecturer") {
             // Check if Lecture Practice is completed
-            const practice = yield Practice_1.Practice.findOne({
-                "lecture.id": req.params.lectureID,
+            const lecture = yield Lecture_1.Lecture.findOneAndUpdate({ id: req.params.lectureID }, { isActive: status });
+            res.json({
+                statusCode: 200,
+                message: status
+                    ? "Lecture has been activated!"
+                    : "Lecture has been deactivated",
+                status: true,
+                data: lecture,
             });
-            if (practice &&
-                practice.questions.length === Data_1.ordainedNumberOfPracticeQuestions) {
-                const lecture = yield Lecture_1.Lecture.findOneAndUpdate({ id: req.params.lectureID }, { isActive: status });
-                res.json({
-                    statusCode: 200,
-                    message: status
-                        ? "Lecture has been activated!"
-                        : "Lecture has been deactivated",
-                    status: true,
-                    data: lecture,
-                });
-            }
-            else {
-                res.json({
-                    status: true,
-                    statusCode: 405,
-                    message: "You must complete the practice first!",
-                });
-            }
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
     // Update details of a single lecture
-    app.post(`${basePath}/update/:lectureID`, lecture_1.validateUpdateLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${lecture_2.basePath}/update/:lectureID`, lecture_1.validateUpdateLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         var _c;
         const { lectureID, title, description, files, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
@@ -159,7 +145,7 @@ function default_1(app) {
         }
     }));
     //Delete a single lecture, this will also delete the lecture's practice questions
-    app.delete(`${basePath}/delete`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.delete(`${lecture_2.basePath}/delete`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, lectureID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "lecturer") {
@@ -180,4 +166,4 @@ function default_1(app) {
     }));
 }
 exports.default = default_1;
-//# sourceMappingURL=lecture.js.map
+//# sourceMappingURL=newFile.js.map
