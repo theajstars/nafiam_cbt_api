@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateCourseEnrollmentRequest = exports.validateDeleteCourseMaterialSchema = exports.validateGetAllCourseMaterials = exports.validateCreateCourseMaterial = exports.validateUpdateCourse = exports.validateGetSingleCourseSchema = exports.validateGetAllCourses = exports.validateCreateCourse = exports.validateTokenRequest = void 0;
+exports.validateCourseEnrollmentRequest = exports.validateDeleteCourseMaterialSchema = exports.validateGetAllCourseMaterials = exports.validateCreateCourseMaterial = exports.validateUpdateCourse = exports.validateGetSingleCourseSchema = exports.validateGetAllCourses = exports.validateCreateCourse = exports.validateDefaultCourseRequest = exports.validateTokenRequest = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const tokenSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -25,6 +25,28 @@ const validateTokenRequest = (req, res, next) => {
     }
 };
 exports.validateTokenRequest = validateTokenRequest;
+const defaultCourseSchema = joi_1.default.object({
+    token: joi_1.default.string().required(),
+    courseID: joi_1.default.string().optional(),
+    status: joi_1.default.boolean().optional(),
+});
+const validateDefaultCourseRequest = (req, res, next) => {
+    const { error } = defaultCourseSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateDefaultCourseRequest = validateDefaultCourseRequest;
 const createSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     code: joi_1.default.string().required(),

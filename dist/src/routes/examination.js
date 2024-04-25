@@ -22,7 +22,7 @@ const Student_1 = require("../models/Student");
 const basePath = "/examination";
 function default_1(app) {
     app.post(`${basePath}/create`, examination_1.validateCreateExaminationSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, title, year, course: courseCode } = req.body;
+        const { token, title, date, course: courseCode } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
         const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
         if (token && lecturer) {
@@ -30,7 +30,7 @@ function default_1(app) {
             const examination = yield new Examination_1.Examination({
                 id: (0, Methods_1.generateRandomString)(32),
                 title,
-                year,
+                date,
                 lecturerID: id,
                 course: course.id,
                 courseTitle: course.title,
@@ -174,11 +174,11 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/edit`, examination_1.validateEditExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, questions, title, year, course } = req.body;
+        const { token, examinationID, questions, title, date, course } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
         const lecturer = yield Lecturer_1.Lecturer.findOne({ id });
         if (token && lecturer) {
-            const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { questions, title, year, course });
+            const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { questions, title, date, course });
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination updated!", examination === null ? 404 : 201, examination));
         }
         else {
@@ -424,7 +424,7 @@ function default_1(app) {
                     exam: {
                         title: examination.title,
                         courseTitle: examination.courseTitle,
-                        year: examination.year,
+                        date: examination.date,
                         questions: examination.questions,
                         studentQuestions: questions,
                     },

@@ -20,6 +20,27 @@ export const validateTokenRequest = (req, res, next) => {
     next();
   }
 };
+const defaultCourseSchema = Joi.object({
+  token: Joi.string().required(),
+  courseID: Joi.string().optional(),
+  status: Joi.boolean().optional(),
+});
+
+export const validateDefaultCourseRequest = (req, res, next) => {
+  const { error } = defaultCourseSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
 
 const createSchema = Joi.object<CourseProps & { token: string }>({
   token: Joi.string().required(),

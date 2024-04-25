@@ -31,7 +31,7 @@ export default function (app: Express) {
     `${basePath}/create`,
     validateCreateExaminationSchema,
     async (req, res) => {
-      const { token, title, year, course: courseCode } = req.body;
+      const { token, title, date, course: courseCode } = req.body;
       const { id } = verifyToken(token);
       const lecturer = await Lecturer.findOne({ id });
       if (token && lecturer) {
@@ -39,7 +39,7 @@ export default function (app: Express) {
         const examination = await new Examination({
           id: generateRandomString(32),
           title,
-          year,
+          date,
           lecturerID: id,
           course: course.id,
           courseTitle: course.title,
@@ -235,13 +235,13 @@ export default function (app: Express) {
     `${basePath}/edit`,
     validateEditExaminationRequest,
     async (req, res) => {
-      const { token, examinationID, questions, title, year, course } = req.body;
+      const { token, examinationID, questions, title, date, course } = req.body;
       const { id } = verifyToken(token);
       const lecturer = await Lecturer.findOne({ id });
       if (token && lecturer) {
         const examination = await Examination.findOneAndUpdate(
           { id: examinationID },
-          { questions, title, year, course }
+          { questions, title, date, course }
         );
         res.json(
           returnSuccessResponseObject(
@@ -579,7 +579,7 @@ export default function (app: Express) {
             exam: {
               title: examination.title,
               courseTitle: examination.courseTitle,
-              year: examination.year,
+              date: examination.date,
               questions: examination.questions,
               studentQuestions: questions,
             },

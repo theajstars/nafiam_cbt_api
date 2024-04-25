@@ -7,6 +7,7 @@ import { Course } from "../models/Course";
 import {
   validateCourseEnrollmentRequest,
   validateCreateCourse,
+  validateDefaultCourseRequest,
   validateGetAllCourses,
   validateGetSingleCourseSchema,
   validateUpdateCourse,
@@ -121,6 +122,31 @@ export default function (app: Express) {
       });
     }
   });
+
+  app.post(
+    `${basePath}/status/toggle`,
+    validateDefaultCourseRequest,
+    async (req, res) => {
+      const { token, status, courseID } = req.body;
+
+      const { id, user } = verifyToken(token);
+
+      if (id && user && user === "lecturer") {
+        const course = await Course.findOneAndUpdate(
+          { id: courseID },
+          {
+            active: status,
+          }
+        );
+        res.json(<DefaultResponse>{
+          status: true,
+          statusCode: 200,
+          message: `Course set to ${status ? "active" : "inactive"}`,
+          data: course,
+        });
+      }
+    }
+  );
 
   app.post(
     `${basePath}/enroll`,

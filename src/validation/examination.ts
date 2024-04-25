@@ -25,7 +25,7 @@ export const validateDefaultExaminationRequest = (req, res, next) => {
 const createExaminationSchema = Joi.object({
   token: Joi.string().required(),
   title: Joi.string().required(),
-  year: Joi.string().required(),
+  date: Joi.number().required(),
   course: Joi.string().required(),
 });
 
@@ -49,7 +49,7 @@ const editExaminationSchema = Joi.object({
   examinationID: Joi.string().required(),
   questions: Joi.any().required(),
   title: Joi.string().required(),
-  year: Joi.string().required(),
+  date: Joi.number().required(),
   course: Joi.string().required(),
 });
 

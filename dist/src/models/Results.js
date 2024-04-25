@@ -17,7 +17,7 @@ const resultSchema = new mongoose_1.Schema({
     exam: {
         title: { type: String, required: true },
         courseTitle: { type: String, required: true },
-        year: { type: String, required: true },
+        date: { type: String, required: true },
         questions: { type: Array, required: true },
         studentQuestions: { type: Array, required: true },
     },

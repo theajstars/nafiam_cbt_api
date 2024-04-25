@@ -103,6 +103,21 @@ function default_1(app) {
             });
         }
     }));
+    app.post(`${basePath}/status/toggle`, course_1.validateDefaultCourseRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, status, courseID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "lecturer") {
+            const course = yield Course_1.Course.findOneAndUpdate({ id: courseID }, {
+                active: status,
+            });
+            res.json({
+                status: true,
+                statusCode: 200,
+                message: `Course set to ${status ? "active" : "inactive"}`,
+                data: course,
+            });
+        }
+    }));
     app.post(`${basePath}/enroll`, course_1.validateCourseEnrollmentRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { courseID, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);

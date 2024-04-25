@@ -14,7 +14,7 @@ export type QuestionProps = {
 export interface ExaminationProps {
   id: string;
   title: string;
-  year: string;
+  date: number;
   course: string;
   courseTitle: string;
   lecturerID: string;
@@ -33,7 +33,7 @@ const examinationSchema = new Schema<ExaminationProps, Model<ExaminationProps>>(
   {
     id: { type: String, required: true },
     title: { type: String, required: true },
-    year: { type: String, required: true },
+    date: { type: Number, required: true },
     course: { type: String, required: true },
     courseTitle: { type: String, required: true },
     lecturerID: { type: String, required: true },
