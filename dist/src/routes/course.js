@@ -107,13 +107,25 @@ function default_1(app) {
         const { courseID, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
-            const course = yield Course_1.Course.findOneAndUpdate({ id: courseID }, { $push: { students: id } });
-            res.json({
-                status: true,
-                statusCode: 200,
-                message: "Enrollment successful!",
-                data: course,
-            });
+            //Check if course is active
+            const isCourseActive = yield Course_1.Course.findOne({ id: courseID });
+            if (isCourseActive && isCourseActive.active) {
+                //Course exists and registration is ongoing
+                const course = yield Course_1.Course.findOneAndUpdate({ id: courseID, active: true }, { $push: { students: id } });
+                res.json({
+                    status: true,
+                    statusCode: 200,
+                    message: "Enrollment successful!",
+                    data: course,
+                });
+            }
+            else {
+                res.json({
+                    status: true,
+                    statusCode: 405,
+                    message: "You cannot register for this course!",
+                });
+            }
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);

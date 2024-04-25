@@ -10,6 +10,7 @@ const courseSchema = new mongoose_1.Schema({
     school: { type: String, required: true },
     description: { type: String, required: true },
     students: { type: Array, required: true },
+    active: { type: Boolean, required: false },
 });
 const Course = (0, mongoose_1.model)("Course", courseSchema);
 exports.Course = Course;
