@@ -210,6 +210,7 @@ exports.validateDeleteCourseMaterialSchema = validateDeleteCourseMaterialSchema;
 const courseEnrollSchema = joi_1.default.object({
     courseID: joi_1.default.string().required(),
     token: joi_1.default.string().required(),
+    studentID: joi_1.default.string().optional(),
 });
 const validateCourseEnrollmentRequest = (req, res, next) => {
     const { error } = courseEnrollSchema.validate(req.body);

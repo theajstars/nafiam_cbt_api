@@ -183,4 +183,30 @@ export default function (app: Express) {
       }
     }
   );
+  app.post(
+    `${basePath}/student/dismiss`,
+    validateCourseEnrollmentRequest,
+    async (req, res) => {
+      const { courseID, token, studentID } = req.body;
+
+      const { id, user } = verifyToken(token);
+
+      if (id && user && user !== "student") {
+        const findCourse = await Course.findOne({ id: courseID });
+
+        const course = await Course.findOneAndUpdate(
+          { id: courseID },
+          { students: findCourse.students.filter((s) => s !== studentID) }
+        );
+        res.json(<DefaultResponse>{
+          status: true,
+          statusCode: 200,
+          message: "Dismissal successful!",
+          data: course,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
 }

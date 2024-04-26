@@ -207,6 +207,7 @@ export const validateDeleteCourseMaterialSchema = (req, res, next) => {
 const courseEnrollSchema = Joi.object({
   courseID: Joi.string().required(),
   token: Joi.string().required(),
+  studentID: Joi.string().optional(),
 });
 
 export const validateCourseEnrollmentRequest = (req, res, next) => {
