@@ -252,6 +252,7 @@ export default function (app: Express) {
         });
         const resolvedPractice = {
           id: practice.id,
+          courseID: practice.courseID,
           lecture: { title: practice.lecture.title, id: practice.lecture.id },
           questions: (await hasStudentCompletedPreceedingLecturePractices())
             ? resolvedQuestions

@@ -213,6 +213,7 @@ function default_1(app) {
             });
             const resolvedPractice = {
                 id: practice.id,
+                courseID: practice.courseID,
                 lecture: { title: practice.lecture.title, id: practice.lecture.id },
                 questions: (yield hasStudentCompletedPreceedingLecturePractices())
                     ? resolvedQuestions
