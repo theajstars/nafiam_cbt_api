@@ -83,13 +83,14 @@ export default function (app: Express) {
 
     if (user === "admin" || user === "lecturer") {
       const course = await new Course({
-        id: generateRandomString(16),
+        id: generateRandomString(32),
         lecturerID: user === "admin" ? lecturerID : id,
         title,
         code,
         description,
         school,
         students: [],
+        active: false,
       }).save();
       res.json(<DefaultResponse>{
         status: true,
