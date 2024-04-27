@@ -69,13 +69,14 @@ function default_1(app) {
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (user === "admin" || user === "lecturer") {
             const course = yield new Course_1.Course({
-                id: (0, Methods_1.generateRandomString)(16),
+                id: (0, Methods_1.generateRandomString)(32),
                 lecturerID: user === "admin" ? lecturerID : id,
                 title,
                 code,
                 description,
                 school,
                 students: [],
+                active: false,
             }).save();
             res.json({
                 status: true,
