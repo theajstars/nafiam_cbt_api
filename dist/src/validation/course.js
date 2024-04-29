@@ -115,10 +115,11 @@ const validateGetSingleCourseSchema = (req, res, next) => {
 };
 exports.validateGetSingleCourseSchema = validateGetSingleCourseSchema;
 const updateSchema = joi_1.default.object({
-    courseID: joi_1.default.string().required(),
     token: joi_1.default.string().required(),
+    courseID: joi_1.default.string().required(),
     code: joi_1.default.string().required(),
     description: joi_1.default.string().required(),
+    lecturerID: joi_1.default.string().required(),
     school: joi_1.default.string().required(),
     title: joi_1.default.string().required(),
 });

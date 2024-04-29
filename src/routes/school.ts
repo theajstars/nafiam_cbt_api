@@ -13,6 +13,9 @@ import {
 } from "../validation/admin";
 import { Lecturer } from "../models/Lecturer";
 import { Course } from "../models/Course";
+import { Lecture } from "../models/Lecture";
+import { Practice } from "../models/Practice";
+import { Examination } from "../models/Examination";
 
 const basePath = "/school";
 
@@ -107,14 +110,25 @@ export default function (app: Express) {
     validateSingleSchoolRequest,
     async (req, res) => {
       const { token, schoolID } = req.body;
-      // 'dean' refers to lecturer ID
+
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         const school = await School.findOneAndDelete({ id: schoolID });
+        const coursesUnderSchool = await Course.find({ school: schoolID });
+
+        coursesUnderSchool.map((c) => async () => {
+          const lecture = await Lecture.deleteMany({ courseID: c.id });
+          const practice = await Practice.deleteMany({ courseID: c.id });
+          const examination = await Examination.deleteMany({ course: c.id });
+          return { lecture, practice, examination };
+        });
+
+        const deleteCourses = await Course.deleteMany({ school: schoolID });
+
         res.json({
           status: true,
           statusCode: 200,
-          data: school,
+          data: { school, deleteCourses },
         });
       } else {
         res.json(UnauthorizedResponseObject);

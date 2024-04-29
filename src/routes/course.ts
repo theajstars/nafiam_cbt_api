@@ -12,6 +12,9 @@ import {
   validateGetSingleCourseSchema,
   validateUpdateCourse,
 } from "../validation/course";
+import { Lecture } from "../models/Lecture";
+import { Practice } from "../models/Practice";
+import { Examination } from "../models/Examination";
 
 const basePath = "/course";
 
@@ -101,7 +104,8 @@ export default function (app: Express) {
     }
   });
   app.post(`${basePath}/update`, validateUpdateCourse, async (req, res) => {
-    const { courseID, title, code, description, school, token } = req.body;
+    const { courseID, title, code, lecturerID, description, school, token } =
+      req.body;
 
     const { id, user } = verifyToken(token);
 
@@ -111,13 +115,14 @@ export default function (app: Express) {
         {
           title,
           code,
-          description,
           school,
+          lecturerID,
+          description,
         }
       );
       res.json(<DefaultResponse>{
         status: true,
-        statusCode: 201,
+        statusCode: 200,
         message: "Course details updated successfully!",
         data: course,
       });
@@ -204,6 +209,30 @@ export default function (app: Express) {
           statusCode: 200,
           message: "Dismissal successful!",
           data: course,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.delete(
+    `${basePath}/delete`,
+    validateDefaultCourseRequest,
+    async (req, res) => {
+      const { token, courseID } = req.body;
+
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "admin") {
+        const course = await Course.deleteOne({ id: courseID });
+
+        const lectures = await Lecture.deleteMany({ courseID });
+        const practice = await Practice.deleteMany({ courseID });
+        const examination = await Examination.deleteMany({ course: courseID });
+
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: { course, lectures, practice, examination },
         });
       } else {
         res.json(UnauthorizedResponseObject);

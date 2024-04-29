@@ -14,6 +14,9 @@ const Methods_1 = require("../Lib/Methods");
 const Misc_1 = require("../Lib/Misc");
 const Course_1 = require("../models/Course");
 const course_1 = require("../validation/course");
+const Lecture_1 = require("../models/Lecture");
+const Practice_1 = require("../models/Practice");
+const Examination_1 = require("../models/Examination");
 const basePath = "/course";
 function default_1(app) {
     app.post(`${basePath}s/all`, course_1.validateGetAllCourses, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -87,18 +90,19 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/update`, course_1.validateUpdateCourse, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { courseID, title, code, description, school, token } = req.body;
+        const { courseID, title, code, lecturerID, description, school, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (user === "admin" || user === "lecturer") {
             const course = yield Course_1.Course.findOneAndUpdate({ id: courseID }, {
                 title,
                 code,
-                description,
                 school,
+                lecturerID,
+                description,
             });
             res.json({
                 status: true,
-                statusCode: 201,
+                statusCode: 200,
                 message: "Course details updated successfully!",
                 data: course,
             });
@@ -158,6 +162,24 @@ function default_1(app) {
                 statusCode: 200,
                 message: "Dismissal successful!",
                 data: course,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.delete(`${basePath}/delete`, course_1.validateDefaultCourseRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, courseID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const course = yield Course_1.Course.deleteOne({ id: courseID });
+            const lectures = yield Lecture_1.Lecture.deleteMany({ courseID });
+            const practice = yield Practice_1.Practice.deleteMany({ courseID });
+            const examination = yield Examination_1.Examination.deleteMany({ course: courseID });
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: { course, lectures, practice, examination },
             });
         }
         else {

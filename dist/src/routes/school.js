@@ -17,6 +17,9 @@ const Methods_1 = require("../Lib/Methods");
 const admin_1 = require("../validation/admin");
 const Lecturer_1 = require("../models/Lecturer");
 const Course_1 = require("../models/Course");
+const Lecture_1 = require("../models/Lecture");
+const Practice_1 = require("../models/Practice");
+const Examination_1 = require("../models/Examination");
 const basePath = "/school";
 function default_1(app) {
     app.post(`${basePath}s/all`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -98,14 +101,21 @@ function default_1(app) {
     }));
     app.delete(`${basePath}/delete`, admin_1.validateSingleSchoolRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, schoolID } = req.body;
-        // 'dean' refers to lecturer ID
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const school = yield Schools_1.School.findOneAndDelete({ id: schoolID });
+            const coursesUnderSchool = yield Course_1.Course.find({ school: schoolID });
+            coursesUnderSchool.map((c) => () => __awaiter(this, void 0, void 0, function* () {
+                const lecture = yield Lecture_1.Lecture.deleteMany({ courseID: c.id });
+                const practice = yield Practice_1.Practice.deleteMany({ courseID: c.id });
+                const examination = yield Examination_1.Examination.deleteMany({ course: c.id });
+                return { lecture, practice, examination };
+            }));
+            const deleteCourses = yield Course_1.Course.deleteMany({ school: schoolID });
             res.json({
                 status: true,
                 statusCode: 200,
-                data: school,
+                data: { school, deleteCourses },
             });
         }
         else {
