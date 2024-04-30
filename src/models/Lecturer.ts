@@ -5,6 +5,7 @@ export type LecturerProps = {
   firstName: string;
   lastName: string;
   email: string;
+  school: string;
   password: string;
   serviceNumber: string;
   rank: string;
@@ -19,6 +20,7 @@ const lecturerSchema = new Schema<LecturerProps, Model<LecturerProps>>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },
+  school: { type: String, required: true },
   password: { type: String, required: true },
   serviceNumber: { type: String, required: true },
   rank: { type: String, required: true },

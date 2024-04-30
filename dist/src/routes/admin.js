@@ -345,7 +345,7 @@ function default_2(app) {
     }));
     //LECTURERS FUNCTIONALITY
     app.post(`${basePath}/lecturer/create`, admin_2.validateCreateLecturer, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, email, firstName, lastName, rank, gender, role, serviceNumber, } = req.body;
+        const { token, email, firstName, lastName, rank, school, gender, role, serviceNumber, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const lecturerExists = yield Lecturer_1.Lecturer.findOne({
@@ -361,6 +361,7 @@ function default_2(app) {
                     firstName,
                     lastName,
                     rank,
+                    school,
                     role,
                     serviceNumber,
                     gender,
@@ -390,7 +391,7 @@ function default_2(app) {
         }
     }));
     app.post(`${basePath}/lecturer/update`, admin_2.validateUpdateLecturer, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { lecturerID, token, email, firstName, lastName, rank, gender, role, serviceNumber, } = req.body;
+        const { lecturerID, token, email, firstName, lastName, rank, school, gender, role, serviceNumber, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const lecturerExists = yield Lecturer_1.Lecturer.findOne({
@@ -410,6 +411,7 @@ function default_2(app) {
                     firstName,
                     lastName,
                     rank,
+                    school,
                     role,
                     serviceNumber,
                     gender,

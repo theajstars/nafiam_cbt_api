@@ -37,7 +37,7 @@ const createLecturerSchema = Joi.object({
   gender: Joi.string().required(),
   role: Joi.string().required(),
   serviceNumber: Joi.string().required(),
-  // school: Joi.string().required(),
+  school: Joi.string().required(),
 });
 
 export const validateCreateLecturer = (req, res, next) => {
@@ -65,7 +65,7 @@ const updateLecturerSchema = Joi.object({
   gender: Joi.string().required(),
   role: Joi.string().required(),
   serviceNumber: Joi.string().required(),
-  // school: Joi.string().required(),
+  school: Joi.string().required(),
 });
 
 export const validateUpdateLecturer = (req, res, next) => {

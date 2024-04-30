@@ -42,7 +42,7 @@ const createLecturerSchema = joi_1.default.object({
     gender: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
     serviceNumber: joi_1.default.string().required(),
-    // school: Joi.string().required(),
+    school: joi_1.default.string().required(),
 });
 const validateCreateLecturer = (req, res, next) => {
     const { error } = createLecturerSchema.validate(req.body);
@@ -71,7 +71,7 @@ const updateLecturerSchema = joi_1.default.object({
     gender: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
     serviceNumber: joi_1.default.string().required(),
-    // school: Joi.string().required(),
+    school: joi_1.default.string().required(),
 });
 const validateUpdateLecturer = (req, res, next) => {
     const { error } = updateLecturerSchema.validate(req.body);
