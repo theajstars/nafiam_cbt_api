@@ -13,7 +13,7 @@ export interface StudentProps {
   role: "civilian" | "personnel";
   dateCreated: number;
   isChangedPassword: boolean;
-  // school: string;
+  school: string;
 }
 
 const studentSchema = new Schema<StudentProps>({
@@ -28,7 +28,7 @@ const studentSchema = new Schema<StudentProps>({
   role: { type: String, required: true },
   dateCreated: { type: Number, required: true },
   isChangedPassword: { type: Boolean, required: true },
-  // school: { type: String, required: true },
+  school: { type: String, required: true },
 });
 
 const Student = model<StudentProps>("Student", studentSchema);

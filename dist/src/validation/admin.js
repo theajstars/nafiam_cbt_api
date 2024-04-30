@@ -14,7 +14,7 @@ const onboardstudentSchema = joi_1.default.object({
     gender: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
     serviceNumber: joi_1.default.string().required(),
-    // school: Joi.string().required(),
+    school: joi_1.default.string().required(),
 });
 const validateOnboardStudent = (req, res, next) => {
     const { error } = onboardstudentSchema.validate(req.body);
@@ -119,6 +119,7 @@ const updateStudentSchema = joi_1.default.object({
     email: joi_1.default.string().required(),
     rank: joi_1.default.string().required(),
     gender: joi_1.default.string().required(),
+    school: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
     serviceNumber: joi_1.default.string().required(),
 });

@@ -37,7 +37,10 @@ const basePath = "/admin";
 export default function (app: Express) {
   app.post(`${basePath}/login`, validateLoginRequest, async (req, res) => {
     const { id, password, navigatorObject } = req.body;
-    const admin = await Admin.findOne({ serviceNumber: id });
+    const admin = await Admin.findOne({
+      $or: [{ serviceNumber: id }, { email: id }],
+    });
+    console.log(admin);
     if (admin) {
       const isPasswordCorrect = await bcrypt.compare(password, admin.password);
       await new Log({
@@ -258,6 +261,7 @@ export default function (app: Express) {
         gender,
         role,
         serviceNumber,
+        school,
       } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
@@ -281,7 +285,7 @@ export default function (app: Express) {
             isChangedPassword: false,
             password: hash,
             dateCreated: Date.now(),
-            // school,
+            school,
           }).save();
           res.json({
             status: true,
@@ -315,6 +319,7 @@ export default function (app: Express) {
         lastName,
         rank,
         gender,
+        school,
         role,
         serviceNumber,
       } = req.body;
@@ -341,6 +346,7 @@ export default function (app: Express) {
               role,
               serviceNumber,
               gender,
+              school,
               // school,
             }
           );

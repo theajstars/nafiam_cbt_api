@@ -28,7 +28,10 @@ const basePath = "/admin";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password, navigatorObject } = req.body;
-        const admin = yield Admin_1.Admin.findOne({ serviceNumber: id });
+        const admin = yield Admin_1.Admin.findOne({
+            $or: [{ serviceNumber: id }, { email: id }],
+        });
+        console.log(admin);
         if (admin) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, admin.password);
             yield new Log_1.Log({
@@ -208,7 +211,7 @@ function default_2(app) {
         }
     }));
     app.post("/admin/student/onboard", admin_1.validateOnboardStudent, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, email, firstName, lastName, rank, gender, role, serviceNumber, } = req.body;
+        const { token, email, firstName, lastName, rank, gender, role, serviceNumber, school, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const studentExists = yield Student_1.Student.findOne({
@@ -230,7 +233,7 @@ function default_2(app) {
                     isChangedPassword: false,
                     password: hash,
                     dateCreated: Date.now(),
-                    // school,
+                    school,
                 }).save();
                 res.json({
                     status: true,
@@ -253,7 +256,7 @@ function default_2(app) {
         }
     }));
     app.post(`${basePath}/student/update`, admin_1.validateUpdateStudent, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { studentID, token, email, firstName, lastName, rank, gender, role, serviceNumber, } = req.body;
+        const { studentID, token, email, firstName, lastName, rank, gender, school, role, serviceNumber, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const studentExists = yield Student_1.Student.findOne({
@@ -276,6 +279,7 @@ function default_2(app) {
                     role,
                     serviceNumber,
                     gender,
+                    school,
                     // school,
                 });
                 res.json({
