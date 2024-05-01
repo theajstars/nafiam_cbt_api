@@ -13,7 +13,7 @@ const onboardstudentSchema = joi_1.default.object({
     rank: joi_1.default.string().required(),
     gender: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
-    serviceNumber: joi_1.default.string().optional(),
+    serviceNumber: joi_1.default.string().required().allow(""),
     school: joi_1.default.string().required(),
 });
 const validateOnboardStudent = (req, res, next) => {
@@ -41,7 +41,7 @@ const createLecturerSchema = joi_1.default.object({
     rank: joi_1.default.string().required(),
     gender: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
-    serviceNumber: joi_1.default.string().required(),
+    serviceNumber: joi_1.default.string().required().allow(""),
     school: joi_1.default.string().required(),
 });
 const validateCreateLecturer = (req, res, next) => {
@@ -70,7 +70,7 @@ const updateLecturerSchema = joi_1.default.object({
     rank: joi_1.default.string().required(),
     gender: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
-    serviceNumber: joi_1.default.string().required(),
+    serviceNumber: joi_1.default.string().required().allow(""),
     school: joi_1.default.string().required(),
 });
 const validateUpdateLecturer = (req, res, next) => {
@@ -121,7 +121,7 @@ const updateStudentSchema = joi_1.default.object({
     gender: joi_1.default.string().required(),
     school: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
-    serviceNumber: joi_1.default.string().optional(),
+    serviceNumber: joi_1.default.string().required().allow(""),
 });
 const validateUpdateStudent = (req, res, next) => {
     const { error } = updateStudentSchema.validate(req.body);

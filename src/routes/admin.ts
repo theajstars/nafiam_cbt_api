@@ -40,7 +40,7 @@ export default function (app: Express) {
     const admin = await Admin.findOne({
       $or: [{ serviceNumber: id }, { email: id }],
     });
-    console.log(admin);
+
     if (admin) {
       const isPasswordCorrect = await bcrypt.compare(password, admin.password);
       await new Log({
@@ -206,7 +206,8 @@ export default function (app: Express) {
               firstName,
               lastName,
               email,
-              serviceNumber,
+              serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
+
               rank,
             }
           );
@@ -280,7 +281,8 @@ export default function (app: Express) {
             lastName,
             rank,
             role,
-            serviceNumber,
+            serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
+
             gender,
             isChangedPassword: false,
             password: hash,
@@ -344,7 +346,8 @@ export default function (app: Express) {
               lastName,
               rank,
               role,
-              serviceNumber,
+              serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
+
               gender,
               school,
               // school,
@@ -436,7 +439,8 @@ export default function (app: Express) {
         const lecturerExists = await Lecturer.findOne({
           $or: [{ email: email }, { serviceNumber }],
         });
-        if (!lecturerExists) {
+        console.log({ ment: lecturerExists });
+        if (!lecturerExists || serviceNumber.length === 0) {
           const saltRounds = 10;
 
           const salt = await bcrypt.genSalt(saltRounds);
@@ -449,7 +453,8 @@ export default function (app: Express) {
             rank,
             school,
             role,
-            serviceNumber,
+            serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
+
             gender,
             password: hash,
             dateCreated: Date.now(),
@@ -513,7 +518,7 @@ export default function (app: Express) {
               rank,
               school,
               role,
-              serviceNumber,
+              serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
               gender,
             }
           );
@@ -534,7 +539,7 @@ export default function (app: Express) {
     const { id, user } = verifyToken(token);
     if (id && user === "admin") {
       const lecturer = await Lecturer.findOne({ id: lecturerID }).select(
-        "email firstName lastName id rank gender serviceNumber role"
+        "email firstName lastName id rank gender serviceNumber role school"
       );
 
       res.json({
@@ -575,7 +580,7 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         const lecturers = await Lecturer.find({}).select(
-          "email firstName lastName id rank gender role serviceNumber"
+          "email firstName lastName id rank gender role serviceNumber school"
         );
         res.json({
           status: true,

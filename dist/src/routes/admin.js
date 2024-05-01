@@ -31,7 +31,6 @@ function default_2(app) {
         const admin = yield Admin_1.Admin.findOne({
             $or: [{ serviceNumber: id }, { email: id }],
         });
-        console.log(admin);
         if (admin) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, admin.password);
             yield new Log_1.Log({
@@ -167,7 +166,7 @@ function default_2(app) {
                     firstName,
                     lastName,
                     email,
-                    serviceNumber,
+                    serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
                     rank,
                 });
                 res.json({
@@ -228,7 +227,7 @@ function default_2(app) {
                     lastName,
                     rank,
                     role,
-                    serviceNumber,
+                    serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
                     gender,
                     isChangedPassword: false,
                     password: hash,
@@ -277,7 +276,7 @@ function default_2(app) {
                     lastName,
                     rank,
                     role,
-                    serviceNumber,
+                    serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
                     gender,
                     school,
                     // school,
@@ -351,7 +350,8 @@ function default_2(app) {
             const lecturerExists = yield Lecturer_1.Lecturer.findOne({
                 $or: [{ email: email }, { serviceNumber }],
             });
-            if (!lecturerExists) {
+            console.log({ ment: lecturerExists });
+            if (!lecturerExists || serviceNumber.length === 0) {
                 const saltRounds = 10;
                 const salt = yield bcryptjs_1.default.genSalt(saltRounds);
                 const hash = yield bcryptjs_1.default.hash(lastName.toUpperCase(), salt);
@@ -363,7 +363,7 @@ function default_2(app) {
                     rank,
                     school,
                     role,
-                    serviceNumber,
+                    serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
                     gender,
                     password: hash,
                     dateCreated: Date.now(),
@@ -413,7 +413,7 @@ function default_2(app) {
                     rank,
                     school,
                     role,
-                    serviceNumber,
+                    serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
                     gender,
                 });
                 res.json({
@@ -432,7 +432,7 @@ function default_2(app) {
         const { token, lecturerID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user === "admin") {
-            const lecturer = yield Lecturer_1.Lecturer.findOne({ id: lecturerID }).select("email firstName lastName id rank gender serviceNumber role");
+            const lecturer = yield Lecturer_1.Lecturer.findOne({ id: lecturerID }).select("email firstName lastName id rank gender serviceNumber role school");
             res.json({
                 status: true,
                 statusCode: 200,
@@ -464,7 +464,7 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const lecturers = yield Lecturer_1.Lecturer.find({}).select("email firstName lastName id rank gender role serviceNumber");
+            const lecturers = yield Lecturer_1.Lecturer.find({}).select("email firstName lastName id rank gender role serviceNumber school");
             res.json({
                 status: true,
                 statusCode: 200,

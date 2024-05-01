@@ -93,7 +93,7 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user !== "student") {
-            const lecturers = yield Lecturer_1.Lecturer.find({}).select("email firstName lastName id rank gender role serviceNumber  dateCreated isChangedPassword");
+            const lecturers = yield Lecturer_1.Lecturer.find({}).select("email firstName lastName id rank gender role serviceNumber  dateCreated isChangedPassword school");
             res.json({
                 status: true,
                 statusCode: 200,
@@ -109,7 +109,7 @@ function default_2(app) {
         const { token } = req.body;
         const { user, id } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "lecturer") {
-            const students = yield Student_1.Student.find({}).select("id firstName lastName email password serviceNumber rank gender role");
+            const students = yield Student_1.Student.find({}).select("id firstName lastName email password serviceNumber rank gender role school");
             res.json({
                 data: students,
                 status: true,

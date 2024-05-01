@@ -97,7 +97,7 @@ export default function (app: Express) {
     const { id, user } = verifyToken(token);
     if (id && user && user !== "student") {
       const lecturers = await Lecturer.find({}).select(
-        "email firstName lastName id rank gender role serviceNumber  dateCreated isChangedPassword"
+        "email firstName lastName id rank gender role serviceNumber  dateCreated isChangedPassword school"
       );
       res.json({
         status: true,
@@ -118,7 +118,7 @@ export default function (app: Express) {
       const { user, id } = verifyToken(token);
       if (id && user && user === "lecturer") {
         const students = await Student.find({}).select(
-          "id firstName lastName email password serviceNumber rank gender role"
+          "id firstName lastName email password serviceNumber rank gender role school"
         );
         res.json(<DefaultResponse>{
           data: students,
