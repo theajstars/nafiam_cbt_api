@@ -14,12 +14,15 @@ import { genPassword, generateRandomString } from "../Lib/Methods";
 
 import { Lecturer } from "../models/Lecturer";
 import { Admin } from "../models/Admin";
+import { Course } from "../models/Course";
 
 const basePath = "/student";
 export default function (app: Express) {
   app.post(`${basePath}/login`, validateLoginRequest, async (req, res) => {
     const { id, password, navigatorObject } = req.body;
-    const student = await Student.findOne({ serviceNumber: id.toUpperCase() });
+    const student = await Student.findOne({
+      $or: [{ serviceNumber: id.toUpperCase() }, { email: id }],
+    });
     if (student) {
       const isPasswordCorrect = await bcrypt.compare(
         password,
@@ -88,6 +91,27 @@ export default function (app: Express) {
           status: true,
           statusCode: 200,
           data: student,
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  // GET COURSES UNDER STUDENT SCHOOL
+  app.post(
+    `${basePath}/courses/eligible`,
+    validateTokenRequest,
+    async (req, res) => {
+      const { token } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user && user === "student") {
+        const student = await Student.findOne({ id });
+        const courses = await Course.find({ school: student?.school ?? "" });
+        res.json({
+          status: true,
+          statusCode: 200,
+          data: courses,
+          message: "Courses found!",
         });
       } else {
         res.json(UnauthorizedResponseObject);

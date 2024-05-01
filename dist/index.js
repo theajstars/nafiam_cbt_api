@@ -38,9 +38,8 @@ app.use((0, cors_1.default)({
 }));
 app.use((0, body_parser_1.default)({ extended: true }));
 const PORT = 8080;
-const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
-// const dbConnectString =
-//   "mongodb+srv://theajstars:dGF9caF4b8PlrLtP@data.hy4gux2.mongodb.net/?retryWrites=true&w=majority&appName=data/nafiamDB";
+// const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
+const dbConnectString = "mongodb+srv://theajstars:dGF9caF4b8PlrLtP@data.hy4gux2.mongodb.net/?retryWrites=true&w=majority&appName=data/nafiamDB";
 (0, mongoose_1.connect)(dbConnectString)
     .then(() => {
     app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));

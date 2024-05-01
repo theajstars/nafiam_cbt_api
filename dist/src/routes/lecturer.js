@@ -27,7 +27,7 @@ function default_2(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password } = req.body;
         const lecturer = yield Lecturer_1.Lecturer.findOne({
-            serviceNumber: id.toUpperCase(),
+            $or: [{ serviceNumber: id.toUpperCase() }, { email: id }],
         });
         if (lecturer) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, lecturer.password);

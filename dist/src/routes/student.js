@@ -20,11 +20,14 @@ const Student_1 = require("../models/Student");
 const Misc_1 = require("../Lib/Misc");
 const Log_1 = require("../models/Log");
 const Methods_1 = require("../Lib/Methods");
+const Course_1 = require("../models/Course");
 const basePath = "/student";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password, navigatorObject } = req.body;
-        const student = yield Student_1.Student.findOne({ serviceNumber: id.toUpperCase() });
+        const student = yield Student_1.Student.findOne({
+            $or: [{ serviceNumber: id.toUpperCase() }, { email: id }],
+        });
         if (student) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, student.password);
             const log = yield new Log_1.Log({
@@ -80,6 +83,25 @@ function default_2(app) {
                 status: true,
                 statusCode: 200,
                 data: student,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    // GET COURSES UNDER STUDENT SCHOOL
+    app.post(`${basePath}/courses/eligible`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "student") {
+            const student = yield Student_1.Student.findOne({ id });
+            const courses = yield Course_1.Course.find({ school: (_a = student === null || student === void 0 ? void 0 : student.school) !== null && _a !== void 0 ? _a : "" });
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: courses,
+                message: "Courses found!",
             });
         }
         else {
