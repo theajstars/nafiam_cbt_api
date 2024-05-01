@@ -13,7 +13,7 @@ const onboardstudentSchema = joi_1.default.object({
     rank: joi_1.default.string().required(),
     gender: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
-    serviceNumber: joi_1.default.string().required(),
+    serviceNumber: joi_1.default.string().optional(),
     school: joi_1.default.string().required(),
 });
 const validateOnboardStudent = (req, res, next) => {
@@ -121,7 +121,7 @@ const updateStudentSchema = joi_1.default.object({
     gender: joi_1.default.string().required(),
     school: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
-    serviceNumber: joi_1.default.string().required(),
+    serviceNumber: joi_1.default.string().optional(),
 });
 const validateUpdateStudent = (req, res, next) => {
     const { error } = updateStudentSchema.validate(req.body);
@@ -143,7 +143,7 @@ exports.validateUpdateStudent = validateUpdateStudent;
 const createSchoolSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     name: joi_1.default.string().required(),
-    dean: joi_1.default.string().required(),
+    dean: joi_1.default.string().optional().allow(""),
 });
 const validateCreateSchoolRequest = (req, res, next) => {
     const { error } = createSchoolSchema.validate(req.body);

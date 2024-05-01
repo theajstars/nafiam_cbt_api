@@ -8,7 +8,7 @@ const onboardstudentSchema = Joi.object({
   rank: Joi.string().required(),
   gender: Joi.string().required(),
   role: Joi.string().required(),
-  serviceNumber: Joi.string().required(),
+  serviceNumber: Joi.string().optional(),
   school: Joi.string().required(),
 });
 
@@ -113,7 +113,7 @@ const updateStudentSchema = Joi.object({
   gender: Joi.string().required(),
   school: Joi.string().required(),
   role: Joi.string().required(),
-  serviceNumber: Joi.string().required(),
+  serviceNumber: Joi.string().optional(),
 });
 
 export const validateUpdateStudent = (req, res, next) => {
@@ -134,7 +134,7 @@ export const validateUpdateStudent = (req, res, next) => {
 const createSchoolSchema = Joi.object({
   token: Joi.string().required(),
   name: Joi.string().required(),
-  dean: Joi.string().required(),
+  dean: Joi.string().optional().allow(""),
 });
 
 export const validateCreateSchoolRequest = (req, res, next) => {

@@ -63,12 +63,13 @@ function default_1(app) {
     app.post(`${basePath}/create`, admin_1.validateCreateSchoolRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, name, dean } = req.body;
         // 'dean' refers to lecturer ID
+        // Dean is NOT required for creating schools
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const school = yield new Schools_1.School({
                 id: (0, Methods_1.generateRandomString)(32),
                 name,
-                dean,
+                dean: dean !== null && dean !== void 0 ? dean : "",
             }).save();
             res.json({
                 status: true,
@@ -83,6 +84,7 @@ function default_1(app) {
     app.post(`${basePath}/update`, admin_1.validateUpdateSchoolRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, name, dean, schoolID } = req.body;
         // 'dean' refers to lecturer ID
+        // Dean is REQUIRED for updating schools
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const school = yield Schools_1.School.findOneAndUpdate({ id: schoolID }, {

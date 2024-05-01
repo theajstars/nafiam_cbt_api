@@ -5,7 +5,7 @@ const mongoose_1 = require("mongoose");
 const schoolSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
     name: { type: String, required: true },
-    dean: { type: String, required: true },
+    dean: { type: String, required: false },
 });
 const School = (0, mongoose_1.model)("School", schoolSchema);
 exports.School = School;

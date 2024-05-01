@@ -63,12 +63,13 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, name, dean } = req.body;
       // 'dean' refers to lecturer ID
+      // Dean is NOT required for creating schools
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         const school = await new School({
           id: generateRandomString(32),
           name,
-          dean,
+          dean: dean ?? "",
         }).save();
         res.json({
           status: true,
@@ -86,6 +87,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, name, dean, schoolID } = req.body;
       // 'dean' refers to lecturer ID
+      // Dean is REQUIRED for updating schools
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         const school = await School.findOneAndUpdate(

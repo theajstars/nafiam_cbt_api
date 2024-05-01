@@ -22,7 +22,7 @@ const studentSchema = new Schema<StudentProps>({
   lastName: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  serviceNumber: { type: String, required: true },
+  serviceNumber: { type: String, required: false },
   rank: { type: String, required: true },
   gender: { type: String, required: true },
   role: { type: String, required: true },

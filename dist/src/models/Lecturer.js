@@ -9,7 +9,7 @@ const lecturerSchema = new mongoose_1.Schema({
     email: { type: String, required: true },
     school: { type: String, required: true },
     password: { type: String, required: true },
-    serviceNumber: { type: String, required: true },
+    serviceNumber: { type: String, required: false },
     rank: { type: String, required: true },
     gender: { type: String, required: true },
     role: { type: String, required: true },
