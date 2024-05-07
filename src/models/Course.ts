@@ -2,7 +2,7 @@ import { Schema, model, Model } from "mongoose";
 
 export type CourseProps = {
   id: string;
-  lecturerID: string;
+  instructorID: string;
   title: string;
   code: string;
   school: string;
@@ -13,7 +13,7 @@ export type CourseProps = {
 
 const courseSchema = new Schema<CourseProps, Model<CourseProps>>({
   id: { type: String, required: true },
-  lecturerID: { type: String, required: true },
+  instructorID: { type: String, required: true },
   title: { type: String, required: true },
   code: { type: String, required: true },
   school: { type: String, required: true },

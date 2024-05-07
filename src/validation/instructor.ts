@@ -1,12 +1,12 @@
 import Joi from "@hapi/joi";
 
-const defaultLecturerSchema = Joi.object({
+const defaultInstructorSchema = Joi.object({
   token: Joi.string().required(),
-  lecturerID: Joi.string().optional(),
+  instructorID: Joi.string().optional(),
 });
 
-export const validateDefaultLecturerRequest = (req, res, next) => {
-  const { error } = defaultLecturerSchema.validate(req.body);
+export const validateDefaultInstructorRequest = (req, res, next) => {
+  const { error } = defaultInstructorSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {
       return e.message;

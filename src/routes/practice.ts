@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 
-import { Lecturer } from "../models/Lecturer";
+import { Instructor } from "../models/Instructor";
 import { validateTokenRequest } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import {
@@ -31,7 +31,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, lectureID, questions } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user && user === "lecturer") {
+      if (id && user && user === "instructor") {
         const practice = await Practice.findOneAndUpdate(
           {
             "lecture.id": lectureID,
@@ -49,14 +49,14 @@ export default function (app: Express) {
       }
     }
   );
-  // Get all attempts by students from lecturer
+  // Get all attempts by students from instructor
   app.post(
     `${basePath}/attempts`,
     validateDefaultPracticeRequest,
     async (req, res) => {
       const { token, practiceID } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user && user === "lecturer") {
+      if (id && user && user === "instructor") {
         const attempts = await Attempt.find({
           practiceID,
         });
@@ -94,7 +94,7 @@ export default function (app: Express) {
       }
     }
   );
-  // Get the practice of a lecture by a lecturer or admin
+  // Get the practice of a lecture by a instructor or admin
   app.post(
     `${basePath}/get/:practiceID`,
     validateTokenRequest,
@@ -132,7 +132,7 @@ export default function (app: Express) {
           data: whitelist ?? undefined,
           message: whitelist
             ? "Whitelist found"
-            : "Lecturer has not created whitelist for this practice",
+            : "Instructor has not created whitelist for this practice",
         });
       } else {
         res.json(UnauthorizedResponseObject);
@@ -147,7 +147,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, practiceID, studentID } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user && user === "lecturer") {
+      if (id && user && user === "instructor") {
         // Find Whitelist
         const whitelist = await Whitelist.findOne({ practiceID });
 
@@ -182,7 +182,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, practiceID, studentID } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user && user === "lecturer") {
+      if (id && user && user === "instructor") {
         // Find Whitelist
         const whitelist = await Whitelist.findOne({ practiceID });
 

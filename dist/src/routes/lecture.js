@@ -24,7 +24,7 @@ function default_1(app) {
         var _a, _b;
         const { title, courseID, description, files, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
+        if (id && user && user === "instructor") {
             //Get Existing lectures for the course
             const lectures = yield Lecture_1.Lecture.find({ courseID });
             const index = lectures.length + 1;
@@ -106,7 +106,7 @@ function default_1(app) {
     app.post(`${basePath}/status/:lectureID`, lecture_1.validateToggleLectureStatusRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, status } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
+        if (id && user && user === "instructor") {
             // Check if Lecture Practice is completed
             const practice = yield Practice_1.Practice.findOne({
                 "lecture.id": req.params.lectureID,
@@ -140,7 +140,7 @@ function default_1(app) {
         var _c;
         const { lectureID, title, description, files, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
+        if (id && user && user === "instructor") {
             const lecture = yield Lecture_1.Lecture.findOneAndUpdate({
                 id: (_c = req.params.lectureID) !== null && _c !== void 0 ? _c : lectureID,
             }, { title, description, files });
@@ -162,7 +162,7 @@ function default_1(app) {
     app.delete(`${basePath}/delete`, lecture_1.validateDefaultLectureRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, lectureID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
+        if (id && user && user === "instructor") {
             const lecture = yield Lecture_1.Lecture.findOneAndDelete({ id: lectureID });
             const practice = yield Practice_1.Practice.findOneAndDelete({
                 "lecture.id": lectureID,

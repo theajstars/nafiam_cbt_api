@@ -15,7 +15,7 @@ const Schools_1 = require("../models/Schools");
 const Misc_1 = require("../Lib/Misc");
 const Methods_1 = require("../Lib/Methods");
 const admin_1 = require("../validation/admin");
-const Lecturer_1 = require("../models/Lecturer");
+const Instructor_1 = require("../models/Instructor");
 const Course_1 = require("../models/Course");
 const Lecture_1 = require("../models/Lecture");
 const Practice_1 = require("../models/Practice");
@@ -42,7 +42,7 @@ function default_1(app) {
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
             const school = yield Schools_1.School.findOne({ id: schoolID });
-            const lecturer = yield Lecturer_1.Lecturer.findOne({
+            const instructor = yield Instructor_1.Instructor.findOne({
                 id: school ? school.dean : "",
             }).select("rank gender role serviceNumber email firstName lastName id");
             const courses = yield Course_1.Course.find({ school: schoolID });
@@ -51,7 +51,7 @@ function default_1(app) {
                 statusCode: 200,
                 data: {
                     school,
-                    dean: lecturer,
+                    dean: instructor,
                     courses,
                 },
             });
@@ -62,7 +62,7 @@ function default_1(app) {
     }));
     app.post(`${basePath}/create`, admin_1.validateCreateSchoolRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, name, dean } = req.body;
-        // 'dean' refers to lecturer ID
+        // 'dean' refers to instructor ID
         // Dean is NOT required for creating schools
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
@@ -83,7 +83,7 @@ function default_1(app) {
     }));
     app.post(`${basePath}/update`, admin_1.validateUpdateSchoolRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, name, dean, schoolID } = req.body;
-        // 'dean' refers to lecturer ID
+        // 'dean' refers to instructor ID
         // Dean is REQUIRED for updating schools
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {

@@ -35,11 +35,11 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}s/lecturer/all`, course_1.validateGetAllCourses, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, lecturerID } = req.body;
+    app.post(`${basePath}s/instructor/all`, course_1.validateGetAllCourses, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, instructorID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (user === "lecturer") {
-            const courses = yield Course_1.Course.find({ lecturerID: lecturerID !== null && lecturerID !== void 0 ? lecturerID : id });
+        if (user === "instructor") {
+            const courses = yield Course_1.Course.find({ instructorID: instructorID !== null && instructorID !== void 0 ? instructorID : id });
             res.json({
                 status: true,
                 statusCode: 200,
@@ -68,12 +68,12 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/create`, course_1.validateCreateCourse, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { title, code, description, school, token, lecturerID } = req.body;
+        const { title, code, description, school, token, instructorID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (user === "admin" || user === "lecturer") {
+        if (user === "admin" || user === "instructor") {
             const course = yield new Course_1.Course({
                 id: (0, Methods_1.generateRandomString)(32),
-                lecturerID: user === "admin" ? lecturerID : id,
+                instructorID: user === "admin" ? instructorID : id,
                 title,
                 code,
                 description,
@@ -90,14 +90,14 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/update`, course_1.validateUpdateCourse, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { courseID, title, code, lecturerID, description, school, token } = req.body;
+        const { courseID, title, code, instructorID, description, school, token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (user === "admin" || user === "lecturer") {
+        if (user === "admin" || user === "instructor") {
             const course = yield Course_1.Course.findOneAndUpdate({ id: courseID }, {
                 title,
                 code,
                 school,
-                lecturerID,
+                instructorID,
                 description,
             });
             res.json({
@@ -111,7 +111,7 @@ function default_1(app) {
     app.post(`${basePath}/status/toggle`, course_1.validateDefaultCourseRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, status, courseID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
+        if (id && user && user === "instructor") {
             const course = yield Course_1.Course.findOneAndUpdate({ id: courseID }, {
                 active: status,
             });

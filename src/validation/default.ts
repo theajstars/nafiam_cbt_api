@@ -26,7 +26,7 @@ const updatePasswordSchema = Joi.object({
   oldPassword: Joi.string().required(),
   newPassword: Joi.string().required(),
   navigatorObject: Joi.any().required(),
-  user: Joi.valid("student", "lecturer", "admin").required(),
+  user: Joi.valid("student", "instructor", "admin").required(),
 });
 
 export const validateUpdatePasswordRequest = (req, res, next) => {

@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const JWT_1 = require("../Lib/JWT");
-const Lecturer_1 = require("../models/Lecturer");
+const Instructor_1 = require("../models/Instructor");
 const Misc_1 = require("../Lib/Misc");
 const Methods_1 = require("../Lib/Methods");
 const course_1 = require("../validation/course");
@@ -68,10 +68,10 @@ function default_2(app) {
                             res.json(Object.assign(Object.assign({}, Misc_1.UnauthorizedResponseObject), { message: "Incorrect password" }));
                         }
                         break;
-                    case "lecturer":
-                        var isPasswordCorrect = yield bcryptjs_1.default.compare(oldPassword, (yield Lecturer_1.Lecturer.findOne({ id })).password);
+                    case "instructor":
+                        var isPasswordCorrect = yield bcryptjs_1.default.compare(oldPassword, (yield Instructor_1.Instructor.findOne({ id })).password);
                         if (isPasswordCorrect) {
-                            yield Lecturer_1.Lecturer.findOneAndUpdate({ id }, { password: newPassword, isChangedPassword: true });
+                            yield Instructor_1.Instructor.findOneAndUpdate({ id }, { password: newPassword, isChangedPassword: true });
                             res.json({
                                 status: true,
                                 statusCode: 200,
@@ -159,13 +159,13 @@ function default_2(app) {
                         data: students,
                     });
                     break;
-                case "lecturer":
-                    const lecturers = yield Lecturer_1.Lecturer.find(Object.assign({}, (0, Methods_1.removeEmptyFields)(filter))).select("-password");
+                case "instructor":
+                    const instructors = yield Instructor_1.Instructor.find(Object.assign({}, (0, Methods_1.removeEmptyFields)(filter))).select("-password");
                     res.json({
                         status: true,
                         statusCode: 200,
-                        message: "Lecturers found!",
-                        data: lecturers,
+                        message: "Instructors found!",
+                        data: instructors,
                     });
                     break;
                 case "admin":

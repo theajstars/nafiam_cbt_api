@@ -4,7 +4,7 @@ exports.Course = void 0;
 const mongoose_1 = require("mongoose");
 const courseSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
-    lecturerID: { type: String, required: true },
+    instructorID: { type: String, required: true },
     title: { type: String, required: true },
     code: { type: String, required: true },
     school: { type: String, required: true },

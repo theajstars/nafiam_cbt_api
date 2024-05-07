@@ -1,5 +1,5 @@
 import { Schema, model, Model } from "mongoose";
-import { Gender } from "./Lecturer";
+import { Gender } from "./Instructor";
 
 export interface StudentProps {
   id: string;

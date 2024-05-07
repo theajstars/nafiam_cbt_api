@@ -8,7 +8,7 @@ const examinationSchema = new mongoose_1.Schema({
     date: { type: Number, required: true },
     course: { type: String, required: true },
     courseTitle: { type: String, required: true },
-    lecturerID: { type: String, required: true },
+    instructorID: { type: String, required: true },
     started: { type: Boolean, required: true },
     approved: { type: Boolean, required: true },
     published: { type: Boolean, required: true },

@@ -29,7 +29,7 @@ export const validateOnboardStudent = (req, res, next) => {
   }
 };
 
-const createLecturerSchema = Joi.object({
+const createInstructorSchema = Joi.object({
   token: Joi.string().required(),
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
@@ -41,8 +41,8 @@ const createLecturerSchema = Joi.object({
   school: Joi.string().required(),
 });
 
-export const validateCreateLecturer = (req, res, next) => {
-  const { error } = createLecturerSchema.validate(req.body);
+export const validateCreateInstructor = (req, res, next) => {
+  const { error } = createInstructorSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {
       return e.message;
@@ -56,9 +56,9 @@ export const validateCreateLecturer = (req, res, next) => {
     next();
   }
 };
-const updateLecturerSchema = Joi.object({
+const updateInstructorSchema = Joi.object({
   token: Joi.string().required(),
-  lecturerID: Joi.string().required(),
+  instructorID: Joi.string().required(),
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
   email: Joi.string().required(),
@@ -70,8 +70,8 @@ const updateLecturerSchema = Joi.object({
   school: Joi.string().required(),
 });
 
-export const validateUpdateLecturer = (req, res, next) => {
-  const { error } = updateLecturerSchema.validate(req.body);
+export const validateUpdateInstructor = (req, res, next) => {
+  const { error } = updateInstructorSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {
       return e.message;
@@ -85,13 +85,13 @@ export const validateUpdateLecturer = (req, res, next) => {
     next();
   }
 };
-const singleLecturerSchema = Joi.object({
+const singleInstructorSchema = Joi.object({
   token: Joi.string().required(),
-  lecturerID: Joi.string().required(),
+  instructorID: Joi.string().required(),
 });
 
-export const validateSingleLecturerRequest = (req, res, next) => {
-  const { error } = singleLecturerSchema.validate(req.body);
+export const validateSingleInstructorRequest = (req, res, next) => {
+  const { error } = singleInstructorSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {
       return e.message;

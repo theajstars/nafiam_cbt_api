@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 
-import { Lecturer } from "../models/Lecturer";
+import { Instructor } from "../models/Instructor";
 import { validateTokenRequest } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import {
@@ -31,7 +31,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { title, courseID, description, files, token } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user && user === "lecturer") {
+      if (id && user && user === "instructor") {
         //Get Existing lectures for the course
         const lectures = await Lecture.find({ courseID });
         const index = lectures.length + 1;
@@ -126,7 +126,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, status } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user && user === "lecturer") {
+      if (id && user && user === "instructor") {
         // Check if Lecture Practice is completed
         const practice = await Practice.findOne({
           "lecture.id": req.params.lectureID,
@@ -166,7 +166,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { lectureID, title, description, files, token } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user && user === "lecturer") {
+      if (id && user && user === "instructor") {
         const lecture = await Lecture.findOneAndUpdate(
           {
             id: req.params.lectureID ?? lectureID,
@@ -198,7 +198,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, lectureID } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user && user === "lecturer") {
+      if (id && user && user === "instructor") {
         const lecture = await Lecture.findOneAndDelete({ id: lectureID });
         const practice = await Practice.findOneAndDelete({
           "lecture.id": lectureID,

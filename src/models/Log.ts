@@ -3,7 +3,7 @@ import { Schema, Model, model } from "mongoose";
 export interface LogProps {
   id: string;
   personnelID: string;
-  userType: "admin" | "student" | "lecturer";
+  userType: "admin" | "student" | "instructor";
   action: "login" | "change_password";
   timestamp: number;
   navigatorObject: any;

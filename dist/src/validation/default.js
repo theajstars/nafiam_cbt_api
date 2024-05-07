@@ -32,7 +32,7 @@ const updatePasswordSchema = joi_1.default.object({
     oldPassword: joi_1.default.string().required(),
     newPassword: joi_1.default.string().required(),
     navigatorObject: joi_1.default.any().required(),
-    user: joi_1.default.valid("student", "lecturer", "admin").required(),
+    user: joi_1.default.valid("student", "instructor", "admin").required(),
 });
 const validateUpdatePasswordRequest = (req, res, next) => {
     const { error } = updatePasswordSchema.validate(req.body);

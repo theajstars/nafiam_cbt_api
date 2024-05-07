@@ -4,32 +4,32 @@ import bcrypt from "bcryptjs";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 
-import { Lecturer } from "../models/Lecturer";
+import { Instructor } from "../models/Instructor";
 import { validateTokenRequest } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { Student } from "../models/Student";
-import { validateDefaultLecturerRequest } from "../validation/lecturer";
+import { validateDefaultInstructorRequest } from "../validation/instructor";
 import { validateDefaultProfileUpdateRequest } from "../validation/default";
 import { generateRandomString } from "../Lib/Methods";
 import { Log } from "../models/Log";
-const basePath = "/lecturer";
+const basePath = "/instructor";
 export default function (app: Express) {
   app.post(`${basePath}/login`, async (req, res) => {
     const { id, password } = req.body;
 
-    const lecturer = await Lecturer.findOne({
+    const instructor = await Instructor.findOne({
       $or: [{ serviceNumber: id.toUpperCase() }, { email: id }],
     });
-    if (lecturer) {
+    if (instructor) {
       const isPasswordCorrect = await bcrypt.compare(
         password,
-        lecturer.password
+        instructor.password
       );
 
       const log = await new Log({
-        personnelID: lecturer.id,
+        personnelID: instructor.id,
         id: generateRandomString(32),
-        userType: "lecturer",
+        userType: "instructor",
         action: "login",
         comments: isPasswordCorrect ? "Login successful!" : "Invalid Password",
         timestamp: Date.now(),
@@ -40,7 +40,7 @@ export default function (app: Express) {
         statusCode: isPasswordCorrect ? 200 : 401,
         message: isPasswordCorrect ? "Logged In!" : "Incorrect Password",
         token: isPasswordCorrect
-          ? await createToken(lecturer.id, "lecturer")
+          ? await createToken(instructor.id, "instructor")
           : null,
         log,
       });
@@ -54,17 +54,17 @@ export default function (app: Express) {
   });
   app.post(
     `${basePath}/profile/get`,
-    validateDefaultLecturerRequest,
+    validateDefaultInstructorRequest,
     async (req, res) => {
-      const { token, lecturerID } = req.body;
+      const { token, instructorID } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user && user === "lecturer") {
-        const lecturer = await Lecturer.findOne({ id: lecturerID ?? id });
+      if (id && user && user === "instructor") {
+        const instructor = await Instructor.findOne({ id: instructorID ?? id });
         res.json({
           status: true,
           statusCode: 200,
-          message: "Lecturer found!",
-          data: lecturer,
+          message: "Instructor found!",
+          data: instructor,
         });
       } else {
         res.json(UnauthorizedResponseObject);
@@ -77,15 +77,15 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, firstName, lastName, email } = req.body;
       const { id, user } = verifyToken(token);
-      if (id && user && user === "lecturer") {
-        const lecturer = await Lecturer.findOneAndUpdate(
+      if (id && user && user === "instructor") {
+        const instructor = await Instructor.findOneAndUpdate(
           { id },
           { firstName, lastName, email }
         );
         res.json({
           status: true,
           statusCode: 200,
-          data: lecturer,
+          data: instructor,
         });
       } else {
         res.json(UnauthorizedResponseObject);
@@ -96,14 +96,14 @@ export default function (app: Express) {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user && user !== "student") {
-      const lecturers = await Lecturer.find({}).select(
+      const instructors = await Instructor.find({}).select(
         "email firstName lastName id rank gender role serviceNumber  dateCreated isChangedPassword school"
       );
       res.json({
         status: true,
         statusCode: 200,
-        data: lecturers,
-        message: "Lecturers retrieved!",
+        data: instructors,
+        message: "Instructors retrieved!",
       });
     } else {
       res.json(UnauthorizedResponseObject);
@@ -116,7 +116,7 @@ export default function (app: Express) {
     async (req, res) => {
       const { token } = req.body;
       const { user, id } = verifyToken(token);
-      if (id && user && user === "lecturer") {
+      if (id && user && user === "instructor") {
         const students = await Student.find({}).select(
           "id firstName lastName email password serviceNumber rank gender role school"
         );

@@ -26,7 +26,7 @@ function default_1(app) {
     app.post(`${basePath}/update`, lecture_1.validateUpdatePracticeQuestionsRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, lectureID, questions } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
+        if (id && user && user === "instructor") {
             const practice = yield Practice_1.Practice.findOneAndUpdate({
                 "lecture.id": lectureID,
             }, { questions });
@@ -41,11 +41,11 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    // Get all attempts by students from lecturer
+    // Get all attempts by students from instructor
     app.post(`${basePath}/attempts`, practice_1.validateDefaultPracticeRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, practiceID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
+        if (id && user && user === "instructor") {
             const attempts = yield Attempt_1.Attempt.find({
                 practiceID,
             });
@@ -78,7 +78,7 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    // Get the practice of a lecture by a lecturer or admin
+    // Get the practice of a lecture by a instructor or admin
     app.post(`${basePath}/get/:practiceID`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
@@ -109,7 +109,7 @@ function default_1(app) {
                 data: whitelist !== null && whitelist !== void 0 ? whitelist : undefined,
                 message: whitelist
                     ? "Whitelist found"
-                    : "Lecturer has not created whitelist for this practice",
+                    : "Instructor has not created whitelist for this practice",
             });
         }
         else {
@@ -120,7 +120,7 @@ function default_1(app) {
     app.post(`${basePath}/whitelist/add`, practice_1.validateDefaultPracticeRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, practiceID, studentID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
+        if (id && user && user === "instructor") {
             // Find Whitelist
             const whitelist = yield Whitelist_1.Whitelist.findOne({ practiceID });
             if (!whitelist.students.includes(studentID)) {
@@ -149,7 +149,7 @@ function default_1(app) {
     app.post(`${basePath}/whitelist/remove`, practice_1.validateDefaultPracticeRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, practiceID, studentID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
+        if (id && user && user === "instructor") {
             // Find Whitelist
             const whitelist = yield Whitelist_1.Whitelist.findOne({ practiceID });
             const updatedWhitelist = yield Whitelist_1.Whitelist.findOneAndUpdate({ practiceID }, { students: whitelist.students.fitler((s) => s !== studentID) });

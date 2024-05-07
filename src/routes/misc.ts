@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 
-import { Lecturer } from "../models/Lecturer";
+import { Instructor } from "../models/Instructor";
 import { Examination } from "../models/Examination";
 import {
   UnauthorizedResponseObject,
@@ -88,15 +88,15 @@ export default function (app: Express) {
                 });
               }
               break;
-            case "lecturer":
+            case "instructor":
               var isPasswordCorrect = await bcrypt.compare(
                 oldPassword,
                 (
-                  await Lecturer.findOne({ id })
+                  await Instructor.findOne({ id })
                 ).password
               );
               if (isPasswordCorrect) {
-                await Lecturer.findOneAndUpdate(
+                await Instructor.findOneAndUpdate(
                   { id },
                   { password: newPassword, isChangedPassword: true }
                 );
@@ -205,15 +205,15 @@ export default function (app: Express) {
               data: students,
             });
             break;
-          case "lecturer":
-            const lecturers = await Lecturer.find({
+          case "instructor":
+            const instructors = await Instructor.find({
               ...removeEmptyFields(filter),
             }).select("-password");
             res.json({
               status: true,
               statusCode: 200,
-              message: "Lecturers found!",
-              data: lecturers,
+              message: "Instructors found!",
+              data: instructors,
             });
             break;
           case "admin":

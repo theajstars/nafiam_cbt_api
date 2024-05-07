@@ -12,7 +12,7 @@ import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { Log } from "../models/Log";
 import { genPassword, generateRandomString } from "../Lib/Methods";
 
-import { Lecturer } from "../models/Lecturer";
+import { Instructor } from "../models/Instructor";
 import { Admin } from "../models/Admin";
 import { Course } from "../models/Course";
 

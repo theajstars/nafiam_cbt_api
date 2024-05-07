@@ -4,7 +4,7 @@ import ws from "ws";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 
-import { Lecturer } from "../models/Lecturer";
+import { Instructor } from "../models/Instructor";
 import { Examination } from "../models/Examination";
 import {
   UnauthorizedResponseObject,
@@ -33,14 +33,14 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, title, date, course: courseCode } = req.body;
       const { id } = verifyToken(token);
-      const lecturer = await Lecturer.findOne({ id });
-      if (token && lecturer) {
+      const instructor = await Instructor.findOne({ id });
+      if (token && instructor) {
         const course = await Course.findOne({ code: courseCode });
         const examination = await new Examination({
           id: generateRandomString(32),
           title,
           date,
-          lecturerID: id,
+          instructorID: id,
           course: course.id,
           courseTitle: course.title,
           approved: false,
@@ -75,7 +75,7 @@ export default function (app: Express) {
           const examinations =
             isAdmin && user === "admin"
               ? await Examination.find({})
-              : await Examination.find({ lecturerID: id });
+              : await Examination.find({ instructorID: id });
           res.json(
             returnSuccessResponseObject(
               "Examination list obtained!",
@@ -98,7 +98,10 @@ export default function (app: Express) {
         const examination =
           user === "admin"
             ? await Examination.findOne({ id: examinationID })
-            : await Examination.findOne({ id: examinationID, lecturerID: id });
+            : await Examination.findOne({
+                id: examinationID,
+                instructorID: id,
+              });
 
         res.json(
           returnSuccessResponseObject(
@@ -237,8 +240,8 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, examinationID, questions, title, date, course } = req.body;
       const { id } = verifyToken(token);
-      const lecturer = await Lecturer.findOne({ id });
-      if (token && lecturer) {
+      const instructor = await Instructor.findOne({ id });
+      if (token && instructor) {
         const examination = await Examination.findOneAndUpdate(
           { id: examinationID },
           { questions, title, date, course }
@@ -265,8 +268,8 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, examinationID } = req.body;
       const { id, user } = verifyToken(token);
-      const lecturer = await Lecturer.findOne({ id });
-      if (id && user === "lecturer" && lecturer) {
+      const instructor = await Instructor.findOne({ id });
+      if (id && user === "instructor" && instructor) {
         const examination = await Examination.findOneAndUpdate(
           { id: examinationID },
           { published: true }

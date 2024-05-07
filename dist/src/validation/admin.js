@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateUpdateAdminRequest = exports.validateCreateAdminRequest = exports.validateSingleSchoolRequest = exports.validateUpdateSchoolRequest = exports.validateCreateSchoolRequest = exports.validateUpdateStudent = exports.validateSingleLecturerRequest = exports.validateUpdateLecturer = exports.validateCreateLecturer = exports.validateOnboardStudent = void 0;
+exports.validateUpdateAdminRequest = exports.validateCreateAdminRequest = exports.validateSingleSchoolRequest = exports.validateUpdateSchoolRequest = exports.validateCreateSchoolRequest = exports.validateUpdateStudent = exports.validateSingleInstructorRequest = exports.validateUpdateInstructor = exports.validateCreateInstructor = exports.validateOnboardStudent = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const onboardstudentSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -33,7 +33,7 @@ const validateOnboardStudent = (req, res, next) => {
     }
 };
 exports.validateOnboardStudent = validateOnboardStudent;
-const createLecturerSchema = joi_1.default.object({
+const createInstructorSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     firstName: joi_1.default.string().required(),
     lastName: joi_1.default.string().required(),
@@ -44,8 +44,8 @@ const createLecturerSchema = joi_1.default.object({
     serviceNumber: joi_1.default.string().required().allow(""),
     school: joi_1.default.string().required(),
 });
-const validateCreateLecturer = (req, res, next) => {
-    const { error } = createLecturerSchema.validate(req.body);
+const validateCreateInstructor = (req, res, next) => {
+    const { error } = createInstructorSchema.validate(req.body);
     if (error) {
         const errorResponse = error.details.map((e) => {
             return e.message;
@@ -60,10 +60,10 @@ const validateCreateLecturer = (req, res, next) => {
         next();
     }
 };
-exports.validateCreateLecturer = validateCreateLecturer;
-const updateLecturerSchema = joi_1.default.object({
+exports.validateCreateInstructor = validateCreateInstructor;
+const updateInstructorSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
-    lecturerID: joi_1.default.string().required(),
+    instructorID: joi_1.default.string().required(),
     firstName: joi_1.default.string().required(),
     lastName: joi_1.default.string().required(),
     email: joi_1.default.string().required(),
@@ -73,8 +73,8 @@ const updateLecturerSchema = joi_1.default.object({
     serviceNumber: joi_1.default.string().required().allow(""),
     school: joi_1.default.string().required(),
 });
-const validateUpdateLecturer = (req, res, next) => {
-    const { error } = updateLecturerSchema.validate(req.body);
+const validateUpdateInstructor = (req, res, next) => {
+    const { error } = updateInstructorSchema.validate(req.body);
     if (error) {
         const errorResponse = error.details.map((e) => {
             return e.message;
@@ -89,13 +89,13 @@ const validateUpdateLecturer = (req, res, next) => {
         next();
     }
 };
-exports.validateUpdateLecturer = validateUpdateLecturer;
-const singleLecturerSchema = joi_1.default.object({
+exports.validateUpdateInstructor = validateUpdateInstructor;
+const singleInstructorSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
-    lecturerID: joi_1.default.string().required(),
+    instructorID: joi_1.default.string().required(),
 });
-const validateSingleLecturerRequest = (req, res, next) => {
-    const { error } = singleLecturerSchema.validate(req.body);
+const validateSingleInstructorRequest = (req, res, next) => {
+    const { error } = singleInstructorSchema.validate(req.body);
     if (error) {
         const errorResponse = error.details.map((e) => {
             return e.message;
@@ -110,7 +110,7 @@ const validateSingleLecturerRequest = (req, res, next) => {
         next();
     }
 };
-exports.validateSingleLecturerRequest = validateSingleLecturerRequest;
+exports.validateSingleInstructorRequest = validateSingleInstructorRequest;
 const updateStudentSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     studentID: joi_1.default.string().required(),

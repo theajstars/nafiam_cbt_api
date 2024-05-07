@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 interface DecodedResults {
   id: string;
-  user: "admin" | "student" | "lecturer";
+  user: "admin" | "student" | "instructor";
   iat: number;
   exp: number;
 }
@@ -24,7 +24,7 @@ const verifyToken = (token: string) => {
 
 const createToken = async (
   id: string,
-  user: "admin" | "student" | "lecturer"
+  user: "admin" | "student" | "instructor"
 ) => {
   const token = jwt.sign({ id: id, user }, "AJD9W38(#*f(n#h9FAh#(!#bn", {
     expiresIn: "7d",

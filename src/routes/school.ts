@@ -11,7 +11,7 @@ import {
   validateSingleSchoolRequest,
   validateUpdateSchoolRequest,
 } from "../validation/admin";
-import { Lecturer } from "../models/Lecturer";
+import { Instructor } from "../models/Instructor";
 import { Course } from "../models/Course";
 import { Lecture } from "../models/Lecture";
 import { Practice } from "../models/Practice";
@@ -39,7 +39,7 @@ export default function (app: Express) {
     const { id, user } = verifyToken(token);
     if (id && user) {
       const school = await School.findOne({ id: schoolID });
-      const lecturer = await Lecturer.findOne({
+      const instructor = await Instructor.findOne({
         id: school ? school.dean : "",
       }).select("rank gender role serviceNumber email firstName lastName id");
       const courses = await Course.find({ school: schoolID });
@@ -49,7 +49,7 @@ export default function (app: Express) {
         statusCode: 200,
         data: {
           school,
-          dean: lecturer,
+          dean: instructor,
           courses,
         },
       });
@@ -62,7 +62,7 @@ export default function (app: Express) {
     validateCreateSchoolRequest,
     async (req, res) => {
       const { token, name, dean } = req.body;
-      // 'dean' refers to lecturer ID
+      // 'dean' refers to instructor ID
       // Dean is NOT required for creating schools
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
@@ -86,7 +86,7 @@ export default function (app: Express) {
     validateUpdateSchoolRequest,
     async (req, res) => {
       const { token, name, dean, schoolID } = req.body;
-      // 'dean' refers to lecturer ID
+      // 'dean' refers to instructor ID
       // Dean is REQUIRED for updating schools
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {

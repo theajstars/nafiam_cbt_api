@@ -14,27 +14,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const JWT_1 = require("../Lib/JWT");
-const Lecturer_1 = require("../models/Lecturer");
+const Instructor_1 = require("../models/Instructor");
 const course_1 = require("../validation/course");
 const Misc_1 = require("../Lib/Misc");
 const Student_1 = require("../models/Student");
-const lecturer_1 = require("../validation/lecturer");
+const instructor_1 = require("../validation/instructor");
 const default_1 = require("../validation/default");
 const Methods_1 = require("../Lib/Methods");
 const Log_1 = require("../models/Log");
-const basePath = "/lecturer";
+const basePath = "/instructor";
 function default_2(app) {
     app.post(`${basePath}/login`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password } = req.body;
-        const lecturer = yield Lecturer_1.Lecturer.findOne({
+        const instructor = yield Instructor_1.Instructor.findOne({
             $or: [{ serviceNumber: id.toUpperCase() }, { email: id }],
         });
-        if (lecturer) {
-            const isPasswordCorrect = yield bcryptjs_1.default.compare(password, lecturer.password);
+        if (instructor) {
+            const isPasswordCorrect = yield bcryptjs_1.default.compare(password, instructor.password);
             const log = yield new Log_1.Log({
-                personnelID: lecturer.id,
+                personnelID: instructor.id,
                 id: (0, Methods_1.generateRandomString)(32),
-                userType: "lecturer",
+                userType: "instructor",
                 action: "login",
                 comments: isPasswordCorrect ? "Login successful!" : "Invalid Password",
                 timestamp: Date.now(),
@@ -45,7 +45,7 @@ function default_2(app) {
                 statusCode: isPasswordCorrect ? 200 : 401,
                 message: isPasswordCorrect ? "Logged In!" : "Incorrect Password",
                 token: isPasswordCorrect
-                    ? yield (0, JWT_1.createToken)(lecturer.id, "lecturer")
+                    ? yield (0, JWT_1.createToken)(instructor.id, "instructor")
                     : null,
                 log,
             });
@@ -58,16 +58,16 @@ function default_2(app) {
             });
         }
     }));
-    app.post(`${basePath}/profile/get`, lecturer_1.validateDefaultLecturerRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, lecturerID } = req.body;
+    app.post(`${basePath}/profile/get`, instructor_1.validateDefaultInstructorRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, instructorID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
-            const lecturer = yield Lecturer_1.Lecturer.findOne({ id: lecturerID !== null && lecturerID !== void 0 ? lecturerID : id });
+        if (id && user && user === "instructor") {
+            const instructor = yield Instructor_1.Instructor.findOne({ id: instructorID !== null && instructorID !== void 0 ? instructorID : id });
             res.json({
                 status: true,
                 statusCode: 200,
-                message: "Lecturer found!",
-                data: lecturer,
+                message: "Instructor found!",
+                data: instructor,
             });
         }
         else {
@@ -77,12 +77,12 @@ function default_2(app) {
     app.post(`${basePath}/profile/update`, default_1.validateDefaultProfileUpdateRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, firstName, lastName, email } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
-            const lecturer = yield Lecturer_1.Lecturer.findOneAndUpdate({ id }, { firstName, lastName, email });
+        if (id && user && user === "instructor") {
+            const instructor = yield Instructor_1.Instructor.findOneAndUpdate({ id }, { firstName, lastName, email });
             res.json({
                 status: true,
                 statusCode: 200,
-                data: lecturer,
+                data: instructor,
             });
         }
         else {
@@ -93,12 +93,12 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user !== "student") {
-            const lecturers = yield Lecturer_1.Lecturer.find({}).select("email firstName lastName id rank gender role serviceNumber  dateCreated isChangedPassword school");
+            const instructors = yield Instructor_1.Instructor.find({}).select("email firstName lastName id rank gender role serviceNumber  dateCreated isChangedPassword school");
             res.json({
                 status: true,
                 statusCode: 200,
-                data: lecturers,
-                message: "Lecturers retrieved!",
+                data: instructors,
+                message: "Instructors retrieved!",
             });
         }
         else {
@@ -108,7 +108,7 @@ function default_2(app) {
     app.post(`${basePath}/students/all`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { user, id } = (0, JWT_1.verifyToken)(token);
-        if (id && user && user === "lecturer") {
+        if (id && user && user === "instructor") {
             const students = yield Student_1.Student.find({}).select("id firstName lastName email password serviceNumber rank gender role school");
             res.json({
                 data: students,
@@ -123,4 +123,4 @@ function default_2(app) {
     }));
 }
 exports.default = default_2;
-//# sourceMappingURL=lecturer.js.map
+//# sourceMappingURL=instructor.js.map

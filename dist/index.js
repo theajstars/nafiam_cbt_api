@@ -19,7 +19,7 @@ const cors_1 = __importDefault(require("cors"));
 const mongoose_1 = require("mongoose");
 const admin_1 = __importDefault(require("./src/routes/admin"));
 const student_1 = __importDefault(require("./src/routes/student"));
-const lecturer_1 = __importDefault(require("./src/routes/lecturer"));
+const instructor_1 = __importDefault(require("./src/routes/instructor"));
 const examination_1 = __importDefault(require("./src/routes/examination"));
 const course_1 = __importDefault(require("./src/routes/course"));
 const file_1 = __importDefault(require("./src/routes/file"));
@@ -46,7 +46,7 @@ const dbConnectString = "mongodb+srv://theajstars:dGF9caF4b8PlrLtP@data.hy4gux2.
     (0, student_1.default)(app);
     (0, misc_1.default)(app);
     (0, admin_1.default)(app);
-    (0, lecturer_1.default)(app);
+    (0, instructor_1.default)(app);
     (0, examination_1.default)(app);
     (0, course_1.default)(app);
     (0, file_1.default)(app);
@@ -74,7 +74,7 @@ const dbConnectString = "mongodb+srv://theajstars:dGF9caF4b8PlrLtP@data.hy4gux2.
     }
     // genPassword("AJIBOYE");
     // createAdmin();
-    // Course.updateMany({}, { lecturerID: "1709114865502" }).exec();
+    // Course.updateMany({}, { instructorID: "1709114865502" }).exec();
 })
     .catch((err) => {
     console.error("Failed to connect to DB", err);

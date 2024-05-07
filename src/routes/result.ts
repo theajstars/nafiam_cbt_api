@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 
-import { Lecturer } from "../models/Lecturer";
+import { Instructor } from "../models/Instructor";
 import { validateTokenRequest } from "../validation/course";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 import { Student } from "../models/Student";

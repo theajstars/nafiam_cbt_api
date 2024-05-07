@@ -23,7 +23,7 @@ const course_1 = require("../validation/course");
 const default_1 = require("../validation/default");
 const Log_1 = require("../models/Log");
 const admin_2 = require("../validation/admin");
-const Lecturer_1 = require("../models/Lecturer");
+const Instructor_1 = require("../models/Instructor");
 const basePath = "/admin";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -342,20 +342,20 @@ function default_2(app) {
             });
         }
     }));
-    //LECTURERS FUNCTIONALITY
-    app.post(`${basePath}/lecturer/create`, admin_2.validateCreateLecturer, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    //INSTRUCTORS FUNCTIONALITY
+    app.post(`${basePath}/instructor/create`, admin_2.validateCreateInstructor, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, email, firstName, lastName, rank, school, gender, role, serviceNumber, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const lecturerExists = yield Lecturer_1.Lecturer.findOne({
+            const instructorExists = yield Instructor_1.Instructor.findOne({
                 $or: [{ email: email }, { serviceNumber }],
             });
-            console.log({ ment: lecturerExists });
-            if (!lecturerExists || serviceNumber.length === 0) {
+            console.log({ ment: instructorExists });
+            if (!instructorExists || serviceNumber.length === 0) {
                 const saltRounds = 10;
                 const salt = yield bcryptjs_1.default.genSalt(saltRounds);
                 const hash = yield bcryptjs_1.default.hash(lastName.toUpperCase(), salt);
-                const lecturer = yield new Lecturer_1.Lecturer({
+                const instructor = yield new Instructor_1.Instructor({
                     id: (0, Methods_1.generateRandomString)(32),
                     email,
                     firstName,
@@ -373,8 +373,8 @@ function default_2(app) {
                 res.json({
                     status: true,
                     statusCode: 201,
-                    data: lecturer,
-                    message: "New Lecturer created",
+                    data: instructor,
+                    message: "New Instructor created",
                 });
             }
             else {
@@ -382,7 +382,7 @@ function default_2(app) {
                     status: true,
                     statusCode: 409,
                     data: false,
-                    message: "Lecturer exists!",
+                    message: "Instructor exists!",
                 });
             }
         }
@@ -390,23 +390,23 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}/lecturer/update`, admin_2.validateUpdateLecturer, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { lecturerID, token, email, firstName, lastName, rank, school, gender, role, serviceNumber, } = req.body;
+    app.post(`${basePath}/instructor/update`, admin_2.validateUpdateInstructor, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { instructorID, token, email, firstName, lastName, rank, school, gender, role, serviceNumber, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const lecturerExists = yield Lecturer_1.Lecturer.findOne({
+            const instructorExists = yield Instructor_1.Instructor.findOne({
                 $or: [{ email: email }, { serviceNumber }],
             });
-            if (lecturerExists && lecturerExists.id !== lecturerID) {
+            if (instructorExists && instructorExists.id !== instructorID) {
                 res.json({
                     status: true,
                     statusCode: 409,
-                    data: { id: lecturerExists.id, lecturerID },
-                    message: "Lecturer exists!",
+                    data: { id: instructorExists.id, instructorID },
+                    message: "Instructor exists!",
                 });
             }
             else {
-                const lecturer = yield Lecturer_1.Lecturer.findOneAndUpdate({ id: lecturerID }, {
+                const instructor = yield Instructor_1.Instructor.findOneAndUpdate({ id: instructorID }, {
                     email,
                     firstName,
                     lastName,
@@ -419,8 +419,8 @@ function default_2(app) {
                 res.json({
                     status: true,
                     statusCode: 200,
-                    data: lecturer,
-                    message: "Lecturer updated",
+                    data: instructor,
+                    message: "Instructor updated",
                 });
             }
         }
@@ -428,15 +428,15 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}/lecturer/get`, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, lecturerID } = req.body;
+    app.post(`${basePath}/instructor/get`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, instructorID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user === "admin") {
-            const lecturer = yield Lecturer_1.Lecturer.findOne({ id: lecturerID }).select("email firstName lastName id rank gender serviceNumber role school");
+            const instructor = yield Instructor_1.Instructor.findOne({ id: instructorID }).select("email firstName lastName id rank gender serviceNumber role school");
             res.json({
                 status: true,
                 statusCode: 200,
-                data: lecturer,
+                data: instructor,
                 message: "Profile successfully retrieved!",
             });
         }
@@ -444,15 +444,17 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.delete(`${basePath}/lecturer/delete`, admin_1.validateSingleLecturerRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, lecturerID } = req.body;
+    app.delete(`${basePath}/instructor/delete`, admin_1.validateSingleInstructorRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, instructorID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const lecturer = yield Lecturer_1.Lecturer.findOneAndDelete({ id: lecturerID });
+            const instructor = yield Instructor_1.Instructor.findOneAndDelete({
+                id: instructorID,
+            });
             res.json({
                 status: true,
                 statusCode: 200,
-                data: lecturer,
+                data: instructor,
                 message: "Profile successfully deleted!",
             });
         }
@@ -460,16 +462,16 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}/lecturers/all/get`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/instructors/all/get`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const lecturers = yield Lecturer_1.Lecturer.find({}).select("email firstName lastName id rank gender role serviceNumber school");
+            const instructors = yield Instructor_1.Instructor.find({}).select("email firstName lastName id rank gender role serviceNumber school");
             res.json({
                 status: true,
                 statusCode: 200,
-                data: lecturers,
-                message: "Lecturers retrieved!",
+                data: instructors,
+                message: "Instructors retrieved!",
             });
         }
         else {

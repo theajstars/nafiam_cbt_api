@@ -53,7 +53,7 @@ const createSchema = joi_1.default.object({
     description: joi_1.default.string().required(),
     school: joi_1.default.string().required(),
     title: joi_1.default.string().required(),
-    lecturerID: joi_1.default.string().optional(),
+    instructorID: joi_1.default.string().optional(),
 });
 const validateCreateCourse = (req, res, next) => {
     const { error } = createSchema.validate(req.body);
@@ -74,7 +74,7 @@ const validateCreateCourse = (req, res, next) => {
 exports.validateCreateCourse = validateCreateCourse;
 const getAllSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
-    lecturerID: joi_1.default.string().optional(),
+    instructorID: joi_1.default.string().optional(),
 });
 const validateGetAllCourses = (req, res, next) => {
     const { error } = getAllSchema.validate(req.body);
@@ -119,7 +119,7 @@ const updateSchema = joi_1.default.object({
     courseID: joi_1.default.string().required(),
     code: joi_1.default.string().required(),
     description: joi_1.default.string().required(),
-    lecturerID: joi_1.default.string().required(),
+    instructorID: joi_1.default.string().required(),
     school: joi_1.default.string().required(),
     title: joi_1.default.string().required(),
 });

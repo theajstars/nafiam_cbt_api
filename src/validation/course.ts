@@ -48,7 +48,7 @@ const createSchema = Joi.object<CourseProps & { token: string }>({
   description: Joi.string().required(),
   school: Joi.string().required(),
   title: Joi.string().required(),
-  lecturerID: Joi.string().optional(),
+  instructorID: Joi.string().optional(),
 });
 
 export const validateCreateCourse = (req, res, next) => {
@@ -69,7 +69,7 @@ export const validateCreateCourse = (req, res, next) => {
 
 const getAllSchema = Joi.object({
   token: Joi.string().required(),
-  lecturerID: Joi.string().optional(),
+  instructorID: Joi.string().optional(),
 });
 export const validateGetAllCourses = (req, res, next) => {
   const { error } = getAllSchema.validate(req.body);
@@ -116,7 +116,7 @@ const updateSchema = Joi.object<
   courseID: Joi.string().required(),
   code: Joi.string().required(),
   description: Joi.string().required(),
-  lecturerID: Joi.string().required(),
+  instructorID: Joi.string().required(),
   school: Joi.string().required(),
   title: Joi.string().required(),
 });

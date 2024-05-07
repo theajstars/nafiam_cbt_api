@@ -17,7 +17,7 @@ import { genPassword, generateRandomString } from "../Lib/Methods";
 import {
   validateCreateAdminRequest,
   validateOnboardStudent,
-  validateSingleLecturerRequest,
+  validateSingleInstructorRequest,
   validateUpdateAdminRequest,
   validateUpdateStudent,
 } from "../validation/admin";
@@ -28,10 +28,10 @@ import {
 } from "../validation/default";
 import { Log } from "../models/Log";
 import {
-  validateCreateLecturer,
-  validateUpdateLecturer,
+  validateCreateInstructor,
+  validateUpdateInstructor,
 } from "../validation/admin";
-import { Lecturer } from "../models/Lecturer";
+import { Instructor } from "../models/Instructor";
 const basePath = "/admin";
 
 export default function (app: Express) {
@@ -418,10 +418,10 @@ export default function (app: Express) {
     }
   );
 
-  //LECTURERS FUNCTIONALITY
+  //INSTRUCTORS FUNCTIONALITY
   app.post(
-    `${basePath}/lecturer/create`,
-    validateCreateLecturer,
+    `${basePath}/instructor/create`,
+    validateCreateInstructor,
     async (req, res) => {
       const {
         token,
@@ -436,16 +436,16 @@ export default function (app: Express) {
       } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
-        const lecturerExists = await Lecturer.findOne({
+        const instructorExists = await Instructor.findOne({
           $or: [{ email: email }, { serviceNumber }],
         });
-        console.log({ ment: lecturerExists });
-        if (!lecturerExists || serviceNumber.length === 0) {
+        console.log({ ment: instructorExists });
+        if (!instructorExists || serviceNumber.length === 0) {
           const saltRounds = 10;
 
           const salt = await bcrypt.genSalt(saltRounds);
           const hash = await bcrypt.hash(lastName.toUpperCase(), salt);
-          const lecturer = await new Lecturer({
+          const instructor = await new Instructor({
             id: generateRandomString(32),
             email,
             firstName,
@@ -464,15 +464,15 @@ export default function (app: Express) {
           res.json({
             status: true,
             statusCode: 201,
-            data: lecturer,
-            message: "New Lecturer created",
+            data: instructor,
+            message: "New Instructor created",
           });
         } else {
           res.json({
             status: true,
             statusCode: 409,
             data: false,
-            message: "Lecturer exists!",
+            message: "Instructor exists!",
           });
         }
       } else {
@@ -481,11 +481,11 @@ export default function (app: Express) {
     }
   );
   app.post(
-    `${basePath}/lecturer/update`,
-    validateUpdateLecturer,
+    `${basePath}/instructor/update`,
+    validateUpdateInstructor,
     async (req, res) => {
       const {
-        lecturerID,
+        instructorID,
         token,
         email,
         firstName,
@@ -498,19 +498,19 @@ export default function (app: Express) {
       } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
-        const lecturerExists = await Lecturer.findOne({
+        const instructorExists = await Instructor.findOne({
           $or: [{ email: email }, { serviceNumber }],
         });
-        if (lecturerExists && lecturerExists.id !== lecturerID) {
+        if (instructorExists && instructorExists.id !== instructorID) {
           res.json({
             status: true,
             statusCode: 409,
-            data: { id: lecturerExists.id, lecturerID },
-            message: "Lecturer exists!",
+            data: { id: instructorExists.id, instructorID },
+            message: "Instructor exists!",
           });
         } else {
-          const lecturer = await Lecturer.findOneAndUpdate(
-            { id: lecturerID },
+          const instructor = await Instructor.findOneAndUpdate(
+            { id: instructorID },
             {
               email,
               firstName,
@@ -525,8 +525,8 @@ export default function (app: Express) {
           res.json({
             status: true,
             statusCode: 200,
-            data: lecturer,
-            message: "Lecturer updated",
+            data: instructor,
+            message: "Instructor updated",
           });
         }
       } else {
@@ -534,18 +534,18 @@ export default function (app: Express) {
       }
     }
   );
-  app.post(`${basePath}/lecturer/get`, async (req, res) => {
-    const { token, lecturerID } = req.body;
+  app.post(`${basePath}/instructor/get`, async (req, res) => {
+    const { token, instructorID } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user === "admin") {
-      const lecturer = await Lecturer.findOne({ id: lecturerID }).select(
+      const instructor = await Instructor.findOne({ id: instructorID }).select(
         "email firstName lastName id rank gender serviceNumber role school"
       );
 
       res.json({
         status: true,
         statusCode: 200,
-        data: lecturer,
+        data: instructor,
         message: "Profile successfully retrieved!",
       });
     } else {
@@ -553,18 +553,20 @@ export default function (app: Express) {
     }
   });
   app.delete(
-    `${basePath}/lecturer/delete`,
-    validateSingleLecturerRequest,
+    `${basePath}/instructor/delete`,
+    validateSingleInstructorRequest,
     async (req, res) => {
-      const { token, lecturerID } = req.body;
+      const { token, instructorID } = req.body;
 
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
-        const lecturer = await Lecturer.findOneAndDelete({ id: lecturerID });
+        const instructor = await Instructor.findOneAndDelete({
+          id: instructorID,
+        });
         res.json({
           status: true,
           statusCode: 200,
-          data: lecturer,
+          data: instructor,
           message: "Profile successfully deleted!",
         });
       } else {
@@ -573,20 +575,20 @@ export default function (app: Express) {
     }
   );
   app.post(
-    `${basePath}/lecturers/all/get`,
+    `${basePath}/instructors/all/get`,
     validateTokenRequest,
     async (req, res) => {
       const { token } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
-        const lecturers = await Lecturer.find({}).select(
+        const instructors = await Instructor.find({}).select(
           "email firstName lastName id rank gender role serviceNumber school"
         );
         res.json({
           status: true,
           statusCode: 200,
-          data: lecturers,
-          message: "Lecturers retrieved!",
+          data: instructors,
+          message: "Instructors retrieved!",
         });
       } else {
         res.json(UnauthorizedResponseObject);

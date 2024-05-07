@@ -6,10 +6,10 @@ import bcrypt from "bcryptjs";
 
 import admin from "./src/routes/admin";
 import student from "./src/routes/student";
-import lecturer from "./src/routes/lecturer";
+import instructor from "./src/routes/instructor";
 import examination from "./src/routes/examination";
 import course from "./src/routes/course";
-import { Lecturer } from "./src/models/Lecturer";
+import { Instructor } from "./src/models/Instructor";
 import file from "./src/routes/file";
 import { Examination } from "./src/models/Examination";
 import { Course } from "./src/models/Course";
@@ -41,7 +41,7 @@ connect(dbConnectString)
     student(app);
     misc(app);
     admin(app);
-    lecturer(app);
+    instructor(app);
     examination(app);
     course(app);
     file(app);
@@ -68,7 +68,7 @@ connect(dbConnectString)
 
     // genPassword("AJIBOYE");
     // createAdmin();
-    // Course.updateMany({}, { lecturerID: "1709114865502" }).exec();
+    // Course.updateMany({}, { instructorID: "1709114865502" }).exec();
   })
   .catch((err) => {
     console.error("Failed to connect to DB", err);

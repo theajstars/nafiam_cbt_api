@@ -38,15 +38,15 @@ export default function (app: Express) {
   });
 
   app.post(
-    `${basePath}s/lecturer/all`,
+    `${basePath}s/instructor/all`,
     validateGetAllCourses,
     async (req, res) => {
-      const { token, lecturerID } = req.body;
+      const { token, instructorID } = req.body;
 
       const { id, user } = verifyToken(token);
 
-      if (user === "lecturer") {
-        const courses = await Course.find({ lecturerID: lecturerID ?? id });
+      if (user === "instructor") {
+        const courses = await Course.find({ instructorID: instructorID ?? id });
         res.json(<DefaultResponse>{
           status: true,
           statusCode: 200,
@@ -80,14 +80,14 @@ export default function (app: Express) {
     }
   );
   app.post(`${basePath}/create`, validateCreateCourse, async (req, res) => {
-    const { title, code, description, school, token, lecturerID } = req.body;
+    const { title, code, description, school, token, instructorID } = req.body;
 
     const { id, user } = verifyToken(token);
 
-    if (user === "admin" || user === "lecturer") {
+    if (user === "admin" || user === "instructor") {
       const course = await new Course({
         id: generateRandomString(32),
-        lecturerID: user === "admin" ? lecturerID : id,
+        instructorID: user === "admin" ? instructorID : id,
         title,
         code,
         description,
@@ -104,19 +104,19 @@ export default function (app: Express) {
     }
   });
   app.post(`${basePath}/update`, validateUpdateCourse, async (req, res) => {
-    const { courseID, title, code, lecturerID, description, school, token } =
+    const { courseID, title, code, instructorID, description, school, token } =
       req.body;
 
     const { id, user } = verifyToken(token);
 
-    if (user === "admin" || user === "lecturer") {
+    if (user === "admin" || user === "instructor") {
       const course = await Course.findOneAndUpdate(
         { id: courseID },
         {
           title,
           code,
           school,
-          lecturerID,
+          instructorID,
           description,
         }
       );
@@ -137,7 +137,7 @@ export default function (app: Express) {
 
       const { id, user } = verifyToken(token);
 
-      if (id && user && user === "lecturer") {
+      if (id && user && user === "instructor") {
         const course = await Course.findOneAndUpdate(
           { id: courseID },
           {

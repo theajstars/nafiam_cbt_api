@@ -1,6 +1,6 @@
 import { Schema, Model, model } from "mongoose";
 export type Gender = "male" | "female";
-export type LecturerProps = {
+export type InstructorProps = {
   id: string;
   firstName: string;
   lastName: string;
@@ -15,7 +15,7 @@ export type LecturerProps = {
   isChangedPassword: boolean;
 };
 
-const lecturerSchema = new Schema<LecturerProps, Model<LecturerProps>>({
+const instructorSchema = new Schema<InstructorProps, Model<InstructorProps>>({
   id: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
@@ -32,5 +32,5 @@ const lecturerSchema = new Schema<LecturerProps, Model<LecturerProps>>({
   // school: { type: String, required: true },
 });
 
-const Lecturer = model<LecturerProps>("Lecturer", lecturerSchema);
-export { Lecturer };
+const Instructor = model<InstructorProps>("Instructor", instructorSchema);
+export { Instructor };
