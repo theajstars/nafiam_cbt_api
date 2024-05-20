@@ -34,6 +34,13 @@ export default function (app: Express) {
       message: "Server is live!!",
     });
   });
+  app.get("/check", (req, res) => {
+    res.json({
+      status: "true",
+      statusCode: 200,
+      message: "Check is heck!!",
+    });
+  });
   app.post(`${basePath}/ranks/get`, validateTokenRequest, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
