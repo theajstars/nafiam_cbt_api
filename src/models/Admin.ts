@@ -8,8 +8,9 @@ export interface AdminProps {
   serviceNumber: string;
   rank: string;
   dateCreated: number;
-  password: string;
   isChangedPassword: boolean;
+  password: string;
+  school: string;
   superUser: boolean;
 }
 
@@ -22,6 +23,7 @@ const adminSchema = new Schema<AdminProps, Model<AdminProps>>({
   rank: { type: String, required: true },
   dateCreated: { type: Number, required: true },
   password: { type: String, required: true },
+  school: { type: String, required: false },
   isChangedPassword: { type: Boolean, required: true },
   superUser: { type: Boolean, required: true },
 });

@@ -203,6 +203,7 @@ const createAdminSchema = Joi.object({
   email: Joi.string().required(),
   serviceNumber: Joi.string().required(),
   rank: Joi.string().required(),
+  school: Joi.string().optional(),
 });
 
 export const validateCreateAdminRequest = (req, res, next) => {
@@ -228,6 +229,7 @@ const updateAdminSchema = Joi.object({
   email: Joi.string().required(),
   serviceNumber: Joi.string().required(),
   rank: Joi.string().required(),
+  school: Joi.string().optional(),
 });
 
 export const validateUpdateAdminRequest = (req, res, next) => {

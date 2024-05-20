@@ -11,6 +11,7 @@ const adminSchema = new mongoose_1.Schema({
     rank: { type: String, required: true },
     dateCreated: { type: Number, required: true },
     password: { type: String, required: true },
+    school: { type: String, required: false },
     isChangedPassword: { type: Boolean, required: true },
     superUser: { type: Boolean, required: true },
 });

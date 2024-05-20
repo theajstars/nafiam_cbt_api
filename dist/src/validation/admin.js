@@ -213,6 +213,7 @@ const createAdminSchema = joi_1.default.object({
     email: joi_1.default.string().required(),
     serviceNumber: joi_1.default.string().required(),
     rank: joi_1.default.string().required(),
+    school: joi_1.default.string().optional(),
 });
 const validateCreateAdminRequest = (req, res, next) => {
     const { error } = createAdminSchema.validate(req.body);
@@ -239,6 +240,7 @@ const updateAdminSchema = joi_1.default.object({
     email: joi_1.default.string().required(),
     serviceNumber: joi_1.default.string().required(),
     rank: joi_1.default.string().required(),
+    school: joi_1.default.string().optional(),
 });
 const validateUpdateAdminRequest = (req, res, next) => {
     const { error } = updateAdminSchema.validate(req.body);

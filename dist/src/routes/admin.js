@@ -61,7 +61,7 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const admin = yield Admin_1.Admin.findOne({ id }).select("id firstName lastName email superUser rank serviceNumber dateCreated isChangedPassword");
+            const admin = yield Admin_1.Admin.findOne({ id }).select("id firstName lastName email superUser rank serviceNumber dateCreated isChangedPassword school");
             res.json({
                 status: true,
                 statusCode: 200,
@@ -97,7 +97,7 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const admins = yield Admin_1.Admin.find({}).select("id firstName lastName email rank serviceNumber isChangedPassword superUser dateCreated");
+            const admins = yield Admin_1.Admin.find({}).select("id firstName lastName email rank serviceNumber isChangedPassword superUser dateCreated school");
             res.json({
                 status: true,
                 statusCode: 200,
@@ -109,7 +109,7 @@ function default_2(app) {
         }
     }));
     app.post(`${basePath}/create`, admin_1.validateCreateAdminRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, firstName, lastName, email, serviceNumber, rank } = req.body;
+        const { token, firstName, lastName, email, serviceNumber, rank, school } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             //Check if Admin already exists
@@ -136,6 +136,7 @@ function default_2(app) {
                     dateCreated: Date.now(),
                     superUser: false,
                     isChangedPassword: false,
+                    school: school !== null && school !== void 0 ? school : "",
                 }).save();
                 res.json({
                     status: true,
@@ -150,7 +151,7 @@ function default_2(app) {
         }
     }));
     app.post(`${basePath}/update`, admin_1.validateUpdateAdminRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { adminID, token, firstName, lastName, email, serviceNumber, rank, } = req.body;
+        const { adminID, token, firstName, lastName, email, serviceNumber, rank, school, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             //Check if other admin has email or service number
@@ -167,6 +168,7 @@ function default_2(app) {
                     lastName,
                     email,
                     serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
+                    school,
                     rank,
                 });
                 res.json({

@@ -74,7 +74,7 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         const admin = await Admin.findOne({ id }).select(
-          "id firstName lastName email superUser rank serviceNumber dateCreated isChangedPassword"
+          "id firstName lastName email superUser rank serviceNumber dateCreated isChangedPassword school"
         );
         res.json({
           status: true,
@@ -119,7 +119,7 @@ export default function (app: Express) {
     const { id, user } = verifyToken(token);
     if (id && user && user === "admin") {
       const admins = await Admin.find({}).select(
-        "id firstName lastName email rank serviceNumber isChangedPassword superUser dateCreated"
+        "id firstName lastName email rank serviceNumber isChangedPassword superUser dateCreated school"
       );
       res.json({
         status: true,
@@ -134,7 +134,7 @@ export default function (app: Express) {
     `${basePath}/create`,
     validateCreateAdminRequest,
     async (req, res) => {
-      const { token, firstName, lastName, email, serviceNumber, rank } =
+      const { token, firstName, lastName, email, serviceNumber, rank, school } =
         req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
@@ -161,6 +161,7 @@ export default function (app: Express) {
             dateCreated: Date.now(),
             superUser: false,
             isChangedPassword: false,
+            school: school ?? "",
           }).save();
           res.json({
             status: true,
@@ -186,6 +187,7 @@ export default function (app: Express) {
         email,
         serviceNumber,
         rank,
+        school,
       } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
@@ -207,7 +209,7 @@ export default function (app: Express) {
               lastName,
               email,
               serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
-
+              school,
               rank,
             }
           );
