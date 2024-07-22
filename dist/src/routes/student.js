@@ -26,7 +26,7 @@ function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { id, password, navigatorObject } = req.body;
         const student = yield Student_1.Student.findOne({
-            $or: [{ serviceNumber: id.toUpperCase() }, { email: id }],
+            $or: [{ serviceNumber: id.toUpperCase().trim() }, { email: id.trim() }],
         });
         if (student) {
             const isPasswordCorrect = yield bcryptjs_1.default.compare(password, student.password);

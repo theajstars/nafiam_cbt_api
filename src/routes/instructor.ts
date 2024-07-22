@@ -18,7 +18,7 @@ export default function (app: Express) {
     const { id, password } = req.body;
 
     const instructor = await Instructor.findOne({
-      $or: [{ serviceNumber: id.toUpperCase() }, { email: id }],
+      $or: [{ serviceNumber: id.toUpperCase() }, { email: id.trim() }],
     });
     if (instructor) {
       const isPasswordCorrect = await bcrypt.compare(

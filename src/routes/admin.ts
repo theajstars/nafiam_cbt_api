@@ -38,7 +38,7 @@ export default function (app: Express) {
   app.post(`${basePath}/login`, validateLoginRequest, async (req, res) => {
     const { id, password, navigatorObject } = req.body;
     const admin = await Admin.findOne({
-      $or: [{ serviceNumber: id }, { email: id }],
+      $or: [{ serviceNumber: id.trim() }, { email: id.trim() }],
     });
 
     if (admin) {
