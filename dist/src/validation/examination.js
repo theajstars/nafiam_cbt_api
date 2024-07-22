@@ -31,7 +31,7 @@ const createExaminationSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     title: joi_1.default.string().required(),
     date: joi_1.default.number().required(),
-    course: joi_1.default.string().required(),
+    duration: joi_1.default.string().required(),
 });
 const validateCreateExaminationSchema = (req, res, next) => {
     const { error } = createExaminationSchema.validate(req.body);

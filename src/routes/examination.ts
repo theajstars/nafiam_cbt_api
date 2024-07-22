@@ -548,7 +548,7 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
       if (id && user && user === "student") {
         const examination = await Examination.findOne({ id: examinationID });
-        const course = await Course.findOne({ id: examination.course });
+
         const student = await Student.findOne({ id });
         const attendance = await Attendance.findOne({
           examinationID: examinationID,
@@ -581,16 +581,9 @@ export default function (app: Express) {
             },
             exam: {
               title: examination.title,
-              courseTitle: examination.courseTitle,
               date: examination.date,
               questions: examination.questions,
               studentQuestions: questions,
-            },
-            course: {
-              title: course.title,
-              code: course.code,
-              school: course.school,
-              id: course.id,
             },
             attendance: {
               date: attendance.timestamp,

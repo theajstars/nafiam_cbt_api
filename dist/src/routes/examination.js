@@ -400,7 +400,6 @@ function default_1(app) {
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
             const examination = yield Examination_1.Examination.findOne({ id: examinationID });
-            const course = yield Course_1.Course.findOne({ id: examination.course });
             const student = yield Student_1.Student.findOne({ id });
             const attendance = yield Attendance_1.Attendance.findOne({
                 examinationID: examinationID,
@@ -426,16 +425,9 @@ function default_1(app) {
                     },
                     exam: {
                         title: examination.title,
-                        courseTitle: examination.courseTitle,
                         date: examination.date,
                         questions: examination.questions,
                         studentQuestions: questions,
-                    },
-                    course: {
-                        title: course.title,
-                        code: course.code,
-                        school: course.school,
-                        id: course.id,
                     },
                     attendance: {
                         date: attendance.timestamp,
