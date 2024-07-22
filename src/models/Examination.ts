@@ -32,6 +32,7 @@ const examinationSchema = new Schema<ExaminationProps, Model<ExaminationProps>>(
   {
     id: { type: String, required: true },
     title: { type: String, required: true },
+    duration: { type: String, required: true },
     date: { type: Number, required: true },
 
     started: { type: Boolean, required: true },

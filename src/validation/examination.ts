@@ -50,7 +50,6 @@ const editExaminationSchema = Joi.object({
   questions: Joi.any().required(),
   title: Joi.string().required(),
   date: Joi.number().required(),
-  course: Joi.string().required(),
 });
 
 export const validateEditExaminationRequest = (req, res, next) => {

@@ -5,6 +5,7 @@ const mongoose_1 = require("mongoose");
 const examinationSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
     title: { type: String, required: true },
+    duration: { type: String, required: true },
     date: { type: Number, required: true },
     started: { type: Boolean, required: true },
     approved: { type: Boolean, required: true },
