@@ -75,6 +75,6 @@ connect(dbConnectString)
       console.log(`Server running without DB on port: ${PORT}`)
     );
   });
-genPassword("securePassword2024").then((r) => console.log(r));
+// genPassword("securePassword2024").then((r) => console.log(r));
 
 export { app };

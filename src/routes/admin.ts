@@ -441,7 +441,7 @@ export default function (app: Express) {
         const instructorExists = await Instructor.findOne({
           $or: [{ email: email }, { serviceNumber }],
         });
-        console.log({ ment: instructorExists });
+
         if (!instructorExists || serviceNumber.length === 0) {
           const saltRounds = 10;
 

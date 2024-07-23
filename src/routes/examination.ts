@@ -266,8 +266,8 @@ export default function (app: Express) {
     async (req, res) => {
       const { token, examinationID } = req.body;
       const { id, user } = verifyToken(token);
-      const instructor = await Instructor.findOne({ id });
-      if (id && user === "instructor" && instructor) {
+      const admin = await Admin.findOne({ id });
+      if (id && user === "admin" && admin) {
         const examination = await Examination.findOneAndUpdate(
           { id: examinationID },
           { published: true }

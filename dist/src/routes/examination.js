@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const JWT_1 = require("../Lib/JWT");
-const Instructor_1 = require("../models/Instructor");
 const Examination_1 = require("../models/Examination");
 const Misc_1 = require("../Lib/Misc");
 const Methods_1 = require("../Lib/Methods");
@@ -192,8 +191,8 @@ function default_1(app) {
     app.post(`${basePath}/publish`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        const instructor = yield Instructor_1.Instructor.findOne({ id });
-        if (id && user === "instructor" && instructor) {
+        const admin = yield Admin_1.Admin.findOne({ id });
+        if (id && user === "admin" && admin) {
             const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { published: true });
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination published!", examination === null ? 404 : 200, examination));
         }
