@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateStudentBlacklistRequest = exports.validateStudentSubmissionRequest = exports.validateExaminationPasswordRequest = exports.validateApproveExaminationRequest = exports.validateEditExaminationRequest = exports.validateCreateExaminationSchema = exports.validateDefaultExaminationRequest = void 0;
+exports.validateStudentBlacklistRequest = exports.validateStudentSubmissionRequest = exports.validateExaminationPasswordRequest = exports.validateAddStudentsToExaminationRequest = exports.validateApproveExaminationRequest = exports.validateEditExaminationRequest = exports.validateCreateExaminationSchema = exports.validateDefaultExaminationRequest = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const defaultExaminationSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
@@ -97,6 +97,28 @@ const validateApproveExaminationRequest = (req, res, next) => {
     }
 };
 exports.validateApproveExaminationRequest = validateApproveExaminationRequest;
+const addStudentsToExaminationSchema = joi_1.default.object({
+    token: joi_1.default.string().required(),
+    examinationID: joi_1.default.string().required(),
+    students: joi_1.default.any().required(),
+});
+const validateAddStudentsToExaminationRequest = (req, res, next) => {
+    const { error } = addStudentsToExaminationSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateAddStudentsToExaminationRequest = validateAddStudentsToExaminationRequest;
 const validateExaminationPasswordSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     examinationID: joi_1.default.string().required(),

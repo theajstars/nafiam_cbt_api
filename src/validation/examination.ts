@@ -89,6 +89,27 @@ export const validateApproveExaminationRequest = (req, res, next) => {
     next();
   }
 };
+const addStudentsToExaminationSchema = Joi.object({
+  token: Joi.string().required(),
+  examinationID: Joi.string().required(),
+  students: Joi.any().required(),
+});
+
+export const validateAddStudentsToExaminationRequest = (req, res, next) => {
+  const { error } = addStudentsToExaminationSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
 const validateExaminationPasswordSchema = Joi.object({
   token: Joi.string().required(),
   examinationID: Joi.string().required(),

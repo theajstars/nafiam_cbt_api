@@ -217,6 +217,20 @@ function default_1(app) {
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination published!", examination === null ? 404 : 200, examination));
         }
     }));
+    app.post(`${basePath}/add-students`, examination_1.validateAddStudentsToExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID, students } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        console.log(examinationID, students);
+        if (!id || !user || user !== "admin") {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+        else {
+            const examination = yield Examination_1.Examination.findOneAndUpdate({
+                id: examinationID,
+            }, { students });
+            res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination published!", examination === null ? 404 : 200, examination));
+        }
+    }));
     app.post(`${basePath}/students/all`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID, isAdmin } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);

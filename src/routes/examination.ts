@@ -13,6 +13,7 @@ import {
 import { generateRandomString } from "../Lib/Methods";
 import { validateTokenRequest } from "../validation/course";
 import {
+  validateAddStudentsToExaminationRequest,
   validateApproveExaminationRequest,
   validateCreateExaminationSchema,
   validateDefaultExaminationRequest,
@@ -302,6 +303,32 @@ export default function (app: Express) {
             id: examinationID,
           },
           { approved: true, selectedQuestions: questions }
+        );
+        res.json(
+          returnSuccessResponseObject(
+            examination === null ? "Not Found!" : "Examination published!",
+            examination === null ? 404 : 200,
+            examination
+          )
+        );
+      }
+    }
+  );
+  app.post(
+    `${basePath}/add-students`,
+    validateAddStudentsToExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID, students } = req.body;
+      const { id, user } = verifyToken(token);
+      console.log(examinationID, students);
+      if (!id || !user || user !== "admin") {
+        res.json(UnauthorizedResponseObject);
+      } else {
+        const examination = await Examination.findOneAndUpdate(
+          {
+            id: examinationID,
+          },
+          { students }
         );
         res.json(
           returnSuccessResponseObject(
