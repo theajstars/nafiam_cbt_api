@@ -21,7 +21,6 @@ const course_1 = require("../validation/course");
 const JWT_1 = require("../Lib/JWT");
 const Misc_1 = require("../Lib/Misc");
 const basePath = "/file";
-const CLOUDINARY_URL = "cloudinary://897745466481853:clC9-fOu0VrHXtKNEfYDggqSeUY@theajstars";
 const cloudinary = cloudinary_1.default.v2;
 cloudinary.config({
     cloud_name: "theajstars",

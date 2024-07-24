@@ -2,7 +2,8 @@ import { Express, Request } from "express";
 import multer from "multer";
 import Cloudinary from "cloudinary";
 import path from "path";
-import fileSystem from "fs";
+import * as csv from "csv";
+import fileSystem, { promises as fileSystemPromises } from "fs";
 import { File } from "../models/File";
 import { deleteFolderRecursive, generateRandomString } from "../Lib/Methods";
 import { DefaultResponse } from "../Lib/Responses";
@@ -11,8 +12,6 @@ import { verifyToken } from "../Lib/JWT";
 import { UnauthorizedResponseObject } from "../Lib/Misc";
 
 const basePath = "/file";
-const CLOUDINARY_URL =
-  "cloudinary://897745466481853:clC9-fOu0VrHXtKNEfYDggqSeUY@theajstars";
 
 const cloudinary = Cloudinary.v2;
 cloudinary.config({
@@ -90,6 +89,7 @@ export default function (app: Express) {
       }
     }
   );
+
   app.post(`${basePath}s/all`, validateTokenRequest, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);

@@ -3,32 +3,26 @@ import { Gender } from "./Instructor";
 
 export interface StudentProps {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
+  name: string;
   serviceNumber: string;
   rank: string;
-  gender: Gender;
+  unit: string;
+  trade: string;
   role: "civilian" | "personnel";
   dateCreated: number;
-  isChangedPassword: boolean;
-  school: string;
+  batch: number;
 }
 
 const studentSchema = new Schema<StudentProps>({
-  id: { type: String, required: true },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  email: { type: String, required: true },
-  password: { type: String, required: true },
+  id: { type: String, required: false },
+  name: { type: String, required: false },
   serviceNumber: { type: String, required: false },
-  rank: { type: String, required: true },
-  gender: { type: String, required: true },
-  role: { type: String, required: true },
-  dateCreated: { type: Number, required: true },
-  isChangedPassword: { type: Boolean, required: true },
-  school: { type: String, required: true },
+  rank: { type: String, required: false },
+  unit: { type: String, required: false },
+  trade: { type: String, required: false },
+  role: { type: String, required: false },
+  dateCreated: { type: Number, required: false },
+  batch: { type: Number, required: false },
 });
 
 const Student = model<StudentProps>("Student", studentSchema);

@@ -212,29 +212,19 @@ function default_2(app) {
         }
     }));
     app.post("/admin/student/onboard", admin_1.validateOnboardStudent, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, email, firstName, lastName, rank, gender, role, serviceNumber, school, } = req.body;
+        const { token, name, rank, role, batch, serviceNumber, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const studentExists = yield Student_1.Student.findOne({
-                $or: [{ email: email }, { serviceNumber }],
-            });
+            const studentExists = yield Student_1.Student.findOne({ serviceNumber });
             if (!studentExists) {
-                const saltRounds = 10;
-                const salt = yield bcryptjs_1.default.genSalt(saltRounds);
-                const hash = yield bcryptjs_1.default.hash(lastName.toUpperCase(), salt);
                 const student = yield new Student_1.Student({
                     id: (0, Methods_1.generateRandomString)(32),
-                    email,
-                    firstName,
-                    lastName,
+                    name,
+                    serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
                     rank,
                     role,
-                    serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
-                    gender,
-                    isChangedPassword: false,
-                    password: hash,
                     dateCreated: Date.now(),
-                    school,
+                    batch,
                 }).save();
                 res.json({
                     status: true,
@@ -249,6 +239,46 @@ function default_2(app) {
                     statusCode: 409,
                     data: false,
                     message: "Student exists!",
+                });
+            }
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post("/admin/student/bulk", (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, studentArr } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user === "admin") {
+            const students = yield Student_1.Student.find().select("id");
+            const isDuplicateEntry = students.filter((s) => studentArr.map((student) => student.id).includes(s.id)).length > 0;
+            if (!isDuplicateEntry) {
+                const student = yield Student_1.Student.insertMany(studentArr.map((s) => {
+                    return {
+                        id: (0, Methods_1.generateRandomString)(32),
+                        name: s.name,
+                        serviceNumber: s.serviceNumber,
+                        rank: s.rank,
+                        unit: s.unit,
+                        trade: s.trade,
+                        role: "personnel",
+                        dateCreated: Date.now(),
+                        batch: s.batch,
+                    };
+                }));
+                res.json({
+                    status: true,
+                    statusCode: 201,
+                    data: student,
+                    message: "New Student created",
+                });
+            }
+            else {
+                res.json({
+                    status: true,
+                    statusCode: 409,
+                    data: false,
+                    message: "Duplicate Entry!",
                 });
             }
         }
@@ -295,18 +325,26 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post("/admin/students/get", course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token } = req.body;
+    app.post("/admin/students/get", (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, page, limit } = req.body;
         const { user, id } = (0, JWT_1.verifyToken)(token);
         if (!id || !user || user !== "admin") {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
-            const students = yield Student_1.Student.find({});
+            const students = yield Student_1.Student.find({}, {}, {
+                skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
+                limit,
+            });
+            const totalCount = yield Student_1.Student.countDocuments({});
             res.json({
                 data: students,
                 status: true,
                 statusCode: 200,
+                page,
+                limit,
+                rows: students.length,
+                total: totalCount,
                 message: "Students found!",
             });
         }

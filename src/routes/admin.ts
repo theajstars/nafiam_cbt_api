@@ -11,7 +11,7 @@ import {
   returnSuccessResponseObject,
   UnauthorizedResponseObject,
 } from "../Lib/Misc";
-import { Student } from "../models/Student";
+import { Student, StudentProps } from "../models/Student";
 import { Course } from "../models/Course";
 import { genPassword, generateRandomString } from "../Lib/Methods";
 import {
@@ -257,39 +257,25 @@ export default function (app: Express) {
     async (req, res) => {
       const {
         token,
-        email,
-        firstName,
-        lastName,
+        name,
         rank,
-        gender,
+
         role,
+        batch,
         serviceNumber,
-        school,
-      } = req.body;
+      } = req.body as StudentProps & { token: string };
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
-        const studentExists = await Student.findOne({
-          $or: [{ email: email }, { serviceNumber }],
-        });
+        const studentExists = await Student.findOne({ serviceNumber });
         if (!studentExists) {
-          const saltRounds = 10;
-
-          const salt = await bcrypt.genSalt(saltRounds);
-          const hash = await bcrypt.hash(lastName.toUpperCase(), salt);
           const student = await new Student({
             id: generateRandomString(32),
-            email,
-            firstName,
-            lastName,
+            name,
+            serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
             rank,
             role,
-            serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
-
-            gender,
-            isChangedPassword: false,
-            password: hash,
             dateCreated: Date.now(),
-            school,
+            batch,
           }).save();
           res.json({
             status: true,
@@ -310,6 +296,54 @@ export default function (app: Express) {
       }
     }
   );
+  app.post("/admin/student/bulk", async (req, res) => {
+    const { token, studentArr } = req.body as {
+      token: string;
+      studentArr: StudentProps[];
+    };
+    const { id, user } = verifyToken(token);
+    if (id && user && user === "admin") {
+      const students = await Student.find().select("id");
+
+      const isDuplicateEntry =
+        students.filter((s) =>
+          studentArr.map((student) => student.id).includes(s.id)
+        ).length > 0;
+
+      if (!isDuplicateEntry) {
+        const student = await Student.insertMany(
+          studentArr.map((s) => {
+            return {
+              id: generateRandomString(32),
+              name: s.name,
+              serviceNumber: s.serviceNumber,
+              rank: s.rank,
+              unit: s.unit,
+              trade: s.trade,
+              role: "personnel",
+              dateCreated: Date.now(),
+              batch: s.batch,
+            };
+          })
+        );
+        res.json({
+          status: true,
+          statusCode: 201,
+          data: student,
+          message: "New Student created",
+        });
+      } else {
+        res.json({
+          status: true,
+          statusCode: 409,
+          data: false,
+          message: "Duplicate Entry!",
+        });
+      }
+    } else {
+      res.json(UnauthorizedResponseObject);
+    }
+  });
 
   app.post(
     `${basePath}/student/update`,
@@ -368,17 +402,31 @@ export default function (app: Express) {
     }
   );
 
-  app.post("/admin/students/get", validateTokenRequest, async (req, res) => {
-    const { token } = req.body;
+  app.post("/admin/students/get", async (req, res) => {
+    const { token, page, limit } = req.body;
     const { user, id } = verifyToken(token);
     if (!id || !user || user !== "admin") {
       res.json(UnauthorizedResponseObject);
     } else {
-      const students = await Student.find({});
+      const students = await Student.find(
+        {},
+        {},
+
+        {
+          skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
+          limit,
+        }
+      );
+      const totalCount = await Student.countDocuments({});
+
       res.json(<DefaultResponse>{
         data: students,
         status: true,
         statusCode: 200,
+        page,
+        limit,
+        rows: students.length,
+        total: totalCount,
         message: "Students found!",
       });
     }
