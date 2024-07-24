@@ -3,6 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ordainedNumberOfPracticeQuestions = exports.nigerianAirForceRanks = void 0;
 exports.nigerianAirForceRanks = [
     {
+        label: "All",
+        value: "",
+    },
+    {
         label: "None",
         value: "None",
     },

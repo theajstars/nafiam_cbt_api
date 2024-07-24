@@ -252,20 +252,31 @@ function default_2(app) {
         if (id && user && user === "admin") {
             const students = yield Student_1.Student.find().select("id");
             const isDuplicateEntry = students.filter((s) => studentArr.map((student) => student.id).includes(s.id)).length > 0;
+            const newStudents = studentArr
+                .map((s) => {
+                return {
+                    id: (0, Methods_1.generateRandomString)(32),
+                    name: s.name,
+                    serviceNumber: s.serviceNumber,
+                    rank: s.rank,
+                    unit: s.unit,
+                    trade: s.trade,
+                    role: "personnel",
+                    dateCreated: Date.now(),
+                    batch: s.batch,
+                };
+            })
+                .filter((f) => f.id &&
+                f.name &&
+                f.serviceNumber &&
+                f.rank &&
+                f.unit &&
+                f.trade &&
+                f.role &&
+                f.dateCreated &&
+                f.batch);
             if (!isDuplicateEntry) {
-                const student = yield Student_1.Student.insertMany(studentArr.map((s) => {
-                    return {
-                        id: (0, Methods_1.generateRandomString)(32),
-                        name: s.name,
-                        serviceNumber: s.serviceNumber,
-                        rank: s.rank,
-                        unit: s.unit,
-                        trade: s.trade,
-                        role: "personnel",
-                        dateCreated: Date.now(),
-                        batch: s.batch,
-                    };
-                }));
+                const student = yield Student_1.Student.insertMany(newStudents);
                 res.json({
                     status: true,
                     statusCode: 201,
@@ -326,17 +337,18 @@ function default_2(app) {
         }
     }));
     app.post("/admin/students/get", (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, page, limit } = req.body;
+        const { token, page, limit, rank } = req.body;
         const { user, id } = (0, JWT_1.verifyToken)(token);
         if (!id || !user || user !== "admin") {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
-            const students = yield Student_1.Student.find({}, {}, {
+            const filter = rank ? { rank } : {};
+            const students = yield Student_1.Student.find(filter, {}, {
                 skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
                 limit,
             });
-            const totalCount = yield Student_1.Student.countDocuments({});
+            const totalCount = yield Student_1.Student.countDocuments(filter);
             res.json({
                 data: students,
                 status: true,

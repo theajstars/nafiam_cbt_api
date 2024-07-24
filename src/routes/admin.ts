@@ -310,22 +310,34 @@ export default function (app: Express) {
           studentArr.map((student) => student.id).includes(s.id)
         ).length > 0;
 
-      if (!isDuplicateEntry) {
-        const student = await Student.insertMany(
-          studentArr.map((s) => {
-            return {
-              id: generateRandomString(32),
-              name: s.name,
-              serviceNumber: s.serviceNumber,
-              rank: s.rank,
-              unit: s.unit,
-              trade: s.trade,
-              role: "personnel",
-              dateCreated: Date.now(),
-              batch: s.batch,
-            };
-          })
+      const newStudents = studentArr
+        .map((s) => {
+          return {
+            id: generateRandomString(32),
+            name: s.name,
+            serviceNumber: s.serviceNumber,
+            rank: s.rank,
+            unit: s.unit,
+            trade: s.trade,
+            role: "personnel",
+            dateCreated: Date.now(),
+            batch: s.batch,
+          };
+        })
+        .filter(
+          (f) =>
+            f.id &&
+            f.name &&
+            f.serviceNumber &&
+            f.rank &&
+            f.unit &&
+            f.trade &&
+            f.role &&
+            f.dateCreated &&
+            f.batch
         );
+      if (!isDuplicateEntry) {
+        const student = await Student.insertMany(newStudents);
         res.json({
           status: true,
           statusCode: 201,
@@ -403,13 +415,14 @@ export default function (app: Express) {
   );
 
   app.post("/admin/students/get", async (req, res) => {
-    const { token, page, limit } = req.body;
+    const { token, page, limit, rank } = req.body;
     const { user, id } = verifyToken(token);
     if (!id || !user || user !== "admin") {
       res.json(UnauthorizedResponseObject);
     } else {
+      const filter = rank ? { rank } : {};
       const students = await Student.find(
-        {},
+        filter,
         {},
 
         {
@@ -417,7 +430,7 @@ export default function (app: Express) {
           limit,
         }
       );
-      const totalCount = await Student.countDocuments({});
+      const totalCount = await Student.countDocuments(filter);
 
       res.json(<DefaultResponse>{
         data: students,

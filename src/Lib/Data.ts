@@ -1,5 +1,9 @@
 export const nigerianAirForceRanks = [
   {
+    label: "All",
+    value: "",
+  },
+  {
     label: "None",
     value: "None",
   },
