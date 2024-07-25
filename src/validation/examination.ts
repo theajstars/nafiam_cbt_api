@@ -21,6 +21,28 @@ export const validateDefaultExaminationRequest = (req, res, next) => {
     next();
   }
 };
+const createExminationBatchSchema = Joi.object({
+  token: Joi.string().required(),
+  examinationID: Joi.string().required(),
+  students: Joi.array().required(),
+  batch: Joi.number().required(),
+});
+
+export const validateCreateExaminationBatchRequest = (req, res, next) => {
+  const { error } = createExminationBatchSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
 
 const createExaminationSchema = Joi.object({
   token: Joi.string().required(),

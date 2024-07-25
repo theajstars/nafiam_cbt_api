@@ -15,6 +15,7 @@ import { validateTokenRequest } from "../validation/course";
 import {
   validateAddStudentsToExaminationRequest,
   validateApproveExaminationRequest,
+  validateCreateExaminationBatchRequest,
   validateCreateExaminationSchema,
   validateDefaultExaminationRequest,
   validateEditExaminationRequest,
@@ -27,6 +28,7 @@ import { Attendance } from "../models/Attendance";
 import { Result } from "../models/Results";
 import { Student } from "../models/Student";
 import { Admin } from "../models/Admin";
+import { Batch } from "../models/Batch";
 const basePath = "/examination";
 export default function (app: Express) {
   app.post(
@@ -381,6 +383,50 @@ export default function (app: Express) {
           message: "Examination password has been changed!",
           data: { password },
         });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/create-batch`,
+    validateCreateExaminationBatchRequest,
+    async (req, res) => {
+      const { token, examinationID, batch, students } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user === "admin") {
+        const examination = await Examination.findOne({ id: examinationID });
+        const existingBatch = await Batch.findOne({ batchNumber: batch });
+        if (existingBatch && existingBatch.id) {
+          res.json({
+            statusCode: 409,
+            status: true,
+            message: "Batch already exists!",
+          });
+        } else {
+          const newBatch = await new Batch({
+            id: generateRandomString(32),
+            examinationID,
+            title: `${examination.title} Batch ${batch}`,
+            batchNumber: batch,
+            duration: examination.duration,
+            date: examination.date,
+            approved: true,
+            published: true,
+            started: false,
+            completed: false,
+            questions: examination.questions,
+            students,
+            password: "",
+            blacklist: [],
+          }).save();
+          res.json({
+            statusCode: 201,
+            status: true,
+            message: "Examination batch has been created!",
+            data: newBatch,
+          });
+        }
       } else {
         res.json(UnauthorizedResponseObject);
       }

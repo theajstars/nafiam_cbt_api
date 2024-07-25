@@ -18,6 +18,7 @@ const Attendance_1 = require("../models/Attendance");
 const Results_1 = require("../models/Results");
 const Student_1 = require("../models/Student");
 const Admin_1 = require("../models/Admin");
+const Batch_1 = require("../models/Batch");
 const basePath = "/examination";
 function default_1(app) {
     app.post(`${basePath}/create`, examination_1.validateCreateExaminationSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -262,6 +263,48 @@ function default_1(app) {
                 message: "Examination password has been changed!",
                 data: { password },
             });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/create-batch`, examination_1.validateCreateExaminationBatchRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID, batch, students } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user === "admin") {
+            const examination = yield Examination_1.Examination.findOne({ id: examinationID });
+            const existingBatch = yield Batch_1.Batch.findOne({ batchNumber: batch });
+            if (existingBatch && existingBatch.id) {
+                res.json({
+                    statusCode: 409,
+                    status: true,
+                    message: "Batch already exists!",
+                });
+            }
+            else {
+                const newBatch = yield new Batch_1.Batch({
+                    id: (0, Methods_1.generateRandomString)(32),
+                    examinationID,
+                    title: `${examination.title} Batch ${batch}`,
+                    batchNumber: batch,
+                    duration: examination.duration,
+                    date: examination.date,
+                    approved: true,
+                    published: true,
+                    started: false,
+                    completed: false,
+                    questions: examination.questions,
+                    students,
+                    password: "",
+                    blacklist: [],
+                }).save();
+                res.json({
+                    statusCode: 201,
+                    status: true,
+                    message: "Examination batch has been created!",
+                    data: newBatch,
+                });
+            }
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);
