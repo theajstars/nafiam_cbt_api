@@ -8,11 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const JWT_1 = require("../Lib/JWT");
 const Instructor_1 = require("../models/Instructor");
 const Misc_1 = require("../Lib/Misc");
@@ -21,7 +17,6 @@ const course_1 = require("../validation/course");
 const default_1 = require("../validation/default");
 const Student_1 = require("../models/Student");
 const Admin_1 = require("../models/Admin");
-const Log_1 = require("../models/Log");
 const Data_1 = require("../Lib/Data");
 const basePath = "/misc";
 function default_2(app) {
@@ -49,77 +44,6 @@ function default_2(app) {
                 message: "List of ranks",
                 data: Data_1.nigerianAirForceRanks,
             });
-        }
-        else {
-            res.json(Misc_1.UnauthorizedResponseObject);
-        }
-    }));
-    app.post(`${basePath}/password/update`, default_1.validateUpdatePasswordRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, newPassword: newPasswordString, oldPassword, user: userCase, navigatorObject, } = req.body;
-        const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (id && user) {
-            if (user === userCase) {
-                const newPassword = yield (0, Methods_1.genPassword)(newPasswordString);
-                switch (user) {
-                    case "student":
-                        var isPasswordCorrect = yield bcryptjs_1.default.compare(oldPassword, (yield Student_1.Student.findOne({ id })).password);
-                        if (isPasswordCorrect) {
-                            yield Student_1.Student.findOneAndUpdate({ id }, { password: newPassword, isChangedPassword: true });
-                            res.json({
-                                status: true,
-                                statusCode: 200,
-                                message: "Your password has been successfully updated!",
-                            });
-                        }
-                        else {
-                            res.json(Object.assign(Object.assign({}, Misc_1.UnauthorizedResponseObject), { message: "Incorrect password" }));
-                        }
-                        break;
-                    case "instructor":
-                        var isPasswordCorrect = yield bcryptjs_1.default.compare(oldPassword, (yield Instructor_1.Instructor.findOne({ id })).password);
-                        if (isPasswordCorrect) {
-                            yield Instructor_1.Instructor.findOneAndUpdate({ id }, { password: newPassword, isChangedPassword: true });
-                            res.json({
-                                status: true,
-                                statusCode: 200,
-                                message: "Your password has been successfully updated!",
-                            });
-                        }
-                        else {
-                            res.json(Object.assign(Object.assign({}, Misc_1.UnauthorizedResponseObject), { message: "Incorrect password" }));
-                        }
-                        break;
-                    case "admin":
-                        var isPasswordCorrect = yield bcryptjs_1.default.compare(oldPassword, (yield Admin_1.Admin.findOne({ id })).password);
-                        if (isPasswordCorrect) {
-                            yield Admin_1.Admin.findOneAndUpdate({ id }, { password: newPassword, isChangedPassword: true });
-                            res.json({
-                                status: true,
-                                statusCode: 200,
-                                message: "Your password has been successfully updated!",
-                            });
-                        }
-                        else {
-                            res.json(Object.assign(Object.assign({}, Misc_1.UnauthorizedResponseObject), { message: "Incorrect password" }));
-                        }
-                        break;
-                }
-                yield new Log_1.Log({
-                    id: (0, Methods_1.generateRandomString)(32),
-                    personnelID: id,
-                    timestamp: Date.now(),
-                    navigatorObject,
-                    comments: isPasswordCorrect
-                        ? "Password changed!"
-                        : "Password was not changed",
-                    userType: user,
-                    action: "change_password",
-                    status: isPasswordCorrect ? "success" : "error",
-                }).save();
-            }
-            else {
-                res.json(Misc_1.UnauthorizedResponseObject);
-            }
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);

@@ -256,11 +256,11 @@ function default_2(app) {
                 .map((s) => {
                 return {
                     id: (0, Methods_1.generateRandomString)(32),
-                    name: s.name,
-                    serviceNumber: s.serviceNumber,
-                    rank: s.rank,
-                    unit: s.unit,
-                    trade: s.trade,
+                    name: s.name ? s.name.trim() : undefined,
+                    serviceNumber: s.serviceNumber ? s.serviceNumber.trim() : undefined,
+                    rank: s.rank ? s.rank.trim() : undefined,
+                    unit: s.unit ? s.unit.trim() : undefined,
+                    trade: s.trade ? s.trade.trim() : undefined,
                     role: "personnel",
                     dateCreated: Date.now(),
                     batch: s.batch,
