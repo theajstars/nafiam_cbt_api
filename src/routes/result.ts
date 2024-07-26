@@ -22,11 +22,11 @@ export default function (app: Express) {
     `${basePath}/student/get`,
     validateGetSingleResultRequest,
     async (req, res) => {
-      const { token, examinationID, studentID } = req.body;
+      const { token, batchID, studentID } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user) {
         const result = await Result.findOne({
-          examinationID,
+          batchID,
           studentID: user === "student" ? id : studentID,
         });
         res.json({

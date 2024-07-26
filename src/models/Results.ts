@@ -3,8 +3,11 @@ import { Schema, Model, model } from "mongoose";
 export type ResultProps = {
   id: string;
   examinationID: string;
+  batchID: string;
   studentID: string;
   name: string;
+  rank: string;
+  unit: string;
 
   serviceNumber: string;
   grading: {
@@ -29,8 +32,11 @@ export type ResultProps = {
 const resultSchema = new Schema<ResultProps, Model<ResultProps>>({
   id: { type: String, required: true },
   examinationID: { type: String, required: true },
+  batchID: { type: String, required: true },
   studentID: { type: String, required: true },
   name: { type: String, required: true },
+  rank: { type: String, required: true },
+  unit: { type: String, required: true },
 
   serviceNumber: { type: String, required: true },
   grading: {

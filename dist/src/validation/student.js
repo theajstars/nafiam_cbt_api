@@ -7,7 +7,8 @@ exports.validateGetOneStudentAllResultRequest = exports.validateGetAllStudentinR
 const joi_1 = __importDefault(require("@hapi/joi"));
 const getSingleResultSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
-    examinationID: joi_1.default.string().required(),
+    examinationID: joi_1.default.string().optional(),
+    batchID: joi_1.default.string().optional(),
     studentID: joi_1.default.string().optional(),
 });
 const validateGetSingleResultRequest = (req, res, next) => {

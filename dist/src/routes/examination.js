@@ -103,16 +103,17 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/unsullied/get`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID } = req.body;
+        const { token, batchID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
-            const examination = yield Examination_1.Examination.findOne({
-                id: examinationID,
+            const batch = yield Batch_1.Batch.findOne({
+                id: batchID,
                 started: true,
                 completed: false,
             });
             const resultIfExists = yield Results_1.Result.findOne({
-                examinationID,
+                batchID,
+                examinationID: batch.examinationID,
                 studentID: id,
             });
             if (resultIfExists && resultIfExists.id) {
@@ -124,8 +125,8 @@ function default_1(app) {
                 });
             }
             else {
-                if (examination) {
-                    const didStudentRegisterForExamination = examination.students.includes(id);
+                if (batch) {
+                    const didStudentRegisterForExamination = batch === null || batch === void 0 ? void 0 : batch.students.includes(id);
                     // &&
                     // !attendance.students.includes(id);
                     res.json({
@@ -134,7 +135,7 @@ function default_1(app) {
                         message: didStudentRegisterForExamination
                             ? "Examination found!"
                             : "You are not eligible to write this examination",
-                        data: examination,
+                        data: batch,
                     });
                 }
                 else {
@@ -360,6 +361,7 @@ function default_1(app) {
             yield new Attendance_1.Attendance({
                 id: (0, Methods_1.generateRandomString)(32),
                 batchID,
+                examinationID: batch.examinationID,
                 timestamp: Date.now(),
                 students: [],
             }).save();
@@ -485,21 +487,19 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/submit-paper`, examination_1.validateStudentSubmissionRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, questions } = req.body;
+        const { token, batchID, questions } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
-            const examination = yield Examination_1.Examination.findOne({ id: examinationID });
+            const batch = yield Batch_1.Batch.findOne({ id: batchID });
             const student = yield Student_1.Student.findOne({ id });
             const attendance = yield Attendance_1.Attendance.findOne({
-                examinationID: examinationID,
+                batchID: batchID,
             });
-            const isStudentInBlacklist = examination.blacklist.includes(id);
+            const isStudentInBlacklist = batch.blacklist.includes(id);
             const students = attendance.students;
             if (students.includes(id) && !isStudentInBlacklist) {
-                const examinationQuestions = examination.selectedQuestions.map((sQuestion) => {
-                    return examination.questions.find((eQuestion) => eQuestion.id === sQuestion);
-                });
-                const marksObtainable = examination.selectedQuestions.length;
+                const examinationQuestions = batch.questions;
+                const marksObtainable = examinationQuestions.length;
                 const count = questions.map((q) => {
                     const foundQuestion = examinationQuestions.find((eQuestion) => eQuestion.id === q.id);
                     return foundQuestion.answer === q.answer;
@@ -513,21 +513,21 @@ function default_1(app) {
                         percent,
                     },
                     exam: {
-                        title: examination.title,
-                        date: examination.date,
-                        questions: examination.questions,
+                        title: batch.title,
+                        date: Date.now(),
+                        questions: batch.questions,
                         studentQuestions: questions,
                     },
                     attendance: {
                         date: attendance.timestamp,
                     },
                 };
-                yield new Results_1.Result(Object.assign({ id: (0, Methods_1.generateRandomString)(32), examinationID, studentID: id, name: student.name, serviceNumber: student.serviceNumber }, result)).save();
+                const fullResultDetails = yield new Results_1.Result(Object.assign({ id: (0, Methods_1.generateRandomString)(32), examinationID: batch.examinationID, batchID, studentID: id, name: student.name, rank: student.rank, unit: student.unit, serviceNumber: student.serviceNumber }, result)).save();
                 res.json({
                     statusCode: 200,
                     status: true,
                     message: "Examination successfully graded!",
-                    data: result,
+                    data: fullResultDetails,
                 });
             }
             else {

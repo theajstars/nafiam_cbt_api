@@ -156,17 +156,18 @@ export default function (app: Express) {
     `${basePath}/unsullied/get`,
     validateDefaultExaminationRequest,
     async (req, res) => {
-      const { token, examinationID } = req.body;
+      const { token, batchID } = req.body;
       const { id, user } = verifyToken(token);
 
       if (id && user && user === "student") {
-        const examination = await Examination.findOne({
-          id: examinationID,
+        const batch = await Batch.findOne({
+          id: batchID,
           started: true,
           completed: false,
         });
         const resultIfExists = await Result.findOne({
-          examinationID,
+          batchID,
+          examinationID: batch.examinationID,
           studentID: id,
         });
         if (resultIfExists && resultIfExists.id) {
@@ -177,9 +178,9 @@ export default function (app: Express) {
             message: "You have already written this paper",
           });
         } else {
-          if (examination) {
+          if (batch) {
             const didStudentRegisterForExamination =
-              examination.students.includes(id);
+              batch?.students.includes(id);
             // &&
             // !attendance.students.includes(id);
 
@@ -189,7 +190,7 @@ export default function (app: Express) {
               message: didStudentRegisterForExamination
                 ? "Examination found!"
                 : "You are not eligible to write this examination",
-              data: examination,
+              data: batch,
             });
           } else {
             res.json({
@@ -495,6 +496,7 @@ export default function (app: Express) {
         await new Attendance({
           id: generateRandomString(32),
           batchID,
+          examinationID: batch.examinationID,
           timestamp: Date.now(),
           students: [],
         }).save();
@@ -657,26 +659,20 @@ export default function (app: Express) {
     `${basePath}/submit-paper`,
     validateStudentSubmissionRequest,
     async (req, res) => {
-      const { token, examinationID, questions } = req.body;
+      const { token, batchID, questions } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "student") {
-        const examination = await Examination.findOne({ id: examinationID });
+        const batch = await Batch.findOne({ id: batchID });
 
         const student = await Student.findOne({ id });
         const attendance = await Attendance.findOne({
-          examinationID: examinationID,
+          batchID: batchID,
         });
-        const isStudentInBlacklist = examination.blacklist.includes(id);
+        const isStudentInBlacklist = batch.blacklist.includes(id);
         const students = attendance.students;
         if (students.includes(id) && !isStudentInBlacklist) {
-          const examinationQuestions = examination.selectedQuestions.map(
-            (sQuestion) => {
-              return examination.questions.find(
-                (eQuestion) => eQuestion.id === sQuestion
-              );
-            }
-          );
-          const marksObtainable = examination.selectedQuestions.length;
+          const examinationQuestions = batch.questions;
+          const marksObtainable = examinationQuestions.length;
           const count = questions.map((q) => {
             const foundQuestion = examinationQuestions.find(
               (eQuestion) => eQuestion.id === q.id
@@ -693,20 +689,23 @@ export default function (app: Express) {
               percent,
             },
             exam: {
-              title: examination.title,
-              date: examination.date,
-              questions: examination.questions,
+              title: batch.title,
+              date: Date.now(),
+              questions: batch.questions,
               studentQuestions: questions,
             },
             attendance: {
               date: attendance.timestamp,
             },
           };
-          await new Result({
+          const fullResultDetails = await new Result({
             id: generateRandomString(32),
-            examinationID,
+            examinationID: batch.examinationID,
+            batchID,
             studentID: id,
             name: student.name,
+            rank: student.rank,
+            unit: student.unit,
 
             serviceNumber: student.serviceNumber,
             ...result,
@@ -715,7 +714,7 @@ export default function (app: Express) {
             statusCode: 200,
             status: true,
             message: "Examination successfully graded!",
-            data: result,
+            data: fullResultDetails,
           });
         } else {
           res.json({

@@ -211,6 +211,7 @@ exports.validateExaminationPasswordRequest = validateExaminationPasswordRequest;
 const studentSubmitSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     examinationID: joi_1.default.string().optional(),
+    batchID: joi_1.default.string().optional(),
     practiceID: joi_1.default.string().optional(),
     questions: joi_1.default.any().required(),
 });

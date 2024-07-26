@@ -198,6 +198,7 @@ export const validateExaminationPasswordRequest = (req, res, next) => {
 const studentSubmitSchema = Joi.object({
   token: Joi.string().required(),
   examinationID: Joi.string().optional(),
+  batchID: Joi.string().optional(),
   practiceID: Joi.string().optional(),
   questions: Joi.any().required(),
 });

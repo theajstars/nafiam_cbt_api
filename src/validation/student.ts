@@ -2,7 +2,8 @@ import Joi from "@hapi/joi";
 
 const getSingleResultSchema = Joi.object({
   token: Joi.string().required(),
-  examinationID: Joi.string().required(),
+  examinationID: Joi.string().optional(),
+  batchID: Joi.string().optional(),
   studentID: Joi.string().optional(),
 });
 

@@ -5,8 +5,11 @@ const mongoose_1 = require("mongoose");
 const resultSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
     examinationID: { type: String, required: true },
+    batchID: { type: String, required: true },
     studentID: { type: String, required: true },
     name: { type: String, required: true },
+    rank: { type: String, required: true },
+    unit: { type: String, required: true },
     serviceNumber: { type: String, required: true },
     grading: {
         marksObtainable: { type: Number, required: true },
