@@ -233,15 +233,19 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/students/all`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, isAdmin } = req.body;
+        const { token, batchID, isAdmin } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && isAdmin && user !== "student") {
-            const examination = yield Examination_1.Examination.findOne({ id: examinationID });
-            const students = examination.students;
+            const batch = yield Batch_1.Batch.findOne({ id: batchID });
+            const students = batch.students;
+            const studentFullRecords = yield Student_1.Student.find({
+                id: { $in: students },
+            });
+            console.log(studentFullRecords, students);
             res.json({
                 statusCode: 200,
                 message: "Examination eligible students found!",
-                data: students,
+                data: studentFullRecords,
                 status: true,
             });
         }
@@ -250,12 +254,12 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/change-password`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID } = req.body;
+        const { token, batchID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const password = (0, Methods_1.generateRandomString)(6, "ALPHABET").toUpperCase();
-            yield Examination_1.Examination.findOneAndUpdate({
-                id: examinationID,
+            yield Batch_1.Batch.findOneAndUpdate({
+                id: batchID,
             }, { started: true, password });
             res.json({
                 statusCode: 200,
@@ -310,27 +314,59 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    app.post(`${basePath}/batches/all`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (!id || !user) {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+        else {
+            const batches = yield Batch_1.Batch.find({ examinationID });
+            res.json({
+                statusCode: 200,
+                status: true,
+                message: "Examination batches retrieved!",
+                data: batches,
+            });
+        }
+    }));
+    app.post(`${basePath}/batch/get`, examination_1.validateGetSingleExaminationBatchRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, batchID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (!id || !user) {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+        else {
+            const batches = yield Batch_1.Batch.findOne({ id: batchID });
+            res.json({
+                statusCode: 200,
+                status: true,
+                message: "Examination batch retrieved!",
+                data: batches,
+            });
+        }
+    }));
     app.post(`${basePath}/start`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, isAdmin } = req.body;
+        const { token, batchID, isAdmin } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (!isAdmin || !id || !user || user !== "admin") {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
             const password = (0, Methods_1.generateRandomString)(6, "ALPHABET").toUpperCase();
-            const examination = yield Examination_1.Examination.findOneAndUpdate({
-                id: examinationID,
+            const batch = yield Batch_1.Batch.findOneAndUpdate({
+                id: batchID,
             }, { started: true, password });
             yield new Attendance_1.Attendance({
                 id: (0, Methods_1.generateRandomString)(32),
-                examinationID,
+                batchID,
                 timestamp: Date.now(),
                 students: [],
             }).save();
             res.json({
                 statusCode: 200,
                 status: true,
-                message: "Examination starting",
+                message: "Examination Batch starting",
                 data: { password },
             });
         }
@@ -404,16 +440,16 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post(`${basePath}/blacklist/get`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+    app.post(`${basePath}/blacklist/get`, examination_1.validateDefaultBatchRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         var _a;
-        const { token, examinationID } = req.body;
+        const { token, batchID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user !== "student") {
-            const examination = yield Examination_1.Examination.findOne({ id: examinationID });
+            const batch = yield Batch_1.Batch.findOne({ id: batchID });
             res.json({
                 status: true,
                 statusCode: 200,
-                data: (_a = examination === null || examination === void 0 ? void 0 : examination.blacklist) !== null && _a !== void 0 ? _a : [],
+                data: (_a = batch === null || batch === void 0 ? void 0 : batch.blacklist) !== null && _a !== void 0 ? _a : [],
             });
         }
         else {
@@ -421,26 +457,26 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/blacklist/update`, examination_1.validateStudentBlacklistRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, studentID, action } = req.body;
+        const { token, batchID, studentID, action } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             if (action === "blacklist") {
                 //Add Student to examination blacklist
-                const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { $push: { blacklist: studentID } });
+                const batch = yield Batch_1.Batch.findOneAndUpdate({ id: batchID }, { $push: { blacklist: studentID } });
                 res.json({
                     status: true,
                     statusCode: 200,
-                    message: `Student has been blacklisted from ${examination.title}`,
+                    message: `Student has been blacklisted from ${batch.title}`,
                 });
             }
             else {
-                const examination = yield Examination_1.Examination.findOne({ id: examinationID });
-                const newBlacklist = examination.blacklist.filter((s) => s !== studentID);
-                yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { blacklist: newBlacklist });
+                const batch = yield Batch_1.Batch.findOne({ id: batchID });
+                const newBlacklist = batch.blacklist.filter((s) => s !== studentID);
+                yield Batch_1.Batch.findOneAndUpdate({ id: batchID }, { blacklist: newBlacklist });
                 res.json({
                     status: true,
                     statusCode: 200,
-                    message: `Student has been whitelisted into ${examination.title}`,
+                    message: `Student has been whitelisted into ${batch.title}`,
                 });
             }
         }

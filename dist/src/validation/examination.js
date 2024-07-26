@@ -3,11 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateStudentBlacklistRequest = exports.validateStudentSubmissionRequest = exports.validateExaminationPasswordRequest = exports.validateAddStudentsToExaminationRequest = exports.validateApproveExaminationRequest = exports.validateEditExaminationRequest = exports.validateCreateExaminationSchema = exports.validateCreateExaminationBatchRequest = exports.validateDefaultExaminationRequest = void 0;
+exports.validateStudentBlacklistRequest = exports.validateStudentSubmissionRequest = exports.validateExaminationPasswordRequest = exports.validateAddStudentsToExaminationRequest = exports.validateApproveExaminationRequest = exports.validateEditExaminationRequest = exports.validateCreateExaminationSchema = exports.validateGetSingleExaminationBatchRequest = exports.validateCreateExaminationBatchRequest = exports.validateDefaultBatchRequest = exports.validateDefaultExaminationRequest = void 0;
 const joi_1 = __importDefault(require("@hapi/joi"));
 const defaultExaminationSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
-    examinationID: joi_1.default.string().required(),
+    examinationID: joi_1.default.string().optional(),
+    batchID: joi_1.default.string().optional(),
     isAdmin: joi_1.default.boolean().optional(),
 });
 const validateDefaultExaminationRequest = (req, res, next) => {
@@ -27,6 +28,28 @@ const validateDefaultExaminationRequest = (req, res, next) => {
     }
 };
 exports.validateDefaultExaminationRequest = validateDefaultExaminationRequest;
+const defaultBatchSchema = joi_1.default.object({
+    token: joi_1.default.string().required(),
+    batchID: joi_1.default.string().required(),
+    isAdmin: joi_1.default.boolean().optional(),
+});
+const validateDefaultBatchRequest = (req, res, next) => {
+    const { error } = defaultBatchSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateDefaultBatchRequest = validateDefaultBatchRequest;
 const createExminationBatchSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     examinationID: joi_1.default.string().required(),
@@ -50,6 +73,27 @@ const validateCreateExaminationBatchRequest = (req, res, next) => {
     }
 };
 exports.validateCreateExaminationBatchRequest = validateCreateExaminationBatchRequest;
+const getSingleExaminationBatchSchema = joi_1.default.object({
+    token: joi_1.default.string().required(),
+    batchID: joi_1.default.string().required(),
+});
+const validateGetSingleExaminationBatchRequest = (req, res, next) => {
+    const { error } = getSingleExaminationBatchSchema.validate(req.body);
+    if (error) {
+        const errorResponse = error.details.map((e) => {
+            return e.message;
+        });
+        res.json({
+            status: true,
+            statusCode: 400,
+            message: errorResponse.toString(),
+        });
+    }
+    else {
+        next();
+    }
+};
+exports.validateGetSingleExaminationBatchRequest = validateGetSingleExaminationBatchRequest;
 const createExaminationSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     title: joi_1.default.string().required(),
@@ -189,7 +233,7 @@ const validateStudentSubmissionRequest = (req, res, next) => {
 exports.validateStudentSubmissionRequest = validateStudentSubmissionRequest;
 const studentBlacklistSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
-    examinationID: joi_1.default.string().required(),
+    batchID: joi_1.default.string().required(),
     studentID: joi_1.default.string().required(),
     action: joi_1.default.string().required(),
 });

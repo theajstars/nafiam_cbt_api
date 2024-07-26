@@ -2,12 +2,34 @@ import Joi from "@hapi/joi";
 
 const defaultExaminationSchema = Joi.object({
   token: Joi.string().required(),
-  examinationID: Joi.string().required(),
+  examinationID: Joi.string().optional(),
+  batchID: Joi.string().optional(),
   isAdmin: Joi.boolean().optional(),
 });
 
 export const validateDefaultExaminationRequest = (req, res, next) => {
   const { error } = defaultExaminationSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
+const defaultBatchSchema = Joi.object({
+  token: Joi.string().required(),
+  batchID: Joi.string().required(),
+  isAdmin: Joi.boolean().optional(),
+});
+
+export const validateDefaultBatchRequest = (req, res, next) => {
+  const { error } = defaultBatchSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {
       return e.message;
@@ -30,6 +52,26 @@ const createExminationBatchSchema = Joi.object({
 
 export const validateCreateExaminationBatchRequest = (req, res, next) => {
   const { error } = createExminationBatchSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
+const getSingleExaminationBatchSchema = Joi.object({
+  token: Joi.string().required(),
+  batchID: Joi.string().required(),
+});
+
+export const validateGetSingleExaminationBatchRequest = (req, res, next) => {
+  const { error } = getSingleExaminationBatchSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {
       return e.message;
@@ -177,7 +219,7 @@ export const validateStudentSubmissionRequest = (req, res, next) => {
 };
 const studentBlacklistSchema = Joi.object({
   token: Joi.string().required(),
-  examinationID: Joi.string().required(),
+  batchID: Joi.string().required(),
   studentID: Joi.string().required(),
   action: Joi.string().required(),
 });
