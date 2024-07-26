@@ -130,7 +130,7 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
 
       if (id && user && user === "student") {
-        const examination = await Examination.find({
+        const examination = await Batch.find({
           started: true,
           completed: false,
           students: { $in: [id] },
@@ -559,13 +559,13 @@ export default function (app: Express) {
     `${basePath}/validate-password`,
     validateExaminationPasswordRequest,
     async (req, res) => {
-      const { token, examinationID, password } = req.body;
+      const { token, batchID, password } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user) {
-        const examination = await Examination.findOne({
-          id: examinationID,
+        const batch = await Batch.findOne({
+          id: batchID,
         });
-        if (examination.blacklist.includes(id)) {
+        if (batch.blacklist.includes(id)) {
           res.json({
             status: true,
             statusCode: 401,
@@ -573,21 +573,21 @@ export default function (app: Express) {
               "You are not permitted to write this paper. Please contact Admin!",
           });
         } else {
-          if (password === examination.password) {
-            const attendance = await Attendance.findOne({ examinationID });
+          if (password === batch.password) {
+            const attendance = await Attendance.findOne({ batchID });
             if (!attendance.students.includes(id)) {
               await Attendance.findOneAndUpdate(
-                { examinationID },
+                { batchID },
                 { $push: { students: id } }
               );
             }
           }
           res.json({
-            statusCode: password === examination.password ? 200 : 404,
+            statusCode: password === batch.password ? 200 : 404,
             status: true,
 
             message:
-              password === examination.password
+              password === batch.password
                 ? "Correct password!"
                 : "Incorrect password",
             data: { password },

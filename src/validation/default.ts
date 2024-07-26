@@ -2,7 +2,7 @@ import Joi from "@hapi/joi";
 
 const loginValidationSchema = Joi.object({
   id: Joi.string().required(),
-  password: Joi.string().required(),
+  password: Joi.string().optional(),
   navigatorObject: Joi.any().required(),
 });
 

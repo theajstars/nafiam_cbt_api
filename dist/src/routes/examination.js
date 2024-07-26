@@ -87,7 +87,7 @@ function default_1(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
-            const examination = yield Examination_1.Examination.find({
+            const examination = yield Batch_1.Batch.find({
                 started: true,
                 completed: false,
                 students: { $in: [id] },
@@ -406,13 +406,13 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/validate-password`, examination_1.validateExaminationPasswordRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, password } = req.body;
+        const { token, batchID, password } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
-            const examination = yield Examination_1.Examination.findOne({
-                id: examinationID,
+            const batch = yield Batch_1.Batch.findOne({
+                id: batchID,
             });
-            if (examination.blacklist.includes(id)) {
+            if (batch.blacklist.includes(id)) {
                 res.json({
                     status: true,
                     statusCode: 401,
@@ -420,16 +420,16 @@ function default_1(app) {
                 });
             }
             else {
-                if (password === examination.password) {
-                    const attendance = yield Attendance_1.Attendance.findOne({ examinationID });
+                if (password === batch.password) {
+                    const attendance = yield Attendance_1.Attendance.findOne({ batchID });
                     if (!attendance.students.includes(id)) {
-                        yield Attendance_1.Attendance.findOneAndUpdate({ examinationID }, { $push: { students: id } });
+                        yield Attendance_1.Attendance.findOneAndUpdate({ batchID }, { $push: { students: id } });
                     }
                 }
                 res.json({
-                    statusCode: password === examination.password ? 200 : 404,
+                    statusCode: password === batch.password ? 200 : 404,
                     status: true,
-                    message: password === examination.password
+                    message: password === batch.password
                         ? "Correct password!"
                         : "Incorrect password",
                     data: { password },

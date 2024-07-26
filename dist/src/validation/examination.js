@@ -188,7 +188,7 @@ const validateAddStudentsToExaminationRequest = (req, res, next) => {
 exports.validateAddStudentsToExaminationRequest = validateAddStudentsToExaminationRequest;
 const validateExaminationPasswordSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
-    examinationID: joi_1.default.string().required(),
+    batchID: joi_1.default.string().required(),
     password: joi_1.default.string().required(),
 });
 const validateExaminationPasswordRequest = (req, res, next) => {
