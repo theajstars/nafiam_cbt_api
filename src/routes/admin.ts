@@ -303,12 +303,14 @@ export default function (app: Express) {
     };
     const { id, user } = verifyToken(token);
     if (id && user && user === "admin") {
-      const students = await Student.find().select("id");
+      const newStudentServiceNos = studentArr.map((s) =>
+        s.serviceNumber.trim()
+      );
+      const students = await Student.find({
+        serviceNumber: { $in: newStudentServiceNos },
+      });
 
-      const isDuplicateEntry =
-        students.filter((s) =>
-          studentArr.map((student) => student.id).includes(s.id)
-        ).length > 0;
+      const isDuplicateEntry = students.length > 0;
 
       const newStudents = studentArr
         .map((s) => {

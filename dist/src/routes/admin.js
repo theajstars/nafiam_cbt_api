@@ -250,8 +250,11 @@ function default_2(app) {
         const { token, studentArr } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const students = yield Student_1.Student.find().select("id");
-            const isDuplicateEntry = students.filter((s) => studentArr.map((student) => student.id).includes(s.id)).length > 0;
+            const newStudentServiceNos = studentArr.map((s) => s.serviceNumber.trim());
+            const students = yield Student_1.Student.find({
+                serviceNumber: { $in: newStudentServiceNos },
+            });
+            const isDuplicateEntry = students.length > 0;
             const newStudents = studentArr
                 .map((s) => {
                 return {
