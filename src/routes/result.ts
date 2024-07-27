@@ -27,8 +27,9 @@ export default function (app: Express) {
       if (id && user) {
         const result = await Result.findOne({
           batchID,
-          studentID: user === "student" ? id : studentID,
+          studentID,
         });
+        console.log(batchID, studentID, result);
         res.json({
           status: true,
           statusCode: 200,

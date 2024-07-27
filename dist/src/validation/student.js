@@ -10,6 +10,7 @@ const getSingleResultSchema = joi_1.default.object({
     examinationID: joi_1.default.string().optional(),
     batchID: joi_1.default.string().optional(),
     studentID: joi_1.default.string().optional(),
+    resultID: joi_1.default.string().optional(),
 });
 const validateGetSingleResultRequest = (req, res, next) => {
     const { error } = getSingleResultSchema.validate(req.body);

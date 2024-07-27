@@ -374,11 +374,11 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/end`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID } = req.body;
+        const { token, batchID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const examination = yield Examination_1.Examination.findOneAndUpdate({
-                id: examinationID,
+            const batch = yield Batch_1.Batch.findOneAndUpdate({
+                id: batchID,
             }, { completed: true });
             res.json({
                 statusCode: 200,
@@ -538,6 +538,27 @@ function default_1(app) {
                 });
             }
             // const
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/batches/get-completed`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, page, limit } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            const batches = yield Batch_1.Batch.find({ completed: true }, {}, {
+                skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
+                limit,
+            });
+            const attendances = yield Attendance_1.Attendance.find();
+            const results = yield Results_1.Result.find();
+            res.json({
+                statusCode: 200,
+                status: true,
+                message: "Examinations found!",
+                data: { batches, attendances, results },
+            });
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);

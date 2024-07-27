@@ -5,6 +5,7 @@ const getSingleResultSchema = Joi.object({
   examinationID: Joi.string().optional(),
   batchID: Joi.string().optional(),
   studentID: Joi.string().optional(),
+  resultID: Joi.string().optional(),
 });
 
 export const validateGetSingleResultRequest = (req, res, next) => {

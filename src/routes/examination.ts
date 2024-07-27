@@ -513,12 +513,12 @@ export default function (app: Express) {
     `${basePath}/end`,
     validateDefaultExaminationRequest,
     async (req, res) => {
-      const { token, examinationID } = req.body;
+      const { token, batchID } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
-        const examination = await Examination.findOneAndUpdate(
+        const batch = await Batch.findOneAndUpdate(
           {
-            id: examinationID,
+            id: batchID,
           },
           { completed: true }
         );
@@ -725,6 +725,36 @@ export default function (app: Express) {
           });
         }
         // const
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/batches/get-completed`,
+
+    async (req, res) => {
+      const { token, page, limit } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user) {
+        const batches = await Batch.find(
+          { completed: true },
+
+          {},
+
+          {
+            skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
+            limit,
+          }
+        );
+        const attendances = await Attendance.find();
+        const results = await Result.find();
+        res.json({
+          statusCode: 200,
+          status: true,
+          message: "Examinations found!",
+          data: { batches, attendances, results },
+        });
       } else {
         res.json(UnauthorizedResponseObject);
       }

@@ -23,8 +23,9 @@ function default_1(app) {
         if (id && user) {
             const result = yield Results_1.Result.findOne({
                 batchID,
-                studentID: user === "student" ? id : studentID,
+                studentID,
             });
+            console.log(batchID, studentID, result);
             res.json({
                 status: true,
                 statusCode: 200,
