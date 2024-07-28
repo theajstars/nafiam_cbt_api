@@ -27,7 +27,7 @@ export default function (app: Express) {
       if (id && user) {
         const result = await Result.findOne({
           batchID,
-          studentID,
+          studentID: studentID ?? id,
         });
         console.log(batchID, studentID, result);
         res.json({
