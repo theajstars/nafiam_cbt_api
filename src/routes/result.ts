@@ -29,7 +29,7 @@ export default function (app: Express) {
           batchID,
           studentID: studentID ?? id,
         });
-        console.log(batchID, studentID, result);
+        console.log(batchID, studentID, id, result, "Perpetual BS");
         res.json({
           status: true,
           statusCode: 200,
