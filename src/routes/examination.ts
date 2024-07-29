@@ -414,7 +414,7 @@ export default function (app: Express) {
           const newBatch = await new Batch({
             id: generateRandomString(32),
             examinationID,
-            title: `${examination.title} Batch ${batch}`,
+            title: `${examination.title}`,
             batchNumber: batch,
             duration: examination.duration,
             date: examination.date,
@@ -701,6 +701,7 @@ export default function (app: Express) {
           const fullResultDetails = await new Result({
             id: generateRandomString(32),
             examinationID: batch.examinationID,
+            batchNumber: batch.batchNumber,
             batchID,
             studentID: id,
             name: student.name,

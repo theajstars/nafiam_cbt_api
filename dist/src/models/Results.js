@@ -6,6 +6,7 @@ const resultSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
     examinationID: { type: String, required: true },
     batchID: { type: String, required: true },
+    batchNumber: { type: Number, required: true },
     studentID: { type: String, required: true },
     name: { type: String, required: true },
     rank: { type: String, required: true },

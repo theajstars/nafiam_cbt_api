@@ -4,6 +4,7 @@ export type ResultProps = {
   id: string;
   examinationID: string;
   batchID: string;
+  batchNumber: number;
   studentID: string;
   name: string;
   rank: string;
@@ -33,6 +34,7 @@ const resultSchema = new Schema<ResultProps, Model<ResultProps>>({
   id: { type: String, required: true },
   examinationID: { type: String, required: true },
   batchID: { type: String, required: true },
+  batchNumber: { type: Number, required: true },
   studentID: { type: String, required: true },
   name: { type: String, required: true },
   rank: { type: String, required: true },
