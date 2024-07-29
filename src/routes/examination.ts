@@ -707,6 +707,7 @@ export default function (app: Express) {
             name: student.name,
             rank: student.rank,
             unit: student.unit,
+            trade: student.trade,
 
             serviceNumber: student.serviceNumber,
             ...result,

@@ -8,6 +8,7 @@ export type ResultProps = {
   studentID: string;
   name: string;
   rank: string;
+  trade: string;
   unit: string;
 
   serviceNumber: string;
@@ -38,6 +39,7 @@ const resultSchema = new Schema<ResultProps, Model<ResultProps>>({
   studentID: { type: String, required: true },
   name: { type: String, required: true },
   rank: { type: String, required: true },
+  trade: { type: String, required: true },
   unit: { type: String, required: true },
 
   serviceNumber: { type: String, required: true },

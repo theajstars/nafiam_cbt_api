@@ -522,7 +522,7 @@ function default_1(app) {
                         date: attendance.timestamp,
                     },
                 };
-                const fullResultDetails = yield new Results_1.Result(Object.assign({ id: (0, Methods_1.generateRandomString)(32), examinationID: batch.examinationID, batchNumber: batch.batchNumber, batchID, studentID: id, name: student.name, rank: student.rank, unit: student.unit, serviceNumber: student.serviceNumber }, result)).save();
+                const fullResultDetails = yield new Results_1.Result(Object.assign({ id: (0, Methods_1.generateRandomString)(32), examinationID: batch.examinationID, batchNumber: batch.batchNumber, batchID, studentID: id, name: student.name, rank: student.rank, unit: student.unit, trade: student.trade, serviceNumber: student.serviceNumber }, result)).save();
                 res.json({
                     statusCode: 200,
                     status: true,
