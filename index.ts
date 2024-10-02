@@ -21,6 +21,7 @@ import result from "./src/routes/result";
 import log from "./src/routes/log";
 import lecture from "./src/routes/lecture";
 import practice from "./src/routes/practice";
+import { Student } from "./src/models/Student";
 
 const app = express();
 app.use(
@@ -50,6 +51,15 @@ connect(dbConnectString)
     log(app);
     lecture(app);
     practice(app);
+
+    // async function blue() {
+    //   await Student.updateMany(
+    //     {},
+    //     { password: await genPassword("NAFIAM2024") }
+    //   );
+    //   console.log("Done!");
+    // }
+    // blue();
     async function createAdmin() {
       const hash = await genPassword("securePassword2024");
       new Admin({

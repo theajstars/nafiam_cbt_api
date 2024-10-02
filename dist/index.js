@@ -55,6 +55,14 @@ const dbConnectString = "mongodb+srv://theajstars:dGF9caF4b8PlrLtP@data.hy4gux2.
     (0, log_1.default)(app);
     (0, lecture_1.default)(app);
     (0, practice_1.default)(app);
+    // async function blue() {
+    //   await Student.updateMany(
+    //     {},
+    //     { password: await genPassword("NAFIAM2024") }
+    //   );
+    //   console.log("Done!");
+    // }
+    // blue();
     function createAdmin() {
         return __awaiter(this, void 0, void 0, function* () {
             const hash = yield (0, Methods_1.genPassword)("securePassword2024");
