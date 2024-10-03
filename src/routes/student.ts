@@ -105,7 +105,8 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
       if (id && user && user === "student") {
         const student = await Student.findOne({ id });
-        const courses = await Course.find({ school: student?.school ?? "" });
+        // const courses = await Course.find({ school: student?.school ?? "" });
+        const courses = await Course.find({});
         res.json({
           status: true,
           statusCode: 200,

@@ -90,12 +90,12 @@ function default_2(app) {
     }));
     // GET COURSES UNDER STUDENT SCHOOL
     app.post(`${basePath}/courses/eligible`, course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        var _a;
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
             const student = yield Student_1.Student.findOne({ id });
-            const courses = yield Course_1.Course.find({ school: (_a = student === null || student === void 0 ? void 0 : student.school) !== null && _a !== void 0 ? _a : "" });
+            // const courses = await Course.find({ school: student?.school ?? "" });
+            const courses = yield Course_1.Course.find({});
             res.json({
                 status: true,
                 statusCode: 200,
