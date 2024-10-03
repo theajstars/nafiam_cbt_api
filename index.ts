@@ -75,6 +75,13 @@ connect(dbConnectString)
         superUser: true,
       }).save();
     }
+    async function changeAdminPassword() {
+      const hash = await genPassword("NAFIAM2024");
+      await Admin.updateMany({}, { password: hash });
+      console.log("Password has been changed!");
+    }
+
+    // changeAdminPassword();
 
     // createAdmin();
     // Course.updateMany({}, { instructorID: "1709114865502" }).exec();
@@ -85,6 +92,6 @@ connect(dbConnectString)
       console.log(`Server running without DB on port: ${PORT}`)
     );
   });
-genPassword("securePassword2024").then((r) => console.log(r));
+// genPassword("NAFIAM2024").then((r) => console.log(r));
 
 export { app };
