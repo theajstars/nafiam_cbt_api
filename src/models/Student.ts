@@ -9,6 +9,8 @@ export interface StudentProps {
   password: string;
   serviceNumber: string;
   rank: string;
+  unit: string;
+  trade: string;
   gender: Gender;
   role: "civilian" | "personnel";
   dateCreated: number;
@@ -24,6 +26,8 @@ const studentSchema = new Schema<StudentProps>({
   password: { type: String, required: true },
   serviceNumber: { type: String, required: false },
   rank: { type: String, required: true },
+  unit: { type: String, required: true },
+  trade: { type: String, required: true },
   gender: { type: String, required: true },
   role: { type: String, required: true },
   dateCreated: { type: Number, required: true },

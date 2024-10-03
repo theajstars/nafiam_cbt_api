@@ -212,7 +212,7 @@ function default_2(app) {
         }
     }));
     app.post("/admin/student/onboard", admin_1.validateOnboardStudent, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, email, firstName, lastName, rank, gender, role, serviceNumber, school, } = req.body;
+        const { token, email, firstName, lastName, rank, trade, unit, gender, role, serviceNumber, school, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const studentExists = yield Student_1.Student.findOne({
@@ -221,13 +221,15 @@ function default_2(app) {
             if (!studentExists) {
                 const saltRounds = 10;
                 const salt = yield bcryptjs_1.default.genSalt(saltRounds);
-                const hash = yield bcryptjs_1.default.hash(lastName.toUpperCase(), salt);
+                const hash = yield bcryptjs_1.default.hash("NAFIAM2024".toUpperCase(), salt);
                 const student = yield new Student_1.Student({
                     id: (0, Methods_1.generateRandomString)(32),
                     email,
                     firstName,
                     lastName,
                     rank,
+                    trade,
+                    unit,
                     role,
                     serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
                     gender,

@@ -11,6 +11,8 @@ const onboardstudentSchema = joi_1.default.object({
     lastName: joi_1.default.string().required(),
     email: joi_1.default.string().required(),
     rank: joi_1.default.string().required(),
+    trade: joi_1.default.string().required(),
+    unit: joi_1.default.string().required(),
     gender: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
     serviceNumber: joi_1.default.string().required().allow(""),

@@ -261,6 +261,8 @@ export default function (app: Express) {
         firstName,
         lastName,
         rank,
+        trade,
+        unit,
         gender,
         role,
         serviceNumber,
@@ -275,13 +277,15 @@ export default function (app: Express) {
           const saltRounds = 10;
 
           const salt = await bcrypt.genSalt(saltRounds);
-          const hash = await bcrypt.hash(lastName.toUpperCase(), salt);
+          const hash = await bcrypt.hash("NAFIAM2024".toUpperCase(), salt);
           const student = await new Student({
             id: generateRandomString(32),
             email,
             firstName,
             lastName,
             rank,
+            trade,
+            unit,
             role,
             serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
 
