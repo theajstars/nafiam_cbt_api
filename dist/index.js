@@ -31,6 +31,7 @@ const result_1 = __importDefault(require("./src/routes/result"));
 const log_1 = __importDefault(require("./src/routes/log"));
 const lecture_1 = __importDefault(require("./src/routes/lecture"));
 const practice_1 = __importDefault(require("./src/routes/practice"));
+const Data_1 = require("./src/Lib/Data");
 const app = (0, express_1.default)();
 exports.app = app;
 app.use((0, cors_1.default)({
@@ -65,12 +66,10 @@ const dbConnectString = "mongodb+srv://theajstars:dGF9caF4b8PlrLtP@data.hy4gux2.
     // blue();
     function createAdmin() {
         return __awaiter(this, void 0, void 0, function* () {
-            const hash = yield (0, Methods_1.genPassword)("securePassword2024");
-            new Admin_1.Admin({
+            const hash = yield (0, Methods_1.genPassword)(`NAFIAM${Data_1.year}`);
+            const admin = yield new Admin_1.Admin({
                 id: (0, Methods_1.generateRandomString)(32),
-                firstName: "Zeus",
-                lastName: "Olympus",
-                email: "me@theajstars.com",
+                name: "Zeus of Olympus",
                 serviceNumber: "NAF01/12345",
                 rank: "Air Chief Marshal",
                 dateCreated: Date.now(),

@@ -18,4 +18,6 @@ export const nigerianAirForceRanks = [
   "Corporal",
   "Lance Corporal",
 ];
+export const year = new Date().getFullYear().toString();
+
 export const ordainedNumberOfPracticeQuestions = 20;

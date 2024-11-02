@@ -199,12 +199,10 @@ export const validateSingleSchoolRequest = (req, res, next) => {
 };
 const createAdminSchema = Joi.object({
   token: Joi.string().required(),
-  firstName: Joi.string().required(),
-  lastName: Joi.string().required(),
-  email: Joi.string().required(),
+  name: Joi.string().required(),
+
   serviceNumber: Joi.string().required(),
   rank: Joi.string().required(),
-  school: Joi.string().optional(),
 });
 
 export const validateCreateAdminRequest = (req, res, next) => {
@@ -225,12 +223,10 @@ export const validateCreateAdminRequest = (req, res, next) => {
 const updateAdminSchema = Joi.object({
   adminID: Joi.string().required(),
   token: Joi.string().required(),
-  firstName: Joi.string().required(),
-  lastName: Joi.string().required(),
-  email: Joi.string().required(),
+
+  name: Joi.string().required(),
   serviceNumber: Joi.string().required(),
   rank: Joi.string().required(),
-  school: Joi.string().optional(),
 });
 
 export const validateUpdateAdminRequest = (req, res, next) => {

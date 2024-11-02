@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ordainedNumberOfPracticeQuestions = exports.nigerianAirForceRanks = void 0;
+exports.ordainedNumberOfPracticeQuestions = exports.year = exports.nigerianAirForceRanks = void 0;
 exports.nigerianAirForceRanks = [
     "Marshal of the Nigerian Air Force",
     "Air Chief Marshal",
@@ -21,5 +21,6 @@ exports.nigerianAirForceRanks = [
     "Corporal",
     "Lance Corporal",
 ];
+exports.year = new Date().getFullYear().toString();
 exports.ordainedNumberOfPracticeQuestions = 20;
 //# sourceMappingURL=Data.js.map

@@ -1,6 +1,6 @@
 import { Express, Request } from "express";
 import bcrypt from "bcryptjs";
-import { Admin } from "../models/Admin";
+import { Admin, AdminProps } from "../models/Admin";
 import { createToken, verifyToken } from "../Lib/JWT";
 import { DefaultResponse } from "../Lib/Responses";
 import {
@@ -32,6 +32,7 @@ import {
   validateUpdateInstructor,
 } from "../validation/admin";
 import { Instructor } from "../models/Instructor";
+import { year } from "../Lib/Data";
 const basePath = "/admin";
 
 export default function (app: Express) {
@@ -118,9 +119,7 @@ export default function (app: Express) {
     const { token } = req.body;
     const { id, user } = verifyToken(token);
     if (id && user && user === "admin") {
-      const admins = await Admin.find({}).select(
-        "id firstName lastName email rank serviceNumber isChangedPassword superUser dateCreated school"
-      );
+      const admins = await Admin.find({}).select("-password");
       res.json({
         status: true,
         statusCode: 200,
@@ -134,34 +133,33 @@ export default function (app: Express) {
     `${basePath}/create`,
     validateCreateAdminRequest,
     async (req, res) => {
-      const { token, firstName, lastName, email, serviceNumber, rank, school } =
-        req.body;
+      const { token, name, serviceNumber, rank } = req.body as AdminProps & {
+        token: string;
+      };
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         //Check if Admin already exists
         const adminExists = await Admin.findOne({
-          $or: [{ email }, { serviceNumber }],
+          serviceNumber,
         });
         if (adminExists && adminExists.id) {
           res.json({
             status: true,
-            message: "Email or Service number for admin already exists!",
+            message: "Service number for admin already exists!",
             statusCode: 409,
           });
         } else {
-          const password = await genPassword(lastName.toUpperCase());
+          const password = await genPassword(`NAFIAM${year}`);
+
           const admin = await new Admin({
             id: generateRandomString(32),
-            firstName,
-            lastName,
-            email,
+            name,
             serviceNumber: serviceNumber?.toUpperCase(),
             rank,
             password,
             dateCreated: Date.now(),
             superUser: false,
             isChangedPassword: false,
-            school: school ?? "",
           }).save();
           res.json({
             status: true,
@@ -179,37 +177,28 @@ export default function (app: Express) {
     `${basePath}/update`,
     validateUpdateAdminRequest,
     async (req, res) => {
-      const {
-        adminID,
-        token,
-        firstName,
-        lastName,
-        email,
-        serviceNumber,
-        rank,
-        school,
-      } = req.body;
+      const { adminID, token, name, serviceNumber, rank } =
+        req.body as AdminProps & { token: string; adminID: string };
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         //Check if other admin has email or service number
         const adminExistsWithPersonalInformation = await Admin.findOne({
-          $or: [{ email }, { serviceNumber }],
+          serviceNumber,
         });
         if (
-          adminExistsWithPersonalInformation &&
-          adminExistsWithPersonalInformation.id &&
-          adminExistsWithPersonalInformation.id === adminID
+          !adminExistsWithPersonalInformation ||
+          (adminExistsWithPersonalInformation &&
+            adminExistsWithPersonalInformation.id &&
+            adminExistsWithPersonalInformation.id === adminID)
         ) {
           //Admin with information is admin to be modified
           const admin = await Admin.findOneAndUpdate(
             { id: adminID },
             {
               token,
-              firstName,
-              lastName,
-              email,
+              name,
               serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
-              school,
+
               rank,
             }
           );
@@ -228,6 +217,26 @@ export default function (app: Express) {
         }
       } else {
         res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.delete(
+    "/admin/delete/:adminID",
+    validateTokenRequest,
+    async (req, res) => {
+      const { token } = req.body;
+      const { adminID } = req.params;
+      const { user, id } = verifyToken(token);
+      if (!id || !user || user !== "admin") {
+        res.json(UnauthorizedResponseObject);
+      } else {
+        const admin = await Admin.deleteOne({ id: adminID });
+        res.json(<DefaultResponse>{
+          data: admin,
+          status: true,
+          statusCode: 204,
+          message: "Admin deleted!",
+        });
       }
     }
   );
@@ -274,10 +283,7 @@ export default function (app: Express) {
         });
         if (!studentExists) {
           const saltRounds = 10;
-
-          const salt = await bcrypt.genSalt(saltRounds);
-          const year = new Date().getFullYear().toString();
-          const hash = await bcrypt.hash(`NAFIAM${year}`, salt);
+          const password = await genPassword(`NAFIAM${year}`);
           const student = await new Student({
             id: generateRandomString(32),
             name,
@@ -290,7 +296,7 @@ export default function (app: Express) {
             serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
 
             isChangedPassword: false,
-            password: hash,
+            password: password,
             dateCreated: Date.now(),
           }).save();
           res.json({

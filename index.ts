@@ -22,6 +22,7 @@ import log from "./src/routes/log";
 import lecture from "./src/routes/lecture";
 import practice from "./src/routes/practice";
 import { Student } from "./src/models/Student";
+import { year } from "./src/Lib/Data";
 
 const app = express();
 app.use(
@@ -61,12 +62,11 @@ connect(dbConnectString)
     // }
     // blue();
     async function createAdmin() {
-      const hash = await genPassword("securePassword2024");
-      new Admin({
+      const hash = await genPassword(`NAFIAM${year}`);
+      const admin = await new Admin({
         id: generateRandomString(32),
-        firstName: "Zeus",
-        lastName: "Olympus",
-        email: "me@theajstars.com",
+        name: "Zeus of Olympus",
+
         serviceNumber: "NAF01/12345",
         rank: "Air Chief Marshal",
         dateCreated: Date.now(),

@@ -208,12 +208,9 @@ const validateSingleSchoolRequest = (req, res, next) => {
 exports.validateSingleSchoolRequest = validateSingleSchoolRequest;
 const createAdminSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
-    firstName: joi_1.default.string().required(),
-    lastName: joi_1.default.string().required(),
-    email: joi_1.default.string().required(),
+    name: joi_1.default.string().required(),
     serviceNumber: joi_1.default.string().required(),
     rank: joi_1.default.string().required(),
-    school: joi_1.default.string().optional(),
 });
 const validateCreateAdminRequest = (req, res, next) => {
     const { error } = createAdminSchema.validate(req.body);
@@ -235,12 +232,9 @@ exports.validateCreateAdminRequest = validateCreateAdminRequest;
 const updateAdminSchema = joi_1.default.object({
     adminID: joi_1.default.string().required(),
     token: joi_1.default.string().required(),
-    firstName: joi_1.default.string().required(),
-    lastName: joi_1.default.string().required(),
-    email: joi_1.default.string().required(),
+    name: joi_1.default.string().required(),
     serviceNumber: joi_1.default.string().required(),
     rank: joi_1.default.string().required(),
-    school: joi_1.default.string().optional(),
 });
 const validateUpdateAdminRequest = (req, res, next) => {
     const { error } = updateAdminSchema.validate(req.body);

@@ -24,6 +24,7 @@ const default_1 = require("../validation/default");
 const Log_1 = require("../models/Log");
 const admin_2 = require("../validation/admin");
 const Instructor_1 = require("../models/Instructor");
+const Data_1 = require("../Lib/Data");
 const basePath = "/admin";
 function default_2(app) {
     app.post(`${basePath}/login`, default_1.validateLoginRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -97,7 +98,7 @@ function default_2(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const admins = yield Admin_1.Admin.find({}).select("id firstName lastName email rank serviceNumber isChangedPassword superUser dateCreated school");
+            const admins = yield Admin_1.Admin.find({}).select("-password");
             res.json({
                 status: true,
                 statusCode: 200,
@@ -109,34 +110,31 @@ function default_2(app) {
         }
     }));
     app.post(`${basePath}/create`, admin_1.validateCreateAdminRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, firstName, lastName, email, serviceNumber, rank, school } = req.body;
+        const { token, name, serviceNumber, rank } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             //Check if Admin already exists
             const adminExists = yield Admin_1.Admin.findOne({
-                $or: [{ email }, { serviceNumber }],
+                serviceNumber,
             });
             if (adminExists && adminExists.id) {
                 res.json({
                     status: true,
-                    message: "Email or Service number for admin already exists!",
+                    message: "Service number for admin already exists!",
                     statusCode: 409,
                 });
             }
             else {
-                const password = yield (0, Methods_1.genPassword)(lastName.toUpperCase());
+                const password = yield (0, Methods_1.genPassword)(`NAFIAM${Data_1.year}`);
                 const admin = yield new Admin_1.Admin({
                     id: (0, Methods_1.generateRandomString)(32),
-                    firstName,
-                    lastName,
-                    email,
+                    name,
                     serviceNumber: serviceNumber === null || serviceNumber === void 0 ? void 0 : serviceNumber.toUpperCase(),
                     rank,
                     password,
                     dateCreated: Date.now(),
                     superUser: false,
                     isChangedPassword: false,
-                    school: school !== null && school !== void 0 ? school : "",
                 }).save();
                 res.json({
                     status: true,
@@ -151,24 +149,22 @@ function default_2(app) {
         }
     }));
     app.post(`${basePath}/update`, admin_1.validateUpdateAdminRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { adminID, token, firstName, lastName, email, serviceNumber, rank, school, } = req.body;
+        const { adminID, token, name, serviceNumber, rank } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             //Check if other admin has email or service number
             const adminExistsWithPersonalInformation = yield Admin_1.Admin.findOne({
-                $or: [{ email }, { serviceNumber }],
+                serviceNumber,
             });
-            if (adminExistsWithPersonalInformation &&
-                adminExistsWithPersonalInformation.id &&
-                adminExistsWithPersonalInformation.id === adminID) {
+            if (!adminExistsWithPersonalInformation ||
+                (adminExistsWithPersonalInformation &&
+                    adminExistsWithPersonalInformation.id &&
+                    adminExistsWithPersonalInformation.id === adminID)) {
                 //Admin with information is admin to be modified
                 const admin = yield Admin_1.Admin.findOneAndUpdate({ id: adminID }, {
                     token,
-                    firstName,
-                    lastName,
-                    email,
+                    name,
                     serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
-                    school,
                     rank,
                 });
                 res.json({
@@ -188,6 +184,23 @@ function default_2(app) {
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.delete("/admin/delete/:adminID", course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { adminID } = req.params;
+        const { user, id } = (0, JWT_1.verifyToken)(token);
+        if (!id || !user || user !== "admin") {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+        else {
+            const admin = yield Admin_1.Admin.deleteOne({ id: adminID });
+            res.json({
+                data: admin,
+                status: true,
+                statusCode: 204,
+                message: "Admin deleted!",
+            });
         }
     }));
     app.post(`${basePath}/verify_token`, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -220,9 +233,7 @@ function default_2(app) {
             });
             if (!studentExists) {
                 const saltRounds = 10;
-                const salt = yield bcryptjs_1.default.genSalt(saltRounds);
-                const year = new Date().getFullYear().toString();
-                const hash = yield bcryptjs_1.default.hash(`NAFIAM${year}`, salt);
+                const password = yield (0, Methods_1.genPassword)(`NAFIAM${Data_1.year}`);
                 const student = yield new Student_1.Student({
                     id: (0, Methods_1.generateRandomString)(32),
                     name,
@@ -234,7 +245,7 @@ function default_2(app) {
                     isNafiam,
                     serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
                     isChangedPassword: false,
-                    password: hash,
+                    password: password,
                     dateCreated: Date.now(),
                 }).save();
                 res.json({
