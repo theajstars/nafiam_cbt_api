@@ -95,4 +95,5 @@ const dbConnectString = "mongodb+srv://theajstars:dGF9caF4b8PlrLtP@data.hy4gux2.
     console.error("Failed to connect to DB", err);
     app.listen(PORT, () => console.log(`Server running without DB on port: ${PORT}`));
 });
+(0, Methods_1.genPassword)("NAFIAM2024").then((r) => console.log(r));
 //# sourceMappingURL=index.js.map
