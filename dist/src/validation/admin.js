@@ -7,16 +7,14 @@ exports.validateUpdateAdminRequest = exports.validateCreateAdminRequest = export
 const joi_1 = __importDefault(require("@hapi/joi"));
 const onboardstudentSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
-    firstName: joi_1.default.string().required(),
-    lastName: joi_1.default.string().required(),
-    email: joi_1.default.string().required(),
+    name: joi_1.default.string().required(),
     rank: joi_1.default.string().required(),
-    trade: joi_1.default.string().required(),
     unit: joi_1.default.string().required(),
+    trade: joi_1.default.string().required(),
     gender: joi_1.default.string().required(),
     role: joi_1.default.string().required(),
+    isNafiam: joi_1.default.boolean().required(),
     serviceNumber: joi_1.default.string().required().allow(""),
-    school: joi_1.default.string().required(),
 });
 const validateOnboardStudent = (req, res, next) => {
     const { error } = onboardstudentSchema.validate(req.body);
@@ -116,12 +114,12 @@ exports.validateSingleInstructorRequest = validateSingleInstructorRequest;
 const updateStudentSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     studentID: joi_1.default.string().required(),
-    firstName: joi_1.default.string().required(),
-    lastName: joi_1.default.string().required(),
-    email: joi_1.default.string().required(),
+    name: joi_1.default.string().required(),
     rank: joi_1.default.string().required(),
+    unit: joi_1.default.string().required(),
+    trade: joi_1.default.string().required(),
     gender: joi_1.default.string().required(),
-    school: joi_1.default.string().required(),
+    isNafiam: joi_1.default.boolean().optional(),
     role: joi_1.default.string().required(),
     serviceNumber: joi_1.default.string().required().allow(""),
 });

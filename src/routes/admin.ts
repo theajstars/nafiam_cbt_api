@@ -257,43 +257,41 @@ export default function (app: Express) {
     async (req, res) => {
       const {
         token,
-        email,
-        firstName,
-        lastName,
+        name,
+
         rank,
-        trade,
         unit,
+        trade,
         gender,
         role,
+        isNafiam,
         serviceNumber,
-        school,
       } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         const studentExists = await Student.findOne({
-          $or: [{ email: email }, { serviceNumber }],
+          serviceNumber,
         });
         if (!studentExists) {
           const saltRounds = 10;
 
           const salt = await bcrypt.genSalt(saltRounds);
-          const hash = await bcrypt.hash("NAFIAM2024".toUpperCase(), salt);
+          const year = new Date().getFullYear().toString();
+          const hash = await bcrypt.hash(`NAFIAM${year}`, salt);
           const student = await new Student({
             id: generateRandomString(32),
-            email,
-            firstName,
-            lastName,
+            name,
             rank,
-            trade,
             unit,
+            trade,
+            gender,
             role,
+            isNafiam,
             serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
 
-            gender,
             isChangedPassword: false,
             password: hash,
             dateCreated: Date.now(),
-            school,
           }).save();
           res.json({
             status: true,
@@ -320,21 +318,21 @@ export default function (app: Express) {
     validateUpdateStudent,
     async (req, res) => {
       const {
-        studentID,
         token,
-        email,
-        firstName,
-        lastName,
+        studentID,
+        name,
         rank,
+        unit,
+        trade,
         gender,
-        school,
+        isNafiam,
         role,
         serviceNumber,
       } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         const studentExists = await Student.findOne({
-          $or: [{ email: email }, { serviceNumber }],
+          serviceNumber,
         });
         if (studentExists && studentExists.id !== studentID) {
           res.json({
@@ -347,16 +345,14 @@ export default function (app: Express) {
           const student = await Student.findOneAndUpdate(
             { id: studentID },
             {
-              email,
-              firstName,
-              lastName,
+              name,
+              unit,
+              trade,
               rank,
               role,
               serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
-
               gender,
-              school,
-              // school,
+              isNafiam,
             }
           );
           res.json({
@@ -372,18 +368,30 @@ export default function (app: Express) {
     }
   );
 
-  app.post("/admin/students/get", validateTokenRequest, async (req, res) => {
-    const { token } = req.body;
+  app.post("/admin/students/get", async (req, res) => {
+    const { token, page, limit } = req.body;
     const { user, id } = verifyToken(token);
     if (!id || !user || user !== "admin") {
       res.json(UnauthorizedResponseObject);
     } else {
-      const students = await Student.find({});
+      const students = await Student.find(
+        {},
+
+        {},
+        {
+          skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
+          limit,
+        }
+      ).select("-password");
+      const totalCount = await Student.countDocuments({});
       res.json(<DefaultResponse>{
-        data: students,
         status: true,
         statusCode: 200,
-        message: "Students found!",
+        data: students,
+        page,
+        limit,
+        rows: students.length,
+        total: totalCount,
       });
     }
   });
@@ -413,7 +421,7 @@ export default function (app: Express) {
       if (!id || !user || user !== "admin") {
         res.json(UnauthorizedResponseObject);
       } else {
-        const student = await Student.findOneAndDelete({ id: studentID });
+        const student = await Student.deleteOne({ id: studentID });
         res.json(<DefaultResponse>{
           data: student,
           status: true,

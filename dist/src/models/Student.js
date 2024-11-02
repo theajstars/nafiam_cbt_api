@@ -4,9 +4,7 @@ exports.Student = void 0;
 const mongoose_1 = require("mongoose");
 const studentSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    email: { type: String, required: true },
+    name: { type: String, required: true },
     password: { type: String, required: true },
     serviceNumber: { type: String, required: false },
     rank: { type: String, required: true },
@@ -16,7 +14,7 @@ const studentSchema = new mongoose_1.Schema({
     role: { type: String, required: true },
     dateCreated: { type: Number, required: true },
     isChangedPassword: { type: Boolean, required: true },
-    school: { type: String, required: true },
+    isNafiam: { type: Boolean, required: false },
 });
 const Student = (0, mongoose_1.model)("Student", studentSchema);
 exports.Student = Student;

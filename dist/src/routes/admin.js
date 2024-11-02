@@ -212,31 +212,30 @@ function default_2(app) {
         }
     }));
     app.post("/admin/student/onboard", admin_1.validateOnboardStudent, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, email, firstName, lastName, rank, trade, unit, gender, role, serviceNumber, school, } = req.body;
+        const { token, name, rank, unit, trade, gender, role, isNafiam, serviceNumber, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const studentExists = yield Student_1.Student.findOne({
-                $or: [{ email: email }, { serviceNumber }],
+                serviceNumber,
             });
             if (!studentExists) {
                 const saltRounds = 10;
                 const salt = yield bcryptjs_1.default.genSalt(saltRounds);
-                const hash = yield bcryptjs_1.default.hash("NAFIAM2024".toUpperCase(), salt);
+                const year = new Date().getFullYear().toString();
+                const hash = yield bcryptjs_1.default.hash(`NAFIAM${year}`, salt);
                 const student = yield new Student_1.Student({
                     id: (0, Methods_1.generateRandomString)(32),
-                    email,
-                    firstName,
-                    lastName,
+                    name,
                     rank,
-                    trade,
                     unit,
-                    role,
-                    serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
+                    trade,
                     gender,
+                    role,
+                    isNafiam,
+                    serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
                     isChangedPassword: false,
                     password: hash,
                     dateCreated: Date.now(),
-                    school,
                 }).save();
                 res.json({
                     status: true,
@@ -259,11 +258,11 @@ function default_2(app) {
         }
     }));
     app.post(`${basePath}/student/update`, admin_1.validateUpdateStudent, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { studentID, token, email, firstName, lastName, rank, gender, school, role, serviceNumber, } = req.body;
+        const { token, studentID, name, rank, unit, trade, gender, isNafiam, role, serviceNumber, } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
             const studentExists = yield Student_1.Student.findOne({
-                $or: [{ email: email }, { serviceNumber }],
+                serviceNumber,
             });
             if (studentExists && studentExists.id !== studentID) {
                 res.json({
@@ -275,15 +274,14 @@ function default_2(app) {
             }
             else {
                 const student = yield Student_1.Student.findOneAndUpdate({ id: studentID }, {
-                    email,
-                    firstName,
-                    lastName,
+                    name,
+                    unit,
+                    trade,
                     rank,
                     role,
                     serviceNumber: serviceNumber === "UNSET" ? "" : serviceNumber,
                     gender,
-                    school,
-                    // school,
+                    isNafiam,
                 });
                 res.json({
                     status: true,
@@ -297,19 +295,26 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
-    app.post("/admin/students/get", course_1.validateTokenRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token } = req.body;
+    app.post("/admin/students/get", (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, page, limit } = req.body;
         const { user, id } = (0, JWT_1.verifyToken)(token);
         if (!id || !user || user !== "admin") {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
-            const students = yield Student_1.Student.find({});
+            const students = yield Student_1.Student.find({}, {}, {
+                skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
+                limit,
+            }).select("-password");
+            const totalCount = yield Student_1.Student.countDocuments({});
             res.json({
-                data: students,
                 status: true,
                 statusCode: 200,
-                message: "Students found!",
+                data: students,
+                page,
+                limit,
+                rows: students.length,
+                total: totalCount,
             });
         }
     }));
@@ -337,7 +342,7 @@ function default_2(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
-            const student = yield Student_1.Student.findOneAndDelete({ id: studentID });
+            const student = yield Student_1.Student.deleteOne({ id: studentID });
             res.json({
                 data: student,
                 status: true,

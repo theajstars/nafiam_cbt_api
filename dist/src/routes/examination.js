@@ -441,7 +441,7 @@ function default_1(app) {
                         date: attendance.timestamp,
                     },
                 };
-                yield new Results_1.Result(Object.assign({ id: (0, Methods_1.generateRandomString)(32), examinationID, studentID: id, firstName: student.firstName, lastName: student.lastName, serviceNumber: student.serviceNumber }, result)).save();
+                yield new Results_1.Result(Object.assign({ id: (0, Methods_1.generateRandomString)(32), examinationID, studentID: id, name: student.name, serviceNumber: student.serviceNumber }, result)).save();
                 res.json({
                     statusCode: 200,
                     status: true,

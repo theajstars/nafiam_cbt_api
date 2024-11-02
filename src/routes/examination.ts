@@ -600,8 +600,8 @@ export default function (app: Express) {
             id: generateRandomString(32),
             examinationID,
             studentID: id,
-            firstName: student.firstName,
-            lastName: student.lastName,
+            name: student.name,
+
             serviceNumber: student.serviceNumber,
             ...result,
           }).save();
