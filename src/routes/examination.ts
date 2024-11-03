@@ -239,8 +239,8 @@ export default function (app: Express) {
       const { token, examinationID, questions, title, date, duration } =
         req.body;
       const { id } = verifyToken(token);
-      const instructor = await Instructor.findOne({ id });
-      if (token && instructor) {
+      const admin = await Admin.findOne({ id });
+      if (token && admin) {
         const examination = await Examination.findOneAndUpdate(
           { id: examinationID },
           { questions, title, date, duration }

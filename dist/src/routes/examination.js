@@ -175,8 +175,8 @@ function default_1(app) {
     app.post(`${basePath}/edit`, examination_1.validateEditExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID, questions, title, date, duration } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
-        const instructor = yield Instructor_1.Instructor.findOne({ id });
-        if (token && instructor) {
+        const admin = yield Admin_1.Admin.findOne({ id });
+        if (token && admin) {
             const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { questions, title, date, duration });
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination updated!", examination === null ? 404 : 201, examination));
         }

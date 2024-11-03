@@ -32,14 +32,13 @@ const log_1 = __importDefault(require("./src/routes/log"));
 const lecture_1 = __importDefault(require("./src/routes/lecture"));
 const practice_1 = __importDefault(require("./src/routes/practice"));
 const Data_1 = require("./src/Lib/Data");
-const logger_1 = require("./src/middleware/logger");
 const app = (0, express_1.default)();
 exports.app = app;
 app.use((0, cors_1.default)({
     origin: "*",
 }));
 app.use((0, body_parser_1.default)({ extended: true }));
-app.use(logger_1.logger);
+// app.use(logger);
 const PORT = 8080;
 // const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
 const dbConnectString = "mongodb+srv://theajstars:dGF9caF4b8PlrLtP@data.hy4gux2.mongodb.net/?retryWrites=true&w=majority&appName=data/nafiamDB";

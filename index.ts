@@ -32,7 +32,7 @@ app.use(
   })
 );
 app.use(bodyParser({ extended: true }));
-app.use(logger);
+// app.use(logger);
 const PORT = 8080;
 // const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
 const dbConnectString =
