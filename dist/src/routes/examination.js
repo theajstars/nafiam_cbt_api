@@ -15,31 +15,27 @@ const Examination_1 = require("../models/Examination");
 const Misc_1 = require("../Lib/Misc");
 const Methods_1 = require("../Lib/Methods");
 const examination_1 = require("../validation/examination");
-const Course_1 = require("../models/Course");
 const Attendance_1 = require("../models/Attendance");
 const Results_1 = require("../models/Results");
 const Student_1 = require("../models/Student");
+const Admin_1 = require("../models/Admin");
 const basePath = "/examination";
 function default_1(app) {
     app.post(`${basePath}/create`, examination_1.validateCreateExaminationSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, title, date, course: courseCode } = req.body;
+        const { token, title, date, duration } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
-        const instructor = yield Instructor_1.Instructor.findOne({ id });
-        if (token && instructor) {
-            const course = yield Course_1.Course.findOne({ code: courseCode });
+        const admin = yield Admin_1.Admin.findOne({ id });
+        if (token && admin) {
             const examination = yield new Examination_1.Examination({
                 id: (0, Methods_1.generateRandomString)(32),
                 title,
                 date,
-                instructorID: id,
-                course: course.id,
-                courseTitle: course.title,
+                duration,
                 approved: false,
-                completed: false,
                 published: false,
                 started: false,
+                completed: false,
                 password: "",
-                students: course.students,
             }).save();
             res.json((0, Misc_1.returnSuccessResponseObject)("Examination created!", 201, examination));
         }
@@ -177,11 +173,11 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/edit`, examination_1.validateEditExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, questions, title, date, course } = req.body;
+        const { token, examinationID, questions, title, date, duration } = req.body;
         const { id } = (0, JWT_1.verifyToken)(token);
         const instructor = yield Instructor_1.Instructor.findOne({ id });
         if (token && instructor) {
-            const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { questions, title, date, course });
+            const examination = yield Examination_1.Examination.findOneAndUpdate({ id: examinationID }, { questions, title, date, duration });
             res.json((0, Misc_1.returnSuccessResponseObject)(examination === null ? "Not Found!" : "Examination updated!", examination === null ? 404 : 201, examination));
         }
         else {
@@ -400,7 +396,6 @@ function default_1(app) {
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
             const examination = yield Examination_1.Examination.findOne({ id: examinationID });
-            const course = yield Course_1.Course.findOne({ id: examination.course });
             const student = yield Student_1.Student.findOne({ id });
             const attendance = yield Attendance_1.Attendance.findOne({
                 examinationID: examinationID,
@@ -426,16 +421,9 @@ function default_1(app) {
                     },
                     exam: {
                         title: examination.title,
-                        courseTitle: examination.courseTitle,
                         date: examination.date,
                         questions: examination.questions,
                         studentQuestions: questions,
-                    },
-                    course: {
-                        title: course.title,
-                        code: course.code,
-                        school: course.school,
-                        id: course.id,
                     },
                     attendance: {
                         date: attendance.timestamp,

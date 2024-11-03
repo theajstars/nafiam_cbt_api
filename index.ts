@@ -23,6 +23,7 @@ import lecture from "./src/routes/lecture";
 import practice from "./src/routes/practice";
 import { Student } from "./src/models/Student";
 import { year } from "./src/Lib/Data";
+import { logger } from "./src/middleware/logger";
 
 const app = express();
 app.use(
@@ -31,7 +32,7 @@ app.use(
   })
 );
 app.use(bodyParser({ extended: true }));
-
+app.use(logger);
 const PORT = 8080;
 // const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
 const dbConnectString =

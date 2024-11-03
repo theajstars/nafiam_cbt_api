@@ -11,7 +11,7 @@ import {
   returnSuccessResponseObject,
 } from "../Lib/Misc";
 import { generateRandomString } from "../Lib/Methods";
-import { validateTokenRequest } from "../validation/course";
+
 import {
   validateApproveExaminationRequest,
   validateCreateExaminationSchema,
@@ -21,34 +21,32 @@ import {
   validateStudentBlacklistRequest,
   validateStudentSubmissionRequest,
 } from "../validation/examination";
-import { Course } from "../models/Course";
+
 import { Attendance } from "../models/Attendance";
 import { Result } from "../models/Results";
 import { Student } from "../models/Student";
+import { Admin } from "../models/Admin";
 const basePath = "/examination";
 export default function (app: Express) {
   app.post(
     `${basePath}/create`,
     validateCreateExaminationSchema,
     async (req, res) => {
-      const { token, title, date, course: courseCode } = req.body;
+      const { token, title, date, duration } = req.body;
       const { id } = verifyToken(token);
-      const instructor = await Instructor.findOne({ id });
-      if (token && instructor) {
-        const course = await Course.findOne({ code: courseCode });
+      const admin = await Admin.findOne({ id });
+      if (token && admin) {
         const examination = await new Examination({
           id: generateRandomString(32),
           title,
           date,
-          instructorID: id,
-          course: course.id,
-          courseTitle: course.title,
+          duration,
+
           approved: false,
-          completed: false,
           published: false,
           started: false,
+          completed: false,
           password: "",
-          students: course.students,
         }).save();
         res.json(
           returnSuccessResponseObject("Examination created!", 201, examination)
@@ -238,13 +236,14 @@ export default function (app: Express) {
     `${basePath}/edit`,
     validateEditExaminationRequest,
     async (req, res) => {
-      const { token, examinationID, questions, title, date, course } = req.body;
+      const { token, examinationID, questions, title, date, duration } =
+        req.body;
       const { id } = verifyToken(token);
       const instructor = await Instructor.findOne({ id });
       if (token && instructor) {
         const examination = await Examination.findOneAndUpdate(
           { id: examinationID },
-          { questions, title, date, course }
+          { questions, title, date, duration }
         );
         res.json(
           returnSuccessResponseObject(
@@ -548,7 +547,7 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
       if (id && user && user === "student") {
         const examination = await Examination.findOne({ id: examinationID });
-        const course = await Course.findOne({ id: examination.course });
+
         const student = await Student.findOne({ id });
         const attendance = await Attendance.findOne({
           examinationID: examinationID,
@@ -581,17 +580,11 @@ export default function (app: Express) {
             },
             exam: {
               title: examination.title,
-              courseTitle: examination.courseTitle,
               date: examination.date,
               questions: examination.questions,
               studentQuestions: questions,
             },
-            course: {
-              title: course.title,
-              code: course.code,
-              school: course.school,
-              id: course.id,
-            },
+
             attendance: {
               date: attendance.timestamp,
             },
