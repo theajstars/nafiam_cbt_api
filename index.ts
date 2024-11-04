@@ -82,6 +82,11 @@ connect(dbConnectString)
       console.log("Password has been changed!");
     }
 
+    async function DoSomething() {
+      await Examination.updateMany({}, { published: false });
+    }
+    // DoSomething();
+
     // changeAdminPassword();
 
     // createAdmin();

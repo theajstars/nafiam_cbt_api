@@ -74,9 +74,7 @@ export default function (app: Express) {
       const { token } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
-        const admin = await Admin.findOne({ id }).select(
-          "id firstName lastName email superUser rank serviceNumber dateCreated isChangedPassword school"
-        );
+        const admin = await Admin.findOne({ id }).select("-password");
         res.json({
           status: true,
           statusCode: 200,

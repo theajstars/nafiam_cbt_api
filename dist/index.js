@@ -23,6 +23,7 @@ const instructor_1 = __importDefault(require("./src/routes/instructor"));
 const examination_1 = __importDefault(require("./src/routes/examination"));
 const course_1 = __importDefault(require("./src/routes/course"));
 const file_1 = __importDefault(require("./src/routes/file"));
+const Examination_1 = require("./src/models/Examination");
 const Admin_1 = require("./src/models/Admin");
 const Methods_1 = require("./src/Lib/Methods");
 const misc_1 = __importDefault(require("./src/routes/misc"));
@@ -87,6 +88,12 @@ const dbConnectString = "mongodb+srv://theajstars:dGF9caF4b8PlrLtP@data.hy4gux2.
             console.log("Password has been changed!");
         });
     }
+    function DoSomething() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield Examination_1.Examination.updateMany({}, { published: false });
+        });
+    }
+    // DoSomething();
     // changeAdminPassword();
     // createAdmin();
     // Course.updateMany({}, { instructorID: "1709114865502" }).exec();
