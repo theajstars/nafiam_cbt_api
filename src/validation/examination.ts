@@ -2,7 +2,7 @@ import Joi from "@hapi/joi";
 
 const defaultExaminationSchema = Joi.object({
   token: Joi.string().required(),
-  examinationID: Joi.string().required(),
+  examinationID: Joi.string().optional(),
   isAdmin: Joi.boolean().optional(),
 });
 
@@ -142,6 +142,48 @@ const studentBlacklistSchema = Joi.object({
 
 export const validateStudentBlacklistRequest = (req, res, next) => {
   const { error } = studentBlacklistSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
+const getSingleBatchSchema = Joi.object({
+  token: Joi.string().required(),
+  batchID: Joi.string().required(),
+});
+
+export const validateGetSingleBatchRequest = (req, res, next) => {
+  const { error } = getSingleBatchSchema.validate(req.body);
+  if (error) {
+    const errorResponse = error.details.map((e) => {
+      return e.message;
+    });
+    res.json({
+      status: true,
+      statusCode: 400,
+      message: errorResponse.toString(),
+    });
+  } else {
+    next();
+  }
+};
+const createExaminationBatchSchema = Joi.object({
+  token: Joi.string().required(),
+  examinationID: Joi.string().required(),
+  batch: Joi.number().required(),
+  students: Joi.any().required(),
+});
+
+export const validateCreateExaminationBatchRequest = (req, res, next) => {
+  const { error } = createExaminationBatchSchema.validate(req.body);
   if (error) {
     const errorResponse = error.details.map((e) => {
       return e.message;

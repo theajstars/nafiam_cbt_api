@@ -14,10 +14,12 @@ import { generateRandomString } from "../Lib/Methods";
 
 import {
   validateApproveExaminationRequest,
+  validateCreateExaminationBatchRequest,
   validateCreateExaminationSchema,
   validateDefaultExaminationRequest,
   validateEditExaminationRequest,
   validateExaminationPasswordRequest,
+  validateGetSingleBatchRequest,
   validateStudentBlacklistRequest,
   validateStudentSubmissionRequest,
 } from "../validation/examination";
@@ -26,6 +28,7 @@ import { Attendance } from "../models/Attendance";
 import { Result } from "../models/Results";
 import { Student } from "../models/Student";
 import { Admin } from "../models/Admin";
+import { Batch } from "../models/Batch";
 const basePath = "/examination";
 export default function (app: Express) {
   app.post(
@@ -334,6 +337,23 @@ export default function (app: Express) {
       }
     }
   );
+  app.post(`${basePath}/batch/students/:batchID`, async (req, res) => {
+    const { token } = req.body;
+    const { id, user } = verifyToken(token);
+    if (id && user && user !== "student") {
+      const { batchID } = req.params;
+      const batch = await Batch.findOne({ id: batchID });
+      const students = await Student.find({ id: { $in: batch?.students } });
+      res.json({
+        statusCode: 200,
+        message: "Examination eligible students found!",
+        data: students,
+        status: true,
+      });
+    } else {
+      res.json(UnauthorizedResponseObject);
+    }
+  });
   app.post(
     `${basePath}/change-password`,
     validateDefaultExaminationRequest,
@@ -615,6 +635,88 @@ export default function (app: Express) {
         // const
       } else {
         res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/create-batch`,
+    validateCreateExaminationBatchRequest,
+    async (req, res) => {
+      const { token, examinationID, batch, students } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user === "admin") {
+        const examination = await Examination.findOne({ id: examinationID });
+        const existingBatch = await Batch.findOne({ batchNumber: batch });
+        if (existingBatch && existingBatch.id) {
+          res.json({
+            statusCode: 409,
+            status: true,
+            message: "Batch already exists!",
+          });
+        } else {
+          const newBatch = await new Batch({
+            id: generateRandomString(32),
+            examinationID,
+            title: `${examination.title}`,
+            batchNumber: batch,
+            duration: examination.duration,
+            date: examination.date,
+            approved: true,
+            published: true,
+            started: false,
+            completed: false,
+            questions: examination.questions,
+            students,
+            password: "",
+            blacklist: [],
+          }).save();
+          res.json({
+            statusCode: 201,
+            status: true,
+            message: "Examination batch has been created!",
+            data: newBatch,
+          });
+        }
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
+  app.post(
+    `${basePath}/batches/all`,
+    validateDefaultExaminationRequest,
+    async (req, res) => {
+      const { token, examinationID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (!id || !user) {
+        res.json(UnauthorizedResponseObject);
+      } else {
+        const batches = await Batch.find({ examinationID });
+        res.json({
+          statusCode: 200,
+          status: true,
+          message: "Examination batches retrieved!",
+          data: batches,
+        });
+      }
+    }
+  );
+  app.post(
+    `${basePath}/batch/get`,
+    validateGetSingleBatchRequest,
+    async (req, res) => {
+      const { token, batchID } = req.body;
+      const { id, user } = verifyToken(token);
+      if (!id || !user) {
+        res.json(UnauthorizedResponseObject);
+      } else {
+        const batches = await Batch.findOne({ id: batchID });
+        res.json({
+          statusCode: 200,
+          status: true,
+          message: "Examination batch retrieved!",
+          data: batches,
+        });
       }
     }
   );

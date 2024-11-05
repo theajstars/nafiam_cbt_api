@@ -18,6 +18,7 @@ const Attendance_1 = require("../models/Attendance");
 const Results_1 = require("../models/Results");
 const Student_1 = require("../models/Student");
 const Admin_1 = require("../models/Admin");
+const Batch_1 = require("../models/Batch");
 const basePath = "/examination";
 function default_1(app) {
     app.post(`${basePath}/create`, examination_1.validateCreateExaminationSchema, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -222,6 +223,24 @@ function default_1(app) {
         if (id && user && isAdmin && user !== "student") {
             const examination = yield Examination_1.Examination.findOne({ id: examinationID });
             const students = examination.students;
+            res.json({
+                statusCode: 200,
+                message: "Examination eligible students found!",
+                data: students,
+                status: true,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/batch/students/:batchID`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user !== "student") {
+            const { batchID } = req.params;
+            const batch = yield Batch_1.Batch.findOne({ id: batchID });
+            const students = yield Student_1.Student.find({ id: { $in: batch === null || batch === void 0 ? void 0 : batch.students } });
             res.json({
                 statusCode: 200,
                 message: "Examination eligible students found!",
@@ -447,6 +466,80 @@ function default_1(app) {
         }
         else {
             res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/create-batch`, examination_1.validateCreateExaminationBatchRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID, batch, students } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user === "admin") {
+            const examination = yield Examination_1.Examination.findOne({ id: examinationID });
+            const existingBatch = yield Batch_1.Batch.findOne({ batchNumber: batch });
+            if (existingBatch && existingBatch.id) {
+                res.json({
+                    statusCode: 409,
+                    status: true,
+                    message: "Batch already exists!",
+                });
+            }
+            else {
+                const newBatch = yield new Batch_1.Batch({
+                    id: (0, Methods_1.generateRandomString)(32),
+                    examinationID,
+                    title: `${examination.title}`,
+                    batchNumber: batch,
+                    duration: examination.duration,
+                    date: examination.date,
+                    approved: true,
+                    published: true,
+                    started: false,
+                    completed: false,
+                    questions: examination.questions,
+                    students,
+                    password: "",
+                    blacklist: [],
+                }).save();
+                res.json({
+                    statusCode: 201,
+                    status: true,
+                    message: "Examination batch has been created!",
+                    data: newBatch,
+                });
+            }
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
+    app.post(`${basePath}/batches/all`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (!id || !user) {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+        else {
+            const batches = yield Batch_1.Batch.find({ examinationID });
+            res.json({
+                statusCode: 200,
+                status: true,
+                message: "Examination batches retrieved!",
+                data: batches,
+            });
+        }
+    }));
+    app.post(`${basePath}/batch/get`, examination_1.validateGetSingleBatchRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, batchID } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (!id || !user) {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+        else {
+            const batches = yield Batch_1.Batch.findOne({ id: batchID });
+            res.json({
+                statusCode: 200,
+                status: true,
+                message: "Examination batch retrieved!",
+                data: batches,
+            });
         }
     }));
 }
