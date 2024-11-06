@@ -337,6 +337,43 @@ export default function (app: Express) {
       }
     }
   );
+  app.post(`${basePath}/students/unbatched`, async (req, res) => {
+    const { token, examinationID, page, limit } = req.body;
+    console.log({ token, examinationID, page, limit });
+    const { id, user } = verifyToken(token);
+    if (id && user && user !== "student") {
+      const batches = await Batch.find({ examinationID });
+      let batchedStudents = [];
+      batches.map((b) => {
+        batchedStudents = [...batchedStudents, ...b.students];
+      });
+      console.log(batchedStudents);
+      const students = await Student.find(
+        { id: { $nin: batchedStudents } },
+
+        {},
+        {
+          skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
+          limit,
+        }
+      ).select("-password");
+
+      const totalCount = await Student.countDocuments({
+        id: { $nin: batchedStudents },
+      });
+      res.json(<DefaultResponse>{
+        status: true,
+        statusCode: 200,
+        data: students,
+        page,
+        limit,
+        rows: students.length,
+        total: totalCount,
+      });
+    } else {
+      res.json(UnauthorizedResponseObject);
+    }
+  });
   app.post(`${basePath}/batch/students/:batchID`, async (req, res) => {
     const { token } = req.body;
     const { id, user } = verifyToken(token);

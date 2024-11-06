@@ -234,6 +234,38 @@ function default_1(app) {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
     }));
+    app.post(`${basePath}/students/unbatched`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, examinationID, page, limit } = req.body;
+        console.log({ token, examinationID, page, limit });
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user && user !== "student") {
+            const batches = yield Batch_1.Batch.find({ examinationID });
+            let batchedStudents = [];
+            batches.map((b) => {
+                batchedStudents = [...batchedStudents, ...b.students];
+            });
+            console.log(batchedStudents);
+            const students = yield Student_1.Student.find({ id: { $nin: batchedStudents } }, {}, {
+                skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
+                limit,
+            }).select("-password");
+            const totalCount = yield Student_1.Student.countDocuments({
+                id: { $nin: batchedStudents },
+            });
+            res.json({
+                status: true,
+                statusCode: 200,
+                data: students,
+                page,
+                limit,
+                rows: students.length,
+                total: totalCount,
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
     app.post(`${basePath}/batch/students/:batchID`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
