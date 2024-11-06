@@ -86,7 +86,7 @@ function default_1(app) {
         const { token } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
-            const examination = yield Examination_1.Examination.find({
+            const examination = yield Batch_1.Batch.find({
                 started: true,
                 completed: false,
                 students: { $in: [id] },
@@ -102,16 +102,16 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/unsullied/get`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID } = req.body;
+        const { token, batchID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
-            const examination = yield Examination_1.Examination.findOne({
-                id: examinationID,
+            const examination = yield Batch_1.Batch.findOne({
+                id: batchID,
                 started: true,
                 completed: false,
             });
             const resultIfExists = yield Results_1.Result.findOne({
-                examinationID,
+                batchID,
                 studentID: id,
             });
             if (resultIfExists && resultIfExists.id) {
@@ -372,11 +372,11 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/validate-password`, examination_1.validateExaminationPasswordRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, password } = req.body;
+        const { token, batchID, password } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
-            const examination = yield Examination_1.Examination.findOne({
-                id: examinationID,
+            const examination = yield Batch_1.Batch.findOne({
+                id: batchID,
             });
             if (examination.blacklist.includes(id)) {
                 res.json({
@@ -387,9 +387,9 @@ function default_1(app) {
             }
             else {
                 if (password === examination.password) {
-                    const attendance = yield Attendance_1.Attendance.findOne({ examinationID });
+                    const attendance = yield Attendance_1.Attendance.findOne({ batchID });
                     if (!attendance.students.includes(id)) {
-                        yield Attendance_1.Attendance.findOneAndUpdate({ examinationID }, { $push: { students: id } });
+                        yield Attendance_1.Attendance.findOneAndUpdate({ batchID }, { $push: { students: id } });
                     }
                 }
                 res.json({
@@ -451,23 +451,20 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/submit-paper`, examination_1.validateStudentSubmissionRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, questions } = req.body;
+        const { token, batchID, questions } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "student") {
-            const examination = yield Examination_1.Examination.findOne({ id: examinationID });
+            const examination = yield Batch_1.Batch.findOne({ id: batchID });
             const student = yield Student_1.Student.findOne({ id });
             const attendance = yield Attendance_1.Attendance.findOne({
-                examinationID: examinationID,
+                batchID: batchID,
             });
             const isStudentInBlacklist = examination.blacklist.includes(id);
             const students = attendance.students;
             if (students.includes(id) && !isStudentInBlacklist) {
-                const examinationQuestions = examination.selectedQuestions.map((sQuestion) => {
-                    return examination.questions.find((eQuestion) => eQuestion.id === sQuestion);
-                });
-                const marksObtainable = examination.selectedQuestions.length;
+                const marksObtainable = examination.questions.length;
                 const count = questions.map((q) => {
-                    const foundQuestion = examinationQuestions.find((eQuestion) => eQuestion.id === q.id);
+                    const foundQuestion = examination.questions.find((eQuestion) => eQuestion.id === q.id);
                     return foundQuestion.answer === q.answer;
                 });
                 const correctCount = count.filter((val) => val === true);
@@ -488,7 +485,7 @@ function default_1(app) {
                         date: attendance.timestamp,
                     },
                 };
-                yield new Results_1.Result(Object.assign({ id: (0, Methods_1.generateRandomString)(32), examinationID, studentID: id, name: student.name, serviceNumber: student.serviceNumber }, result)).save();
+                yield new Results_1.Result(Object.assign({ id: (0, Methods_1.generateRandomString)(32), examinationID: examination.examinationID, batchID: batchID, studentID: id, name: student.name, serviceNumber: student.serviceNumber }, result)).save();
                 res.json({
                     statusCode: 200,
                     status: true,

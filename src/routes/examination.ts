@@ -128,7 +128,7 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
 
       if (id && user && user === "student") {
-        const examination = await Examination.find({
+        const examination = await Batch.find({
           started: true,
           completed: false,
           students: { $in: [id] },
@@ -154,17 +154,17 @@ export default function (app: Express) {
     `${basePath}/unsullied/get`,
     validateDefaultExaminationRequest,
     async (req, res) => {
-      const { token, examinationID } = req.body;
+      const { token, batchID } = req.body;
       const { id, user } = verifyToken(token);
 
       if (id && user && user === "student") {
-        const examination = await Examination.findOne({
-          id: examinationID,
+        const examination = await Batch.findOne({
+          id: batchID,
           started: true,
           completed: false,
         });
         const resultIfExists = await Result.findOne({
-          examinationID,
+          batchID,
           studentID: id,
         });
         if (resultIfExists && resultIfExists.id) {
@@ -505,11 +505,11 @@ export default function (app: Express) {
     `${basePath}/validate-password`,
     validateExaminationPasswordRequest,
     async (req, res) => {
-      const { token, examinationID, password } = req.body;
+      const { token, batchID, password } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user) {
-        const examination = await Examination.findOne({
-          id: examinationID,
+        const examination = await Batch.findOne({
+          id: batchID,
         });
         if (examination.blacklist.includes(id)) {
           res.json({
@@ -520,10 +520,10 @@ export default function (app: Express) {
           });
         } else {
           if (password === examination.password) {
-            const attendance = await Attendance.findOne({ examinationID });
+            const attendance = await Attendance.findOne({ batchID });
             if (!attendance.students.includes(id)) {
               await Attendance.findOneAndUpdate(
-                { examinationID },
+                { batchID },
                 { $push: { students: id } }
               );
             }
@@ -605,28 +605,21 @@ export default function (app: Express) {
     `${basePath}/submit-paper`,
     validateStudentSubmissionRequest,
     async (req, res) => {
-      const { token, examinationID, questions } = req.body;
+      const { token, batchID, questions } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "student") {
-        const examination = await Examination.findOne({ id: examinationID });
+        const examination = await Batch.findOne({ id: batchID });
 
         const student = await Student.findOne({ id });
         const attendance = await Attendance.findOne({
-          examinationID: examinationID,
+          batchID: batchID,
         });
         const isStudentInBlacklist = examination.blacklist.includes(id);
         const students = attendance.students;
         if (students.includes(id) && !isStudentInBlacklist) {
-          const examinationQuestions = examination.selectedQuestions.map(
-            (sQuestion) => {
-              return examination.questions.find(
-                (eQuestion) => eQuestion.id === sQuestion
-              );
-            }
-          );
-          const marksObtainable = examination.selectedQuestions.length;
+          const marksObtainable = examination.questions.length;
           const count = questions.map((q) => {
-            const foundQuestion = examinationQuestions.find(
+            const foundQuestion = examination.questions.find(
               (eQuestion) => eQuestion.id === q.id
             );
             return foundQuestion.answer === q.answer;
@@ -653,7 +646,8 @@ export default function (app: Express) {
           };
           await new Result({
             id: generateRandomString(32),
-            examinationID,
+            examinationID: examination.examinationID,
+            batchID: batchID,
             studentID: id,
             name: student.name,
 

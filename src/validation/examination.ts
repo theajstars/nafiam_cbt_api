@@ -93,7 +93,7 @@ export const validateApproveExaminationRequest = (req, res, next) => {
 };
 const validateExaminationPasswordSchema = Joi.object({
   token: Joi.string().required(),
-  examinationID: Joi.string().required(),
+  batchID: Joi.string().required(),
   password: Joi.string().required(),
 });
 
@@ -115,6 +115,7 @@ export const validateExaminationPasswordRequest = (req, res, next) => {
 const studentSubmitSchema = Joi.object({
   token: Joi.string().required(),
   examinationID: Joi.string().optional(),
+  batchID: Joi.string().optional(),
   practiceID: Joi.string().optional(),
   questions: Joi.any().required(),
 });

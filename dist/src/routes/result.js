@@ -18,11 +18,11 @@ const basePath = "/result";
 function default_1(app) {
     // Get One student Result for One Examination
     app.post(`${basePath}/student/get`, student_1.validateGetSingleResultRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, studentID } = req.body;
+        const { token, batchID, studentID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user) {
             const result = yield Results_1.Result.findOne({
-                examinationID,
+                batchID,
                 studentID: user === "student" ? id : studentID,
             });
             res.json({

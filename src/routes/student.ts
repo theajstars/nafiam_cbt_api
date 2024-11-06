@@ -62,9 +62,7 @@ export default function (app: Express) {
       const { token } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "student") {
-        const student = await Student.findOne({ id }).select(
-          "id firstName lastName email rank serviceNumber gender role isChangedPassword school"
-        );
+        const student = await Student.findOne({ id }).select("-password");
         res.json({
           status: true,
           statusCode: 200,
