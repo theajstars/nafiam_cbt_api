@@ -304,28 +304,37 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/start`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID, isAdmin } = req.body;
+        const { token, examinationID, batchID, isAdmin } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
-        if (!isAdmin || !id || !user || user !== "admin") {
+        if (!id || !user || user === "student") {
             res.json(Misc_1.UnauthorizedResponseObject);
         }
         else {
             const password = (0, Methods_1.generateRandomString)(6, "ALPHABET").toUpperCase();
-            const examination = yield Examination_1.Examination.findOneAndUpdate({
-                id: examinationID,
-            }, { started: true, password });
-            yield new Attendance_1.Attendance({
-                id: (0, Methods_1.generateRandomString)(32),
-                examinationID,
-                timestamp: Date.now(),
-                students: [],
-            }).save();
-            res.json({
-                statusCode: 200,
-                status: true,
-                message: "Examination starting",
-                data: { password },
-            });
+            const batch = yield Batch_1.Batch.findOne({ id: batchID });
+            if (batch && batch.id) {
+                yield new Attendance_1.Attendance({
+                    id: (0, Methods_1.generateRandomString)(32),
+                    examinationID: batch.examinationID,
+                    batchID: batch.id,
+                    timestamp: Date.now(),
+                    students: [],
+                }).save();
+                yield Batch_1.Batch.updateOne({ id: batchID }, { started: true, password });
+                res.json({
+                    statusCode: 200,
+                    status: true,
+                    message: "Examination starting",
+                    data: { password },
+                });
+            }
+            else {
+                res.json({
+                    statusCode: 404,
+                    status: true,
+                    message: "Examination batch does not exist!",
+                });
+            }
         }
     }));
     app.post(`${basePath}/end`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {

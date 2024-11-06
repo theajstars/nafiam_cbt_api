@@ -3,6 +3,7 @@ import Joi from "@hapi/joi";
 const defaultExaminationSchema = Joi.object({
   token: Joi.string().required(),
   examinationID: Joi.string().optional(),
+  batchID: Joi.string().optional(),
   isAdmin: Joi.boolean().optional(),
 });
 

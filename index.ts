@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -33,10 +36,9 @@ app.use(
 );
 app.use(bodyParser({ extended: true }));
 // app.use(logger);
-const PORT = 8080;
+const PORT = process.env.PORT;
 // const dbConnectString = "mongodb://127.0.0.1:27017/nafiam_cbt";
-const dbConnectString =
-  "mongodb+srv://theajstars:dGF9caF4b8PlrLtP@data.hy4gux2.mongodb.net/?retryWrites=true&w=majority&appName=data/nafiamDB";
+const dbConnectString = process.env.MONGO_URL;
 
 connect(dbConnectString)
   .then(() => {

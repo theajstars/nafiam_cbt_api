@@ -5,6 +5,7 @@ const mongoose_1 = require("mongoose");
 const attendanceSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
     examinationID: { type: String, required: true },
+    batchID: { type: String, required: true },
     timestamp: { type: Number, required: true },
     students: { type: Array, required: true },
 });

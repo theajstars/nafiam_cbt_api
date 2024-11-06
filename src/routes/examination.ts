@@ -421,30 +421,35 @@ export default function (app: Express) {
     `${basePath}/start`,
     validateDefaultExaminationRequest,
     async (req, res) => {
-      const { token, examinationID, isAdmin } = req.body;
+      const { token, examinationID, batchID, isAdmin } = req.body;
       const { id, user } = verifyToken(token);
-      if (!isAdmin || !id || !user || user !== "admin") {
+      if (!id || !user || user === "student") {
         res.json(UnauthorizedResponseObject);
       } else {
         const password = generateRandomString(6, "ALPHABET").toUpperCase();
-        const examination = await Examination.findOneAndUpdate(
-          {
-            id: examinationID,
-          },
-          { started: true, password }
-        );
-        await new Attendance({
-          id: generateRandomString(32),
-          examinationID,
-          timestamp: Date.now(),
-          students: [],
-        }).save();
-        res.json({
-          statusCode: 200,
-          status: true,
-          message: "Examination starting",
-          data: { password },
-        });
+        const batch = await Batch.findOne({ id: batchID });
+        if (batch && batch.id) {
+          await new Attendance({
+            id: generateRandomString(32),
+            examinationID: batch.examinationID,
+            batchID: batch.id,
+            timestamp: Date.now(),
+            students: [],
+          }).save();
+          await Batch.updateOne({ id: batchID }, { started: true, password });
+          res.json({
+            statusCode: 200,
+            status: true,
+            message: "Examination starting",
+            data: { password },
+          });
+        } else {
+          res.json({
+            statusCode: 404,
+            status: true,
+            message: "Examination batch does not exist!",
+          });
+        }
       }
     }
   );

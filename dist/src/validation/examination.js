@@ -8,6 +8,7 @@ const joi_1 = __importDefault(require("@hapi/joi"));
 const defaultExaminationSchema = joi_1.default.object({
     token: joi_1.default.string().required(),
     examinationID: joi_1.default.string().optional(),
+    batchID: joi_1.default.string().optional(),
     isAdmin: joi_1.default.boolean().optional(),
 });
 const validateDefaultExaminationRequest = (req, res, next) => {
