@@ -682,7 +682,10 @@ export default function (app: Express) {
       const { id, user } = verifyToken(token);
       if (id && user === "admin") {
         const examination = await Examination.findOne({ id: examinationID });
-        const existingBatch = await Batch.findOne({ batchNumber: batch });
+        const existingBatch = await Batch.findOne({
+          batchNumber: batch,
+          examinationID,
+        });
         if (existingBatch && existingBatch.id) {
           res.json({
             statusCode: 409,
