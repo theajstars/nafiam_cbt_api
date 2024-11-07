@@ -19,6 +19,7 @@ export interface BatchProps {
   batchNumber: number;
   duration: string;
   approved: boolean;
+  isNafiam: boolean;
   published: boolean;
   started: boolean;
   completed: boolean;
@@ -38,6 +39,7 @@ const batchSchema = new Schema<BatchProps, Model<BatchProps>>({
 
   started: { type: Boolean, required: true },
   approved: { type: Boolean, required: true },
+  isNafiam: { type: Boolean, required: true },
   published: { type: Boolean, required: true },
   completed: { type: Boolean, required: true },
   questions: { type: Array, required: false },

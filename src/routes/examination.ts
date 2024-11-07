@@ -35,7 +35,7 @@ export default function (app: Express) {
     `${basePath}/create`,
     validateCreateExaminationSchema,
     async (req, res) => {
-      const { token, title, date, duration } = req.body;
+      const { token, title, date, duration, isNafiam } = req.body;
       const { id } = verifyToken(token);
       const admin = await Admin.findOne({ id });
       if (token && admin) {
@@ -44,6 +44,7 @@ export default function (app: Express) {
           title,
           date,
           duration,
+          isNafiam,
 
           approved: false,
           published: false,
@@ -701,6 +702,7 @@ export default function (app: Express) {
             duration: examination.duration,
             date: examination.date,
             approved: true,
+            isNafiam: examination.isNafiam,
             published: true,
             started: false,
             completed: false,

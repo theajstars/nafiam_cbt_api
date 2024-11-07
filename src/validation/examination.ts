@@ -27,6 +27,7 @@ const createExaminationSchema = Joi.object({
   token: Joi.string().required(),
   title: Joi.string().required(),
   date: Joi.number().required(),
+  isNafiam: Joi.boolean().required(),
   duration: Joi.string().required(),
 });
 

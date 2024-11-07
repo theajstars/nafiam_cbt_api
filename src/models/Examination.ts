@@ -18,6 +18,7 @@ export interface ExaminationProps {
   duration: string;
 
   approved: boolean;
+  isNafiam: boolean;
   published: boolean;
   started: boolean;
   completed: boolean;
@@ -36,6 +37,7 @@ const examinationSchema = new Schema<ExaminationProps, Model<ExaminationProps>>(
     duration: { type: String, required: true },
 
     approved: { type: Boolean, required: true },
+    isNafiam: { type: Boolean, required: true },
     published: { type: Boolean, required: true },
     started: { type: Boolean, required: true },
     completed: { type: Boolean, required: true },
