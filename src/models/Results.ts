@@ -7,6 +7,7 @@ export type ResultProps = {
   studentID: string;
   name: string;
   serviceNumber: string;
+  isNafiam: boolean;
   grading: {
     marksObtainable: number;
     numberCorrect: number;
@@ -33,6 +34,7 @@ const resultSchema = new Schema<ResultProps, Model<ResultProps>>({
   name: { type: String, required: true },
 
   serviceNumber: { type: String, required: true },
+  isNafiam: { type: Boolean, required: true },
   grading: {
     marksObtainable: { type: Number, required: true },
     numberCorrect: { type: Number, required: true },

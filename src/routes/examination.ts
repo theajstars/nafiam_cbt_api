@@ -651,7 +651,7 @@ export default function (app: Express) {
             batchID: batchID,
             studentID: id,
             name: student.name,
-
+            isNafiam: examination.isNafiam,
             serviceNumber: student.serviceNumber,
             ...result,
           }).save();
