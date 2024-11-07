@@ -343,7 +343,6 @@ function default_1(app) {
                 id: batchID,
             }, { completed: true });
             const b = yield Batch_1.Batch.findOne({ id: batchID });
-            console.log("Is fucking completed", b.completed);
             res.json({
                 statusCode: 200,
                 status: true,

@@ -466,7 +466,6 @@ export default function (app: Express) {
         );
 
         const b = await Batch.findOne({ id: batchID });
-        console.log("Is fucking completed", b.completed);
 
         res.json({
           statusCode: 200,
