@@ -579,6 +579,27 @@ function default_1(app) {
             });
         }
     }));
+    app.post(`${basePath}/batches/get-completed`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { token, page, limit } = req.body;
+        const { id, user } = (0, JWT_1.verifyToken)(token);
+        if (id && user) {
+            const batches = yield Batch_1.Batch.find({ completed: true }, {}, {
+                skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
+                limit,
+            });
+            const attendances = yield Attendance_1.Attendance.find();
+            const results = yield Results_1.Result.find();
+            res.json({
+                statusCode: 200,
+                status: true,
+                message: "Examinations found!",
+                data: { batches, attendances, results },
+            });
+        }
+        else {
+            res.json(Misc_1.UnauthorizedResponseObject);
+        }
+    }));
 }
 exports.default = default_1;
 //# sourceMappingURL=examination.js.map

@@ -756,4 +756,34 @@ export default function (app: Express) {
       }
     }
   );
+  app.post(
+    `${basePath}/batches/get-completed`,
+
+    async (req, res) => {
+      const { token, page, limit } = req.body;
+      const { id, user } = verifyToken(token);
+      if (id && user) {
+        const batches = await Batch.find(
+          { completed: true },
+
+          {},
+
+          {
+            skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
+            limit,
+          }
+        );
+        const attendances = await Attendance.find();
+        const results = await Result.find();
+        res.json({
+          statusCode: 200,
+          status: true,
+          message: "Examinations found!",
+          data: { batches, attendances, results },
+        });
+      } else {
+        res.json(UnauthorizedResponseObject);
+      }
+    }
+  );
 }
