@@ -137,7 +137,8 @@ export const validateStudentSubmissionRequest = (req, res, next) => {
 };
 const studentBlacklistSchema = Joi.object({
   token: Joi.string().required(),
-  examinationID: Joi.string().required(),
+  examinationID: Joi.string().optional(),
+  batchID: Joi.string().optional(),
   studentID: Joi.string().required(),
   action: Joi.string().required(),
 });

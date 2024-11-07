@@ -549,10 +549,10 @@ export default function (app: Express) {
     `${basePath}/blacklist/get`,
     validateDefaultExaminationRequest,
     async (req, res) => {
-      const { token, examinationID } = req.body;
+      const { token, batchID } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user !== "student") {
-        const examination = await Examination.findOne({ id: examinationID });
+        const examination = await Batch.findOne({ id: batchID });
         res.json({
           status: true,
           statusCode: 200,
@@ -567,13 +567,13 @@ export default function (app: Express) {
     `${basePath}/blacklist/update`,
     validateStudentBlacklistRequest,
     async (req, res) => {
-      const { token, examinationID, studentID, action } = req.body;
+      const { token, batchID, studentID, action } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         if (action === "blacklist") {
           //Add Student to examination blacklist
-          const examination = await Examination.findOneAndUpdate(
-            { id: examinationID },
+          const examination = await Batch.findOneAndUpdate(
+            { id: batchID },
             { $push: { blacklist: studentID } }
           );
           res.json({
@@ -582,12 +582,12 @@ export default function (app: Express) {
             message: `Student has been blacklisted from ${examination.title}`,
           });
         } else {
-          const examination = await Examination.findOne({ id: examinationID });
+          const examination = await Batch.findOne({ id: batchID });
           const newBlacklist = examination.blacklist.filter(
             (s) => s !== studentID
           );
-          await Examination.findOneAndUpdate(
-            { id: examinationID },
+          await Batch.findOneAndUpdate(
+            { id: batchID },
             { blacklist: newBlacklist }
           );
           res.json({
