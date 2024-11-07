@@ -457,12 +457,12 @@ export default function (app: Express) {
     `${basePath}/end`,
     validateDefaultExaminationRequest,
     async (req, res) => {
-      const { token, examinationID } = req.body;
+      const { token, batchID } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
-        const examination = await Examination.findOneAndUpdate(
+        const examination = await Batch.findOneAndUpdate(
           {
-            id: examinationID,
+            id: batchID,
           },
           { completed: true }
         );
