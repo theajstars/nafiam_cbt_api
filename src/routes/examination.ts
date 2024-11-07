@@ -393,13 +393,13 @@ export default function (app: Express) {
     `${basePath}/change-password`,
     validateDefaultExaminationRequest,
     async (req, res) => {
-      const { token, examinationID } = req.body;
+      const { token, batchID } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
         const password = generateRandomString(6, "ALPHABET").toUpperCase();
-        await Examination.findOneAndUpdate(
+        await Batch.findOneAndUpdate(
           {
-            id: examinationID,
+            id: batchID,
           },
           { started: true, password }
         );
