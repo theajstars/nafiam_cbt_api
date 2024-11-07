@@ -370,7 +370,6 @@ function default_2(app) {
             const instructorExists = yield Instructor_1.Instructor.findOne({
                 $or: [{ email: email }, { serviceNumber }],
             });
-            console.log({ ment: instructorExists });
             if (!instructorExists || serviceNumber.length === 0) {
                 const saltRounds = 10;
                 const salt = yield bcryptjs_1.default.genSalt(saltRounds);

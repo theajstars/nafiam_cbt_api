@@ -65,7 +65,6 @@ const dbConnectString = process.env.MONGO_URL;
     //     {},
     //     { password: await genPassword("NAFIAM2024") }
     //   );
-    //   console.log("Done!");
     // }
     // blue();
     function createAdmin() {
@@ -87,7 +86,6 @@ const dbConnectString = process.env.MONGO_URL;
         return __awaiter(this, void 0, void 0, function* () {
             const hash = yield (0, Methods_1.genPassword)("NAFIAM2024");
             yield Admin_1.Admin.updateMany({}, { password: hash });
-            console.log("Password has been changed!");
         });
     }
     function DoSomething() {

@@ -236,7 +236,6 @@ function default_1(app) {
     }));
     app.post(`${basePath}/students/unbatched`, (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { token, examinationID, page, limit } = req.body;
-        console.log({ token, examinationID, page, limit });
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user !== "student") {
             const batches = yield Batch_1.Batch.find({ examinationID });
@@ -244,7 +243,6 @@ function default_1(app) {
             batches.map((b) => {
                 batchedStudents = [...batchedStudents, ...b.students];
             });
-            console.log(batchedStudents);
             const students = yield Student_1.Student.find({ id: { $nin: batchedStudents } }, {}, {
                 skip: page === 1 ? 0 : page === 2 ? limit : (page - 1) * limit,
                 limit,
@@ -338,12 +336,14 @@ function default_1(app) {
         }
     }));
     app.post(`${basePath}/end`, examination_1.validateDefaultExaminationRequest, (req, res) => __awaiter(this, void 0, void 0, function* () {
-        const { token, examinationID } = req.body;
+        const { token, batchID } = req.body;
         const { id, user } = (0, JWT_1.verifyToken)(token);
         if (id && user && user === "admin") {
-            const examination = yield Examination_1.Examination.findOneAndUpdate({
-                id: examinationID,
+            yield Batch_1.Batch.updateOne({
+                id: batchID,
             }, { completed: true });
+            const b = yield Batch_1.Batch.findOne({ id: batchID });
+            console.log("Is fucking completed", b.completed);
             res.json({
                 statusCode: 200,
                 status: true,

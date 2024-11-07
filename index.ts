@@ -61,7 +61,6 @@ connect(dbConnectString)
     //     {},
     //     { password: await genPassword("NAFIAM2024") }
     //   );
-    //   console.log("Done!");
     // }
     // blue();
     async function createAdmin() {
@@ -81,7 +80,6 @@ connect(dbConnectString)
     async function changeAdminPassword() {
       const hash = await genPassword("NAFIAM2024");
       await Admin.updateMany({}, { password: hash });
-      console.log("Password has been changed!");
     }
 
     async function DoSomething() {

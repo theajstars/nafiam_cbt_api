@@ -339,7 +339,6 @@ export default function (app: Express) {
   );
   app.post(`${basePath}/students/unbatched`, async (req, res) => {
     const { token, examinationID, page, limit } = req.body;
-    console.log({ token, examinationID, page, limit });
     const { id, user } = verifyToken(token);
     if (id && user && user !== "student") {
       const batches = await Batch.find({ examinationID });
@@ -347,7 +346,6 @@ export default function (app: Express) {
       batches.map((b) => {
         batchedStudents = [...batchedStudents, ...b.students];
       });
-      console.log(batchedStudents);
       const students = await Student.find(
         { id: { $nin: batchedStudents } },
 
@@ -460,12 +458,15 @@ export default function (app: Express) {
       const { token, batchID } = req.body;
       const { id, user } = verifyToken(token);
       if (id && user && user === "admin") {
-        const examination = await Batch.findOneAndUpdate(
+        await Batch.updateOne(
           {
             id: batchID,
           },
           { completed: true }
         );
+
+        const b = await Batch.findOne({ id: batchID });
+        console.log("Is fucking completed", b.completed);
 
         res.json({
           statusCode: 200,

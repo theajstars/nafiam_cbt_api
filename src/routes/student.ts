@@ -21,7 +21,6 @@ export default function (app: Express) {
   app.post(`${basePath}/login`, validateLoginRequest, async (req, res) => {
     const { id, password, navigatorObject } = req.body;
     const student = await Student.findOne({ serviceNumber: id.toUpperCase() });
-    console.log(id, student, student.password, password);
     if (student) {
       const isPasswordCorrect = await bcrypt.compare(
         password,
